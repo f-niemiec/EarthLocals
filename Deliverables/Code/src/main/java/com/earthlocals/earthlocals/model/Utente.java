@@ -40,8 +40,8 @@ public class Utente implements Serializable, UserDetails {
     @Column(nullable = false)
     private Character sesso;
 
-    @Column(nullable = false)
-    private String nazionalita;
+    @ManyToOne(optional = false)
+    private Paese nazionalita;
 
     @Column(nullable = false)
     private Boolean pending;
