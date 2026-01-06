@@ -2,6 +2,10 @@ package com.earthlocals.earthlocals.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.jspecify.annotations.NullMarked;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
@@ -11,7 +15,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(builderMethodName = "utenteBuilder")
-public class Utente implements Serializable{
+public class Utente implements Serializable, UserDetails {
 
     @Id
     @GeneratedValue
@@ -69,5 +73,22 @@ public class Utente implements Serializable{
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Collection<Ruolo> ruoli;
+    @Override
+    @NullMarked
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return this.ruoli;
+    }
 
+    @Override
+    @NullMarked
+    public String getUsername() {
+        return this.email;
+
+    }
+
+
+    @Override
+    public boolean isEnabled() {
+        return !this.pending;
+    }
 }

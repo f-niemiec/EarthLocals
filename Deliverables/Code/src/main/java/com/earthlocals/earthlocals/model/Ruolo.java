@@ -2,6 +2,9 @@ package com.earthlocals.earthlocals.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.jspecify.annotations.Nullable;
+import org.springframework.security.core.GrantedAuthority;
+
 import java.io.Serializable;
 import java.util.Collection;
 
@@ -9,7 +12,7 @@ import java.util.Collection;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Ruolo implements Serializable{
+public class Ruolo implements Serializable, GrantedAuthority {
 
     public static final String ACCOUNT_MANAGER = "ROLE_ACCOUNT_MANAGER";
     public static final String VOLUNTEER = "ROLE_VOLUNTEER";
@@ -31,5 +34,10 @@ public class Ruolo implements Serializable{
 
     public Ruolo(String nome) {
         this.nome = nome;
+    }
+
+    @Override
+    public @Nullable String getAuthority() {
+        return nome;
     }
 }
