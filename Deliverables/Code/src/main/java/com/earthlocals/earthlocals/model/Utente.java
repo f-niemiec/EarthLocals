@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Set;
 
 @Entity
 @Data
@@ -40,7 +41,7 @@ public class Utente implements Serializable, UserDetails {
     @Column(nullable = false)
     private Character sesso;
 
-    @ManyToOne(optional = false)
+    @ManyToOne
     private Paese nazionalita;
 
     @Column(nullable = false)
@@ -54,13 +55,18 @@ public class Utente implements Serializable, UserDetails {
 
     private Date tempPwdScadenza;
 
-    //TODO recensioniScritte
-    //TODO recensioniRicevute
-    //TODO candidature
-    //TODO gestione ruolo volontario
+    @OneToMany(mappedBy = "autore")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Set<Recensione> recensioniScritte;
+
+    @OneToMany(mappedBy = "destinatario")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Set<Recensione> recensioniRicevute;
 
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "ruoli_utenti",
             joinColumns = @JoinColumn(
@@ -73,6 +79,8 @@ public class Utente implements Serializable, UserDetails {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Collection<Ruolo> ruoli;
+
+
     @Override
     @NullMarked
     public Collection<? extends GrantedAuthority> getAuthorities() {
