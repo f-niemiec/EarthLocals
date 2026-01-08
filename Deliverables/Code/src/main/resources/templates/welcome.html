@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+
+<!--th:replace="~{fragments/layout :: layout (~{::body},'home')}"-->
+
+<html layout:decorate="~{fragments/layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="https://www.thymeleaf.org">
+
+<body>
+
+<th:block layout:fragment="content">
+
+    <div class="row">
+        <div class="col-md-12 d-flex justify-content-center flex-column align-items-center" id="bannerHomePage">
+            <h2>Volunteering made easy!</h2>
+            <p>"Nessuno è inutile in questo mondo se alleggerisce il fardello di qualcun altro." <br> - Gustave Flaubert</p>
+        </div>
+    </div>
+</th:block>
+
+</body>
+
+</html>

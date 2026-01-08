@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+
+<html lang="it"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:th="https://www.thymeleaf.org">
+
+<body>
+
+<nav class="navbar navbar-expand-lg bg-body-tertiary py-3" th:fragment="header">
+    <div class="container-xl">
+        <a class="navbar-brand d-lg-none" href="/">
+            <img alt="EarthLocals" th:src="@{/resources/images/logo.png}" width="200"/>
+        </a>
+        <button aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"
+                class="navbar-toggler"
+                data-bs-target="#navbarSupportedContent" data-bs-toggle="collapse" type="button">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <div class="navbar-nav mb-2 mb-lg-0 flex-lg-grow-1 align-items-lg-center mt-3 mt-lg-0"
+                 id="navbarNavContent">
+                <div class="d-flex flex-column flex-lg-row">
+                    <a aria-current="page" class="nav-link" href="#">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        Opportunità
+                    </a>
+                    <a aria-current="page" class="nav-link" href="#">Help</a>
+                    <a aria-current="page" class="nav-link" href="#">Community</a>
+                </div>
+                <div>
+                    <a class="navbar-brand d-none d-lg-block" href="/">
+                        <img alt="EarthLocals" th:src="@{/resources/images/logo.png}" width="200"/>
+                    </a>
+                </div>
+                <div class="d-flex flex-column flex-lg-row column-gap-3">
+                    <div sec:authorize="isAnonymous()" style="display: contents">
+                        <a class="nav-link" href="/registration/organizer">
+                            Diventa organizzatore
+                        </a>
+                        <a class="nav-link" href="/login">
+                            <i class="fa-solid fa-circle-user"></i>
+                            Log-in
+                        </a>
+                        <a class="nav-link border rounded-pill px-3 py-2" href="/registration/volunteer">Iscriviti</a>
+                    </div>
+                    <th:block sec:authorize="isAuthenticated()">
+                        <a class="nav-link" href="/account/edit">
+                            <i class="fa-solid fa-circle-user"></i>
+                            Profilo
+                        </a>
+                        <form class="d-flex align-items-center" method="post" th:action="@{/logout}">
+                            <button class="nav-link btn btn-link" type="submit">
+                                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                                Log out
+                            </button>
+                        </form>
+                    </th:block>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</nav>
+</body>
+
+</html>

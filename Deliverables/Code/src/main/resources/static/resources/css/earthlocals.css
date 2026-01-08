@@ -1,0 +1,38 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+#bannerHomePage {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("/resources/images/we the people.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    padding: 200px;
+}
+
+/*
+lg media queries
+ */
+@media (min-width: 992px) {
+
+    #navbarNavContent {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        justify-content: center;
+    }
+
+    #navbarNavContent :last-child {
+        justify-self: end;
+
+    }
+
+    #navbarNavContent :first-child {
+        justify-self: start;
+
+    }
+}
