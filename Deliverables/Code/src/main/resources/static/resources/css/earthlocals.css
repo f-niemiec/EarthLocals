@@ -11,6 +11,16 @@
     max-width: 400px;
 }
 
+#registrationFormContainer {
+    max-width: 900px;
+}
+
+#registrationForm {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-gap: 1rem;
+}
+
 #bannerHomePage {
     background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("/resources/images/homebanner.png");
     background-repeat: no-repeat;
@@ -39,6 +49,16 @@ lg media queries
     #navbarNavContent :first-child {
         justify-self: start;
 
+    }
+
+    #registrationForm {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-gap: 1rem;
+    }
+
+    #submitContainerRegistrationForm {
+        grid-column-start: span 2;
     }
 
     .box-border-form {
