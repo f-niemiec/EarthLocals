@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+
+<!--th:replace="~{fragments/layout :: layout (~{::body},'Registration')}" -->
+<html layout:decorate="~{fragments/layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="https://www.thymeleaf.org">
+<body>
+<th:block layout:fragment="content">
+    <h1 class="mx-auto text-center my-5">Registrazione organizzatore</h1>
+    <div class="mx-lg-auto mb-4 box-border-form rounded-3" id="registrationFormContainer">
+        <div class=" p-4">
+
+            <div class="alert alert-danger" th:if="${param.error}">
+                E-mail o password non valida
+            </div>
+            <form class="" enctype="multipart/form-data" id="registrationForm" method="post"
+                  th:action="@{/registration/organizer}"
+                  th:object="${user}">
+                <div>
+                    <label class="form-label" for="firstNameRegistrationForm">Nome</label>
+                    <input class="form-control" id="firstNameRegistrationForm" placeholder="Mario" required
+                           th:classappend="${#fields.hasErrors('nome')} ? 'is-invalid' : ''"
+                           th:field="*{nome}"
+                           type="text"/>
+                    <div class="invalid-feedback" th:each="error : ${#fields.errors('nome')}" th:text="${error}"></div>
+                </div>
+                <div>
+                    <label class="form-label" for="lastNameRegistrationForm">Cognome</label>
+                    <input class="form-control" id="lastNameRegistrationForm" placeholder="Rossi" required
+                           th:classappend="${#fields.hasErrors('cognome')} ? 'is-invalid' : ''"
+                           th:field="*{cognome}" type="text"/>
+                    <div class="invalid-feedback" th:each="error : ${#fields.errors('cognome')}"
+                         th:text="${error}"></div>
+                </div>
+                <div>
+                    <label class="form-label" for="emailRegistrationForm">E-mail</label>
+                    <input class="form-control" id="emailRegistrationForm" placeholder="mario.rossi@example.com"
+                           required
+                           th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''"
+                           th:field="*{email}" type="email"/>
+                    <div class="invalid-feedback" th:each="error : ${#fields.errors('email')}" th:text="${error}"></div>
+                </div>
+                <div class="d-none d-lg-block">
+                </div>
+                <div>
+                    <label class="form-label" for="passwordRegistrationForm">Password</label>
+                    <input class="form-control" id="passwordRegistrationForm" placeholder="Password" required
+                           th:classappend="${#fields.hasErrors('password')} ? 'is-invalid' : ''"
+                           th:field="*{password}" type="password"/>
+                    <div class="invalid-feedback" th:each="error : ${#fields.errors('password')}"
+                         th:text="${error}"></div>
+                </div>
+                <div>
+                    <label class="form-label" for="confirmPasswordRegistrationForm">Conferma password</label>
+                    <input class="form-control" id="confirmPasswordRegistrationForm" placeholder="Conferma password"
+                           required
+                           th:classappend="${#fields.hasErrors('matchingPassword')} ? 'is-invalid' : ''"
+                           th:field="*{matchingPassword}"
+                           type="password">
+                    <div class="invalid-feedback" th:each="error : ${#fields.errors('matchingPassword')}"
+                         th:text="${error}"></div>
+                </div>
+                <div>
+                    <label class="form-label" for="nazionalitaRegistrationForm">Nazionalità</label>
+                    <select class="form-select" id="nazionalitaRegistrationForm" required
+                            th:classappend="${#fields.hasErrors('nazionalita')} ? 'is-invalid' : ''" th:field="*{nazionalita}">
+                        <th:block th:each="paese:${paesi}">
+                            <option th:value="${paese.id}" th:text="${paese.nome}"></option>
+                        </th:block>
+                    </select>
+                    <div class="invalid-feedback" th:each="error : ${#fields.errors('nazionalita')}"
+                         th:text="${error}"></div>
+                </div>
+                <div>
+                    <label class="form-label" for="dataNascitaRegistrationForm">Data di nascita</label>
+                    <input class="form-control" id="dataNascitaRegistrationForm"
+                           required
+                           th:classappend="${#fields.hasErrors('dataNascita')} ? 'is-invalid' : ''"
+                           th:field="*{dataNascita}"
+                           type="date">
+                    <div class="invalid-feedback" th:each="error : ${#fields.errors('dataNascita')}"
+                         th:text="${error}"></div>
+                </div>
+                <!--TODO: È davvero necessario?-->
+                <div>
+                    <label class="form-label" for="sessoRegistrationForm">Sesso</label>
+                    <select class="form-select" id="sessoRegistrationForm" required
+                            th:classappend="${#fields.hasErrors('sesso')} ? 'is-invalid' : ''"
+                            th:field="*{sesso}">
+                        <option selected value="F">Femmina</option>
+                        <option value="M">Maschio</option>
+                    </select>
+                    <div class="invalid-feedback" th:each="error : ${#fields.errors('sesso')}"
+                         th:text="${error}"></div>
+                </div>
+                <div class="d-none d-lg-block">
+                </div>
+                <div class="mt-4" id="submitContainerRegistrationForm">
+                    <input class="btn border rounded-pill w-100" type="submit" value="Registrati"/>
+                </div>
+            </form>
+        </div>
+
+        <div class="p-4 bg-body-tertiary center text-center rounded-bottom-3">
+            <div>Sei un volontario?</div>
+            <div><a href="/registration/volunteer">Clicca qui!</a></div>
+        </div>
+    </div>
+</th:block>
+</body>
+</html>
