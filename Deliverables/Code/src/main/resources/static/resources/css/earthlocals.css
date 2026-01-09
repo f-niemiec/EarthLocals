@@ -6,6 +6,11 @@
     padding: 0;
 }
 
+
+.mw-400 {
+    max-width: 400px;
+}
+
 #bannerHomePage {
     background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("/resources/images/homebanner.png");
     background-repeat: no-repeat;
@@ -34,5 +39,9 @@ lg media queries
     #navbarNavContent :first-child {
         justify-self: start;
 
+    }
+
+    .box-border-form {
+        border: var(--bs-border-width) var(--bs-border-style) var(--bs-border-color) !important
     }
 }
