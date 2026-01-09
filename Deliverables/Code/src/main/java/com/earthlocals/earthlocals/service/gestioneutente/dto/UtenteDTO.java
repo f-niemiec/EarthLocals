@@ -1,4 +1,4 @@
-package com.earthlocals.earthlocals.gestioneutente.dto;
+package com.earthlocals.earthlocals.service.gestioneutente.dto;
 
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;

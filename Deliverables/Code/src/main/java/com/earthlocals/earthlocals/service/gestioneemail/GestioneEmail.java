@@ -1,4 +1,4 @@
-package com.earthlocals.earthlocals.gestioneemail;
+package com.earthlocals.earthlocals.service.gestioneemail;
 
 import com.earthlocals.earthlocals.model.*;
 import lombok.RequiredArgsConstructor;

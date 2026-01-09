@@ -1,6 +1,6 @@
 package com.earthlocals.earthlocals.system;
 
-import com.earthlocals.earthlocals.gestioneutente.dto.UtenteDTO;
+import com.earthlocals.earthlocals.service.gestioneutente.dto.UtenteDTO;
 import com.earthlocals.earthlocals.model.Paese;
 import com.earthlocals.earthlocals.model.PaeseRepository;
 import org.springframework.data.domain.Sort;

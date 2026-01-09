@@ -43,7 +43,6 @@ public class Missione implements Serializable {
     @Column(columnDefinition = "TEXT")
     private String requisitiExtra;
 
-    //Sinceramente dubbioso su come gestirla
     @Column(nullable = false)
     private String immagine;
 

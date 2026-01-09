@@ -1,4 +1,4 @@
-package com.earthlocals.earthlocals.service.dto;
+package com.earthlocals.earthlocals.service.gestionemissioni.dto;
 
 import com.earthlocals.earthlocals.model.Utente;
 import jakarta.validation.constraints.*;
