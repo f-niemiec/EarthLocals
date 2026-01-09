@@ -1,24 +1,23 @@
 package com.earthlocals.earthlocals.gestioneemail;
 
 import com.earthlocals.earthlocals.model.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class GestioneEmail {
-    @Autowired
-    private JavaMailSender mailSender;
-    private String warning = "\nEmail generata automaticamente, si prega di non rispondere." +
+
+    final private static String warning = "\nEmail generata automaticamente, si prega di non rispondere." +
             "\nEarthLocals";
-    private String linkBase = "http://localhost:8080/";
-    @Autowired
-    private CandidaturaRepository candidaturaRepository;
-    @Autowired
-    private MissioneRepository missioneRepository;
-    @Autowired
-    private UtenteRepository utenteRepository;
+    final private static String linkBase = "http://localhost:8080/";
+
+    final private JavaMailSender mailSender;
+    final private CandidaturaRepository candidaturaRepository;
+    final private MissioneRepository missioneRepository;
+    final private UtenteRepository utenteRepository;
 
     public void inviaEmailCandidatura(Long id) {
         Candidatura candidatura = candidaturaRepository.findById(id).orElseThrow();
