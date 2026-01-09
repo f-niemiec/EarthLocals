@@ -28,8 +28,7 @@ public class Missione implements Serializable {
     @Column(nullable = false)
     private String citta;
 
-    @Column(nullable = false)
-    @Lob
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String descrizione;
 
     @Column(nullable = false)
@@ -38,11 +37,10 @@ public class Missione implements Serializable {
     @Column(nullable = false)
     private Date dataFine;
 
-    @Column(nullable = false)
-    @Lob
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String competenzeRichieste;
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String requisitiExtra;
 
     //Sinceramente dubbioso su come gestirla
