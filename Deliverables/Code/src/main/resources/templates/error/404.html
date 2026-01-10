@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html layout:decorate="~{fragments/layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="https://www.thymeleaf.org">
+
+<body>
+
+<th:block layout:fragment="content">
+  <div class="row">
+    <div class="col-md-12 d-flex justify-content-center flex-column align-items-center" style="margin-top:50px;">
+      <h2>404 - Pagina non trovata! </h2>
+      <p>Ci dispiace, la pagina che stai cercando non esiste.</p>
+      <a class="btn btn-primary" th:href="@{/}">Torna alla Home</a>
+    </div>
+  </div>
+</th:block>
+
+</body>
+</html>
