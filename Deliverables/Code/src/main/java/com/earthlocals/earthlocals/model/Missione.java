@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
 
+//Probabilmente da reworkare per gestire meglio lo stato
 @Entity
 @Data
 @NoArgsConstructor
@@ -63,6 +64,24 @@ public class Missione implements Serializable {
         COMPLETATA,
         ANNULLATA,
         PENDING,
+    }
+
+    //Probabilmente da rivedere perchè ha più senso definirne una accettata
+    public boolean accettaMissione() {
+        if (stato.equals(MissioneStato.PENDING)) {
+            stato = MissioneStato.IN_CORSO;
+            return true;
+        }
+        return false;
+    }
+
+    //Idem da rivedere, forse definirne una rifiutata
+    public boolean rifiutaMissione() {
+        if (stato.equals(MissioneStato.PENDING)) {
+            stato = MissioneStato.ANNULLATA;
+            return true;
+        }
+        return false;
     }
 
 }
