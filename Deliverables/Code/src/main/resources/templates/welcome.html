@@ -9,18 +9,19 @@
 <body>
 
 <th:block layout:fragment="banner">
-
-    <div class="row">
-        <div class="col-md-12 d-flex justify-content-center flex-column align-items-center" id="bannerHomePage">
-            <h2 class="display-1 text-white text-center fw-bold mb-4">Volunteering made easy!</h2>
-            <p class="lead text-white text-center mb-5 d-flex justify-content-sm-center">
-                <span class="col-12 col-sm-10 col-md-8 col-xxl-7">There are three ways to ultimate success: The first way is to be kind. The second way is to be kind. The third way is to be kind.</span>
-            </p>
-            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-                <a class="btn bsb-btn-2xl btn-outline-light" th:href="@{/mission/find_mission}">Esplora le
-                    opportunità!</a>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12 d-flex justify-content-center flex-column align-items-center" id="bannerHomePage">
+                <h2 class="display-1 text-white text-center fw-bold mb-4">Volunteering made easy!</h2>
+                <p class="lead text-white text-center mb-5 d-flex justify-content-sm-center">
+                    <span class="col-12 col-sm-10 col-md-8 col-xxl-7">There are three ways to ultimate success: The first way is to be kind. The second way is to be kind. The third way is to be kind.</span>
+                </p>
+                <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                    <a class="btn bsb-btn-2xl btn-outline-light" th:href="@{/mission/find_mission}">Esplora le
+                        opportunità!</a>
+                </div>
+                <!--            <p>"Nessuno è inutile in questo mondo se alleggerisce il fardello di qualcun altro." <br> - Gustave Flaubert</p>-->
             </div>
-            <!--            <p>"Nessuno è inutile in questo mondo se alleggerisce il fardello di qualcun altro." <br> - Gustave Flaubert</p>-->
         </div>
     </div>
 </th:block>
