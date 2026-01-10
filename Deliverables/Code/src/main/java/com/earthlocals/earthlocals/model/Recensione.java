@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Data
@@ -30,7 +30,7 @@ public class Recensione implements Serializable {
     private Integer voto;
 
     @Column(nullable = false)
-    private Date dataRecensione;
+    private LocalDate dataRecensione;
 
     private String testoRecensione;
 }

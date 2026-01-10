@@ -7,8 +7,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Set;
 
 @Entity
@@ -36,7 +37,7 @@ public class Utente implements Serializable, UserDetails {
     private String password;
 
     @Column(nullable = false)
-    private Date dataNascita;
+    private LocalDate dataNascita;
 
     @Column(nullable = false)
     private Character sesso;
@@ -53,7 +54,7 @@ public class Utente implements Serializable, UserDetails {
 
     private String tempPassword;
 
-    private Date tempPwdScadenza;
+    private LocalDateTime tempPwdScadenza;
 
     @OneToMany(mappedBy = "autore")
     @ToString.Exclude

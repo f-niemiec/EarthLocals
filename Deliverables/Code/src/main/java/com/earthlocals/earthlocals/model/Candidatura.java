@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Data
@@ -16,7 +16,7 @@ public class Candidatura implements Serializable {
     @GeneratedValue
     @Setter(AccessLevel.NONE)
     private Long id;
-    private Date dataCandidatura;
+    private LocalDate dataCandidatura;
 
     @Enumerated(EnumType.STRING)
     private CandidaturaStato stato;
