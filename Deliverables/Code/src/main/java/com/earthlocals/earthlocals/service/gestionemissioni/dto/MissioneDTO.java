@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
@@ -32,12 +32,12 @@ public class MissioneDTO {
     @NotNull(message = "La data di inizio è obbligatoria")
     @FutureOrPresent(message = "La missione non può iniziare nel passato")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date dataInizio;
+    private LocalDate dataInizio;
 
     @NotNull(message = "La data di fine è obbligatoria")
     @Future(message = "La data di fine deve essere nel futuro")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date dataFine;
+    private LocalDate dataFine;
 
     @NotBlank(message = "Le competenze richieste sono obbligatorie")
     private String competenzeRichieste;

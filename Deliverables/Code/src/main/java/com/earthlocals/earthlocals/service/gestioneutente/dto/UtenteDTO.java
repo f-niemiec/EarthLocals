@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
@@ -61,7 +61,7 @@ public class UtenteDTO {
     @NotNull
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Past(message = "La data di nascita inserita non è valida")
-    private Date dataNascita;
+    private LocalDate dataNascita;
 
 
     @NotNull

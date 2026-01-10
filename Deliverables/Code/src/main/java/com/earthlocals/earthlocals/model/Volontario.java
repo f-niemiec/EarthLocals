@@ -4,8 +4,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import lombok.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Set;
 
 @EqualsAndHashCode(callSuper = true)
@@ -15,8 +16,8 @@ import java.util.Set;
 public class Volontario extends Utente {
 
     private String numeroPassaporto;
-    private Date dataScadenzaPassaporto;
-    private Date dataEmissionePassaporto;
+    private LocalDate dataScadenzaPassaporto;
+    private LocalDate dataEmissionePassaporto;
     private String pathPassaporto;
 
     @OneToMany(mappedBy = "candidato")
@@ -26,7 +27,7 @@ public class Volontario extends Utente {
 
 
     @Builder(builderMethodName = "volontarioBuilder")
-    public Volontario(Long id, String nome, String cognome, String email, String password, Date dataNascita, Character sesso, Paese nazionalita, Boolean pending, String bio, String fotoProfilo, String tempPassword, Date tempPwdScadenza, Set<Recensione> recensioniScritte, Set<Recensione> recensioniRicevute, Set<Candidatura> candidature, String numeroPassaporto, Date dataScadenzaPassaporto, Date dataEmissionePassaporto, String pathPassaporto, Collection<Ruolo> ruoli) {
+    public Volontario(Long id, String nome, String cognome, String email, String password, LocalDate dataNascita, Character sesso, Paese nazionalita, Boolean pending, String bio, String fotoProfilo, String tempPassword, LocalDateTime tempPwdScadenza, Set<Recensione> recensioniScritte, Set<Recensione> recensioniRicevute, Set<Candidatura> candidature, String numeroPassaporto, LocalDate dataScadenzaPassaporto, LocalDate dataEmissionePassaporto, String pathPassaporto, Collection<Ruolo> ruoli) {
         super(id, nome, cognome, email, password, dataNascita, sesso, nazionalita, pending, bio, fotoProfilo, tempPassword, tempPwdScadenza, recensioniScritte, recensioniRicevute, ruoli);
         this.numeroPassaporto = numeroPassaporto;
         this.dataScadenzaPassaporto = dataScadenzaPassaporto;

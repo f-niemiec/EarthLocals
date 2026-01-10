@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.Set;
 
 //Probabilmente da reworkare per gestire meglio lo stato
@@ -33,10 +33,10 @@ public class Missione implements Serializable {
     private String descrizione;
 
     @Column(nullable = false)
-    private Date dataInizio;
+    private LocalDate dataInizio;
 
     @Column(nullable = false)
-    private Date dataFine;
+    private LocalDate dataFine;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String competenzeRichieste;
@@ -59,13 +59,6 @@ public class Missione implements Serializable {
     @ManyToOne(optional = false)
     private Utente creatore;
 
-    public enum MissioneStato {
-        IN_CORSO,
-        COMPLETATA,
-        ANNULLATA,
-        PENDING,
-    }
-
     //Probabilmente da rivedere perchè ha più senso definirne una accettata
     public boolean accettaMissione() {
         if (stato.equals(MissioneStato.PENDING)) {
@@ -82,6 +75,13 @@ public class Missione implements Serializable {
             return true;
         }
         return false;
+    }
+
+    public enum MissioneStato {
+        IN_CORSO,
+        COMPLETATA,
+        ANNULLATA,
+        PENDING,
     }
 
 }
