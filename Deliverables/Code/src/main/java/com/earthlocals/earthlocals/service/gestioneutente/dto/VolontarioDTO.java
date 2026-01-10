@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -27,12 +27,12 @@ public class VolontarioDTO extends UtenteDTO {
     @NotNull
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @FutureOrPresent(message = "La data di scadenza del passaporto inserita non è valida")
-    private Date dataScadenzaPassaporto;
+    private LocalDate dataScadenzaPassaporto;
 
     @NotNull
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @PastOrPresent(message = "La data di emissione del passaporto inserita non è valida")
-    private Date dataEmissionePassaporto;
+    private LocalDate dataEmissionePassaporto;
 
     @NotNull
     private MultipartFile passaporto;
