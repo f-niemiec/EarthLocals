@@ -1,17 +1,18 @@
 package com.earthlocals.earthlocals.service.gestioneutente.passport;
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
 
 @Service
+@Transactional
 public class PassportFilesystemStorage implements PassportStorageService {
 
     @Value("${earthlocalsfiles.passport}")
@@ -20,24 +21,17 @@ public class PassportFilesystemStorage implements PassportStorageService {
 
     @Override
     public String acceptUpload(MultipartFile file) throws IOException {
-        var newName = UUID.randomUUID().toString() + "-" + file.getOriginalFilename();
+        var newName = UUID.randomUUID() + "-" + file.getOriginalFilename();
         var target = getPathPassaport(newName);
 
-        try (InputStream in = file.getInputStream()) {
-            Files.copy(in, target);
-        }
+        file.transferTo(target);
 
         return newName;
     }
 
-    @Override
-    public InputStream downloadFile(String fileName) throws IOException {
-        var path = getPathPassaport(fileName);
-        return Files.newInputStream(path);
-    }
 
     @Override
-    public FileSystemResource downloadFileResource(String fileName) {
+    public FileSystemResource downloadFile(String fileName) {
         var path = getPathPassaport(fileName);
         return new FileSystemResource(path);
     }

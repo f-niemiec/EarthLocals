@@ -2,7 +2,7 @@ package com.earthlocals.earthlocals.service.gestionemissioni;
 
 import com.earthlocals.earthlocals.model.*;
 import com.earthlocals.earthlocals.service.gestionemissioni.dto.MissioneDTO;
-import com.earthlocals.earthlocals.service.gestionemissioni.exception.MissioneNotAcceptableException;
+import com.earthlocals.earthlocals.service.gestionemissioni.exceptions.MissioneNotAcceptableException;
 import com.earthlocals.earthlocals.service.gestionemissioni.pictures.PicturesStorageService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

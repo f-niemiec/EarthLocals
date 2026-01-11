@@ -1,8 +1,12 @@
 package com.earthlocals.earthlocals.service.gestioneutente;
 
 import com.earthlocals.earthlocals.model.*;
-import com.earthlocals.earthlocals.service.gestioneutente.dto.*;
-import com.earthlocals.earthlocals.service.gestioneutente.exception.UserAlreadyExistsException;
+import com.earthlocals.earthlocals.service.gestioneutente.dto.EditPasswordDTO;
+import com.earthlocals.earthlocals.service.gestioneutente.dto.EditUtenteDTO;
+import com.earthlocals.earthlocals.service.gestioneutente.dto.UtenteDTO;
+import com.earthlocals.earthlocals.service.gestioneutente.dto.VolontarioDTO;
+import com.earthlocals.earthlocals.service.gestioneutente.exceptions.UserAlreadyExistsException;
+import com.earthlocals.earthlocals.service.gestioneutente.exceptions.WrongPasswordException;
 import com.earthlocals.earthlocals.service.gestioneutente.passport.PassportStorageService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +17,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.io.InputStream;
 import java.util.Collections;
 
 @Service
@@ -29,9 +32,7 @@ public class GestioneUtente {
     final private PaeseRepository paeseRepository;
 
     public Utente registerVolunteer(VolontarioDTO volontarioDTO) throws UserAlreadyExistsException {
-        if (emailExists(volontarioDTO.getEmail())) {
-            throw new UserAlreadyExistsException();
-        }
+        checkUserExists(volontarioDTO.getEmail());
         Paese p = paeseRepository.findById(volontarioDTO.getNazionalita()).orElseThrow();
         Ruolo ruolo = ruoloRepository.findByNome(Ruolo.VOLUNTEER);
 
@@ -44,7 +45,7 @@ public class GestioneUtente {
         utenteBuilder.dataNascita(volontarioDTO.getDataNascita());
         utenteBuilder.sesso(volontarioDTO.getSesso());
         utenteBuilder.nazionalita(p);
-        utenteBuilder.pending(false); // TODO: Conferma registrazione
+        utenteBuilder.pending(true);
         utenteBuilder.ruoli(Collections.singletonList(ruolo));
         utenteBuilder.numeroPassaporto(volontarioDTO.getNumeroPassaporto());
         utenteBuilder.dataScadenzaPassaporto(volontarioDTO.getDataScadenzaPassaporto());
@@ -62,9 +63,8 @@ public class GestioneUtente {
     }
 
     public Utente registerOrganizer(UtenteDTO utenteDTO) throws UserAlreadyExistsException {
-        if (emailExists(utenteDTO.getEmail())) {
-            throw new UserAlreadyExistsException();
-        }
+        checkUserExists(utenteDTO.getEmail());
+
         Paese p = paeseRepository.findById(utenteDTO.getNazionalita()).orElseThrow();
         Ruolo ruolo = ruoloRepository.findByNome(Ruolo.ORGANIZER);
 
@@ -78,7 +78,7 @@ public class GestioneUtente {
         utenteBuilder.dataNascita(utenteDTO.getDataNascita());
         utenteBuilder.sesso(utenteDTO.getSesso());
         utenteBuilder.nazionalita(p);
-        utenteBuilder.pending(false); // TODO: Conferma registrazione
+        utenteBuilder.pending(true);
         utenteBuilder.ruoli(Collections.singletonList(ruolo));
 
         var utente = utenteBuilder.build();
@@ -87,8 +87,11 @@ public class GestioneUtente {
         return utente;
     }
 
-    public Utente editUser(Utente utente, EditUtenteDTO editUtenteDTO) {
-        Paese p = paeseRepository.findById(editUtenteDTO.getNazionalita()).orElseThrow();
+    public Utente editUser(EditUtenteDTO editUtenteDTO) {
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        var utente = (Utente) auth.getPrincipal();
+        var p = paeseRepository.findById(editUtenteDTO.getNazionalita()).orElseThrow();
+
         utente.setNome(editUtenteDTO.getNome());
         utente.setCognome(editUtenteDTO.getCognome());
         utente.setEmail(editUtenteDTO.getEmail());
@@ -98,27 +101,33 @@ public class GestioneUtente {
         return utenteRepository.save(utente);
     }
 
-
-    private boolean emailExists(String email) {
-        return utenteRepository.findByEmail(email) != null;
+    public Utente editPassword(EditPasswordDTO editPasswordDTO) throws WrongPasswordException {
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        var utente = (Utente) auth.getPrincipal();
+        if (!passwordEncoder.matches(editPasswordDTO.getCurrentPassword(), utente.getPassword())) {
+            throw new WrongPasswordException();
+        }
+        utente.setPassword(passwordEncoder.encode(editPasswordDTO.getNewPassword()));
+        return utenteRepository.save(utente);
     }
 
-
-    @PreAuthorize("hasRole('VOLUNTEER')")
-    public InputStream getPassportVolontario() throws Exception {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Volontario volontario = (Volontario) auth.getPrincipal();
-        return passportStorageService.downloadFile(volontario.getPathPassaporto());
+    private void checkUserExists(String email) throws UserAlreadyExistsException {
+        var user = utenteRepository.findByEmail(email);
+        if (user == null) {
+            return;
+        }
+        if (!user.getPending()) {
+            throw new UserAlreadyExistsException();
+        }
+        //TODO
+        utenteRepository.delete(user);
     }
+
 
     @PreAuthorize("hasRole('VOLUNTEER')")
     public FileSystemResource getPassportVolontarioFileResource() throws Exception {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Volontario volontario = (Volontario) auth.getPrincipal();
-        return passportStorageService.downloadFileResource(volontario.getPathPassaporto());
+        return passportStorageService.downloadFile(volontario.getPathPassaporto());
     }
-
-    //TODO Logica per cambio password (DTO a parte o EditUtente) (high-priority)
-    //TODO Logica per cambio passaporto (forse DTO a parte)(low-priority)
-
 }
