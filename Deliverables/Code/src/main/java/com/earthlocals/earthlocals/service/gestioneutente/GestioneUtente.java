@@ -14,7 +14,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -27,6 +29,7 @@ public class GestioneUtente {
     final private PasswordEncoder passwordEncoder;
     final private PassportStorageService passportStorageService;
     final private PaeseRepository paeseRepository;
+    final private VerificationTokenRepository verificationTokenRepository;
 
     public Utente registerVolunteer(VolontarioDTO volontarioDTO) throws UserAlreadyExistsException {
         checkUserExists(volontarioDTO.getEmail());
@@ -135,11 +138,28 @@ public class GestioneUtente {
         utenteRepository.delete(user);
     }
 
-
     @PreAuthorize("hasRole('VOLUNTEER')")
     public FileSystemResource getPassportVolontarioFileResource() throws Exception {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Volontario volontario = (Volontario) auth.getPrincipal();
         return passportStorageService.downloadFile(volontario.getPathPassaporto());
+    }
+
+    public String createVerificationToken(Utente utente) {
+        var token = UUID.randomUUID().toString();
+        var verToken = new VerificationToken(utente, token);
+        verificationTokenRepository.save(verToken);
+        return verToken.getToken();
+    }
+
+    public void activateAccount(String token) {
+        var verToken = verificationTokenRepository.findByToken(token).orElseThrow();
+        var utente = verToken.getUtente();
+        if (verToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("Token scaduto");
+        }
+        utente.setPending(false);
+        utenteRepository.save(utente);
+        verificationTokenRepository.delete(verToken);
     }
 }

@@ -8,7 +8,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Set;
 
@@ -52,9 +51,6 @@ public class Utente implements Serializable, UserDetails {
 
     private String fotoProfilo;
 
-    private String tempPassword;
-
-    private LocalDateTime tempPwdScadenza;
 
     @OneToMany(mappedBy = "autore")
     @ToString.Exclude
