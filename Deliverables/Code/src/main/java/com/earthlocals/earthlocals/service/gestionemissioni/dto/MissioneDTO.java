@@ -1,6 +1,7 @@
 package com.earthlocals.earthlocals.service.gestionemissioni.dto;
 
 import com.earthlocals.earthlocals.model.Utente;
+import com.earthlocals.earthlocals.utility.interfaces.DateOverlapVerifier;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,7 +14,7 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class MissioneDTO {
+public class MissioneDTO implements DateOverlapVerifier {
 
     @NotBlank(message = "Il nome della missione è obbligatorio")
     @Size(min = 5, max = 100, message = "Il nome deve essere tra 5 e 100 caratteri")
@@ -48,5 +49,11 @@ public class MissioneDTO {
     private MultipartFile foto;
 
     private Utente creatore;
+
+    @Override
+    public boolean isDateOverlapping() {
+        return dataFine.isBefore(dataInizio);
+    }
+
 }
 
