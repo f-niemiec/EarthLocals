@@ -1,10 +1,7 @@
 package com.earthlocals.earthlocals.service.gestioneutente;
 
 import com.earthlocals.earthlocals.model.*;
-import com.earthlocals.earthlocals.service.gestioneutente.dto.EditPasswordDTO;
-import com.earthlocals.earthlocals.service.gestioneutente.dto.EditUtenteDTO;
-import com.earthlocals.earthlocals.service.gestioneutente.dto.UtenteDTO;
-import com.earthlocals.earthlocals.service.gestioneutente.dto.VolontarioDTO;
+import com.earthlocals.earthlocals.service.gestioneutente.dto.*;
 import com.earthlocals.earthlocals.service.gestioneutente.exceptions.UserAlreadyExistsException;
 import com.earthlocals.earthlocals.service.gestioneutente.exceptions.WrongPasswordException;
 import com.earthlocals.earthlocals.service.gestioneutente.passport.PassportStorageService;
@@ -109,6 +106,21 @@ public class GestioneUtente {
         }
         utente.setPassword(passwordEncoder.encode(editPasswordDTO.getNewPassword()));
         return utenteRepository.save(utente);
+    }
+
+    public Volontario editPassport(EditPassportDTO editPassportDTO) {
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        var volontario = (Volontario) auth.getPrincipal();
+        volontario.setNumeroPassaporto(editPassportDTO.getNumeroPassaporto());
+        volontario.setDataScadenzaPassaporto(editPassportDTO.getDataScadenzaPassaporto());
+        volontario.setDataEmissionePassaporto(editPassportDTO.getDataEmissionePassaporto());
+        passportStorageService.removeFile(volontario.getPathPassaporto());
+        try {
+            volontario.setPathPassaporto(passportStorageService.acceptUpload(editPassportDTO.getPassaporto()));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return volontarioRepository.save(volontario);
     }
 
     private void checkUserExists(String email) throws UserAlreadyExistsException {
