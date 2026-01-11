@@ -6,6 +6,8 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 @Service
 @RequiredArgsConstructor
 public class GestioneEmail {
@@ -98,15 +100,15 @@ public class GestioneEmail {
         mailSender.send(mail);
     }
 
-    public void inviaEmailConferma(Long id) {
-        Utente utente = utenteRepository.findById(id).orElseThrow();
+    public void inviaEmailRecuperoPassword(String email, String token) {
+        Utente utente = Objects.requireNonNull(utenteRepository.findByEmail(email));
         SimpleMailMessage mail = new SimpleMailMessage();
 
         mail.setTo(utente.getEmail());
         mail.setSubject("[Conferma registrazione] Account EarthLocals");
         mail.setText("Gentile, " + utente.getNome() + ", di seguito le inviamo" +
-                " un link per confermare la propria registrazione: " + linkBase +
-                "id=" + id + "password=" + utente.getTempPassword() + "\n" + warning);
+                " un link per effettuare il cambio password: " + linkBase +
+                "resetPasswordConfirm?token=" + token + "\n" + warning);
         mailSender.send(mail);
     }
 
