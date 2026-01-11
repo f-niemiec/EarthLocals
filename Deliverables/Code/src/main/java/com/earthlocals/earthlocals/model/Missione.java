@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Set;
 
-//Probabilmente da reworkare per gestire meglio lo stato
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -55,33 +55,64 @@ public class Missione implements Serializable {
     @EqualsAndHashCode.Exclude
     private Set<Candidatura> candidature;
 
+    @Column(nullable = false)
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
+    private InternalMissioneStato internalStato;
 
     @ManyToOne(optional = false)
     private Utente creatore;
 
-    //Probabilmente da rivedere perchè ha più senso definirne una accettata
+    public MissioneStato getStato() {
+        switch (this.internalStato) {
+            case PENDING -> {
+                return MissioneStato.PENDING;
+            }
+            case RIFIUTATA -> {
+                return MissioneStato.RIFIUTATA;
+            }
+            case ACCETTATA -> {
+                if (dataFine.isBefore(LocalDate.now())) {
+                    return MissioneStato.COMPLETATA;
+                } else {
+                    return MissioneStato.ACCETTATA;
+                }
+            }
+        }
+        return null;
+    }
+
+
     public boolean accettaMissione() {
-        if (stato.equals(MissioneStato.PENDING)) {
-            stato = MissioneStato.IN_CORSO;
+        if (internalStato.equals(InternalMissioneStato.PENDING)) {
+            internalStato = InternalMissioneStato.ACCETTATA;
             return true;
         }
         return false;
     }
 
-    //Idem da rivedere, forse definirne una rifiutata
     public boolean rifiutaMissione() {
-        if (stato.equals(MissioneStato.PENDING)) {
-            stato = MissioneStato.ANNULLATA;
+        if (internalStato.equals(InternalMissioneStato.PENDING)) {
+            internalStato = InternalMissioneStato.RIFIUTATA;
             return true;
         }
         return false;
     }
+
+
+    public enum InternalMissioneStato {
+        PENDING,
+        RIFIUTATA,
+        ACCETTATA,
+    }
+
 
     public enum MissioneStato {
-        IN_CORSO,
-        COMPLETATA,
-        ANNULLATA,
         PENDING,
+        RIFIUTATA,
+        ACCETTATA,
+        COMPLETATA,
     }
+
 
 }

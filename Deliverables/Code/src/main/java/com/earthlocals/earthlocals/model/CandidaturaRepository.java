@@ -8,4 +8,6 @@ public interface CandidaturaRepository extends CrudRepository<Candidatura, Long>
     Page<Candidatura> findByCandidato(Volontario volontario, Pageable pageable);
 
     Page<Candidatura> findByStatoAndCandidato(Candidatura.CandidaturaStato candidaturaStato, Utente utente, Pageable pageable);
+
+    boolean existsByMissioneAndCandidato(Missione missione, Volontario candidato);
 }
