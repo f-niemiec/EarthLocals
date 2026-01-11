@@ -2,6 +2,8 @@ package com.earthlocals.earthlocals.service.gestioneutente;
 
 import com.earthlocals.earthlocals.model.*;
 import com.earthlocals.earthlocals.service.gestioneutente.dto.*;
+import com.earthlocals.earthlocals.service.gestioneutente.exceptions.ExpiredResetTokenException;
+import com.earthlocals.earthlocals.service.gestioneutente.exceptions.PasswordResetTokenNotFoundException;
 import com.earthlocals.earthlocals.service.gestioneutente.exceptions.UserAlreadyExistsException;
 import com.earthlocals.earthlocals.service.gestioneutente.exceptions.WrongPasswordException;
 import com.earthlocals.earthlocals.service.gestioneutente.passport.PassportStorageService;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -30,6 +33,7 @@ public class GestioneUtente {
     final private PassportStorageService passportStorageService;
     final private PaeseRepository paeseRepository;
     final private VerificationTokenRepository verificationTokenRepository;
+    final private PasswordResetTokenRepository passwordResetTokenRepository;
 
     public Utente registerVolunteer(VolontarioDTO volontarioDTO) throws UserAlreadyExistsException {
         checkUserExists(volontarioDTO.getEmail());
@@ -161,5 +165,30 @@ public class GestioneUtente {
         utente.setPending(false);
         utenteRepository.save(utente);
         verificationTokenRepository.delete(verToken);
+    }
+
+    public Optional<String> createPasswordResetToken(String email) {
+        var utente = utenteRepository.findByEmail(email);
+        if (utente == null) {
+            return Optional.empty();
+        }
+        passwordResetTokenRepository.findByUtente(utente).ifPresent(passwordResetTokenRepository::delete);
+
+        var token = UUID.randomUUID().toString();
+        var resetToken = new PasswordResetToken(utente, token);
+        passwordResetTokenRepository.save(resetToken);
+        return Optional.of(resetToken.getToken());
+    }
+
+    public void resetPassword(ResetPasswordDTO dto) throws PasswordResetTokenNotFoundException, ExpiredResetTokenException {
+        var passToken = passwordResetTokenRepository.findByToken(dto.getToken()).orElseThrow(PasswordResetTokenNotFoundException::new);
+        if (passToken.isExpired()) {
+            throw new ExpiredResetTokenException();
+        }
+        var utente = passToken.getUtente();
+        var hashPassword = passwordEncoder.encode(dto.getNewPassword());
+        utente.setPassword(hashPassword);
+        utenteRepository.save(utente);
+        passwordResetTokenRepository.delete(passToken);
     }
 }
