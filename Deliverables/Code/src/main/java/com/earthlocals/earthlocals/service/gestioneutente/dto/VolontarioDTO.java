@@ -1,6 +1,7 @@
 package com.earthlocals.earthlocals.service.gestioneutente.dto;
 
 
+import com.earthlocals.earthlocals.utility.constraints.FileType;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -35,5 +36,6 @@ public class VolontarioDTO extends UtenteDTO {
     private LocalDate dataEmissionePassaporto;
 
     @NotNull
+    @FileType(allowedExtensions = {"application/pdf"})
     private MultipartFile passaporto;
 }
