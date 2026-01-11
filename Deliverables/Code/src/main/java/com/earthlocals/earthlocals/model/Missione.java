@@ -12,7 +12,6 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder(builderMethodName = "missioneBuilder")
 public class Missione implements Serializable {
 
     @Id
@@ -63,6 +62,22 @@ public class Missione implements Serializable {
     @ManyToOne(optional = false)
     private Utente creatore;
 
+    @Builder(builderMethodName = "missioneBuilder")
+    public Missione(String nome, Paese paese, String citta, String descrizione, LocalDate dataInizio, LocalDate dataFine, String competenzeRichieste, String requisitiExtra, String immagine, Set<Candidatura> candidature, Utente creatore) {
+        this.nome = nome;
+        this.paese = paese;
+        this.citta = citta;
+        this.descrizione = descrizione;
+        this.dataInizio = dataInizio;
+        this.dataFine = dataFine;
+        this.competenzeRichieste = competenzeRichieste;
+        this.requisitiExtra = requisitiExtra;
+        this.immagine = immagine;
+        this.candidature = candidature;
+        this.creatore = creatore;
+        this.internalStato = InternalMissioneStato.PENDING;
+    }
+
     public MissioneStato getStato() {
         switch (this.internalStato) {
             case PENDING -> {
@@ -81,7 +96,6 @@ public class Missione implements Serializable {
         }
         return null;
     }
-
 
     public boolean accettaMissione() {
         if (internalStato.equals(InternalMissioneStato.PENDING)) {
@@ -105,7 +119,6 @@ public class Missione implements Serializable {
         RIFIUTATA,
         ACCETTATA,
     }
-
 
     public enum MissioneStato {
         PENDING,
