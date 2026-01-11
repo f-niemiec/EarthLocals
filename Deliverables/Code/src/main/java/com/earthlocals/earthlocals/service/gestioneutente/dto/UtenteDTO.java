@@ -1,5 +1,6 @@
 package com.earthlocals.earthlocals.service.gestioneutente.dto;
 
+import com.earthlocals.earthlocals.utility.constraints.PasswordMatches;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,6 +13,10 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@PasswordMatches(
+        message = "Le password non coincidono",
+        connectedField = "matchingPassword"
+)
 public class UtenteDTO {
 
     @NotBlank(message = "Il nome è obbligatorio")
