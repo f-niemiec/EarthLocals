@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+
+<html lang="it"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:th="https://www.thymeleaf.org">
+<body>
+<div class="list-group" id="accountSidebar" th:fragment="sidebar">
+    <a class="list-group-item border-0"
+       role="button"
+       th:classappend="${currentPage == 'edit' ? 'fw-bold pe-none' : ''}" th:href="@{/account/edit}">Informazioni
+        profilo</a>
+    <a class="list-group-item border-0"
+       role="button"
+       th:classappend="${currentPage == 'edit-password' ? 'fw-bold pe-none' : ''}"
+       th:href="@{/account/edit-password}">Cambia password</a>
+    <a class="list-group-item border-0"
+       role="button"
+       sec:authorize="hasRole('VOLUNTEER')"
+       th:classappend="${currentPage == 'edit-passport' ? 'fw-bold pe-none' : ''}"
+       th:href="@{/account/volunteer/edit-passport}">Dettagli passaporto</a>
+    <hr class="w-75"/>
+    <a class="list-group-item border-0"
+       role="button"
+       sec:authorize="hasRole('VOLUNTEER')"
+       th:classappend="${currentPage == 'volunteer-candidature' ? 'fw-bold pe-none' : ''}"
+       th:href="@{/account/volunteer/candidature}">Le mie candidature</a>
+    <a class="list-group-item border-0"
+       role="button"
+       sec:authorize="hasRole('VOLUNTEER')"
+       th:classappend="${currentPage == 'volunteer-esperienze' ? 'fw-bold pe-none' : ''}"
+       th:href="@{/account/volunteer/esperienze}">Le mie esperienze</a>
+
+    <a class="list-group-item border-0"
+       role="button"
+       sec:authorize="hasRole('ORGANIZER')"
+       th:classappend="${currentPage == 'organizer-candidature' ? 'fw-bold pe-none' : ''}"
+       th:href="@{/account/organizer/candidature}">Gestione candidature</a>
+
+    <a class="list-group-item border-0"
+       role="button"
+       sec:authorize="hasRole('ORGANIZER')"
+       th:classappend="${currentPage == 'organizer-missions' ? 'fw-bold pe-none' : ''}"
+       th:href="@{/account/organizer/missions}">Gestione missioni</a>
+
+    <a class="list-group-item border-0"
+       role="button"
+       sec:authorize="hasRole('MODERATOR')"
+       th:classappend="${currentPage == 'moderator-missions' ? 'fw-bold pe-none' : ''}"
+       th:href="@{/account/moderator/missions}">Gestione missioni</a>
+
+    <a class="list-group-item border-0"
+       role="button"
+       sec:authorize="hasRole('ORGANIZER')"
+       th:classappend="${currentPage == 'organizer-mission-new' ? 'fw-bold pe-none' : ''}"
+       th:href="@{/account/organizer/mission/new}">Nuova missione</a>
+
+
+</div>
+
+</body>
+</html>

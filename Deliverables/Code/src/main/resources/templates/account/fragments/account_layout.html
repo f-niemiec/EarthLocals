@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{fragments/layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="https://www.thymeleaf.org"
+>
+<head>
+    <link rel="stylesheet" th:href="@{/resources/css/account/account.css}"/>
+</head>
+<body>
+<th:block layout:fragment="content">
+    <div class="mt-5">
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <th:block th:replace="account/fragments/sidebar :: sidebar"/>
+            </div>
+            <div class="col-lg-8">
+                <div class="">
+                    <!– TODO: develop account content ->
+                    <th:block layout:fragment="account_content"/>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</th:block>
+</body>
+</html>
