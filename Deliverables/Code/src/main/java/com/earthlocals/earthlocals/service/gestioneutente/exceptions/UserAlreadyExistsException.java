@@ -1,4 +1,4 @@
-package com.earthlocals.earthlocals.service.gestioneutente.exception;
+package com.earthlocals.earthlocals.service.gestioneutente.exceptions;
 
 public class UserAlreadyExistsException extends Exception {
     public UserAlreadyExistsException() {
