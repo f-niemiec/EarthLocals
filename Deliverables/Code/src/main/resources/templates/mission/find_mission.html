@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html layout:decorate="~{fragments/layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="https://www.thymeleaf.org">
+
+<head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+    <meta charset="utf-8">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <link rel="shortcut icon" th:href="@{/resources/images/favicon.png}" type="image/x-icon">
+    <title th:text="#{layoutTitle}">EarthLocals</title>
+</head>
+
+<body>
+<th:block layout:fragment="content">
+    <div class="py-5">
+        <div class="row g-4">
+            <div class="col-lg-3">
+                <div class="mt-lg-2">
+                    <div>
+                        <h5 class="fw-bold mb-4">Filtra Missioni</h5>
+
+                        <form method="get" th:action="@{/mission/find_mission}">
+
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Luogo</label>
+                                <select class="form-select" name="paeseId">
+                                    <option value="0">Ovunque</option>
+                                    <option th:each="p : ${paesi}"
+                                            th:selected="${p.id == paeseSelezionato}"
+                                            th:text="${p.nome}"
+                                            th:value="${p.id}">
+                                        Italia
+                                    </option>
+                                </select>
+                            </div>
+                            <button class="btn btn-success w-100 rounded-pill fw-bold" type="submit">
+                                Applica Filtri
+                            </button>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-9">
+                <div>
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3>Opportunità disponibili</h3>
+                        <span class="text-muted w-50 text-end">
+                            <span th:text="${missioniPage.totalElements == 1 ? 'Trovata' : 'Trovate'}"></span>
+                            <span th:text="${missioniPage.totalElements}"></span>
+                            <span th:text="${missioniPage.totalElements == 1 ? 'missione' : 'missioni'}"></span>
+                        </span>
+                    </div>
+
+                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4">
+                        <th:block th:each="missione : ${missioniPage}">
+                            <div class="col">
+                                <th:block
+                                        th:replace="fragments/card_missione :: card_missione(${missione}, ~{ :: #missionButton}, ~{:: emptyFragment})">
+                                    <a class="btn btn-primary w-100 rounded-pill" id="missionButton"
+                                       th:href="@{/mission(id = ${missione.id})}">
+                                        Visualizza Dettagli <i class="fa-solid fa-arrow-right ms-1"></i>
+                                    </a>
+                                    <div th:fragment="emptyFragment"></div>
+
+                                </th:block>
+                            </div>
+                        </th:block>
+                    </div>
+                    <th:block th:replace="fragments/pagination :: pagination(${missioniPage})"/>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+</body>
+</html>
