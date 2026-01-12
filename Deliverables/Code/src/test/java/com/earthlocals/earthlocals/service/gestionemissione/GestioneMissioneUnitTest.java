@@ -133,4 +133,44 @@ public class GestioneMissioneUnitTest {
         assertThrows(Exception.class, () -> gestioneMissione.acceptMissione(id));
     }
 
+    @Test
+    void rejectMissione() {
+        var id = 1L;
+        var missione = mock(Missione.class);
+
+        when(missione.getStato()).thenReturn(Missione.MissioneStato.PENDING);
+
+        when(missioneRepository.findById(id)).thenReturn(Optional.of(missione));
+
+        gestioneMissione.rejectMissione(id);
+        verify(missione).rifiutaMissione();
+    }
+
+    @Test
+    void rejectMissioneNotPending() {
+        var missione = mock(Missione.class);
+
+        for (var stato : Missione.MissioneStato.values()) {
+            if (stato.equals(Missione.MissioneStato.PENDING)) continue;
+            var id = 1L;
+
+            when(missione.getStato()).thenReturn(stato);
+
+            when(missioneRepository.findById(id)).thenReturn(Optional.of(missione));
+
+            assertThrows(MissioneNotAcceptableException.class, () -> gestioneMissione.rejectMissione(id));
+            verify(missione, never()).rifiutaMissione();
+        }
+    }
+
+    @Test
+    void rejectMissioneNotExists() {
+
+        var id = 1L;
+
+        when(missioneRepository.findById(id)).thenReturn(Optional.empty());
+
+        assertThrows(Exception.class, () -> gestioneMissione.rejectMissione(id));
+    }
+
 }
