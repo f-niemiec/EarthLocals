@@ -3,6 +3,7 @@ package com.earthlocals.earthlocals.service.gestionemissione;
 import com.earthlocals.earthlocals.model.*;
 import com.earthlocals.earthlocals.service.gestionemissioni.GestioneMissione;
 import com.earthlocals.earthlocals.service.gestionemissioni.dto.MissioneDTO;
+import com.earthlocals.earthlocals.service.gestionemissioni.exceptions.MissioneNotAcceptableException;
 import com.earthlocals.earthlocals.service.gestionemissioni.pictures.PicturesFilesystemStorage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -39,11 +41,11 @@ public class GestioneMissioneUnitTest {
 
     @Test
     void registerMissione() throws Exception {
-        var utente = spy(Utente.class);
+        var utente = mock(Utente.class);
         var file = new MockMultipartFile("File", InputStream.nullInputStream());
         var fileName = "file";
-        var missioneDTO = spy(MissioneDTO.class);
-        var paese = spy(Paese.class);
+        var missioneDTO = mock(MissioneDTO.class);
+        var paese = mock(Paese.class);
 
         when(paese.getId()).thenReturn(1);
         when(paese.getNome()).thenReturn("Italia");
@@ -89,6 +91,46 @@ public class GestioneMissioneUnitTest {
         assertEquals(fileName, missione.getImmagine());
         assertEquals(Missione.MissioneStato.PENDING, missione.getStato());
         assertEquals(utente, missione.getCreatore());
+    }
+
+    @Test
+    void acceptMissione() {
+        var id = 1L;
+        var missione = mock(Missione.class);
+
+        when(missione.getStato()).thenReturn(Missione.MissioneStato.PENDING);
+
+        when(missioneRepository.findById(id)).thenReturn(Optional.of(missione));
+
+        gestioneMissione.acceptMissione(id);
+        verify(missione).accettaMissione();
+    }
+
+    @Test
+    void acceptMissioneNotPending() {
+        var missione = mock(Missione.class);
+
+        for (var stato : Missione.MissioneStato.values()) {
+            if (stato.equals(Missione.MissioneStato.PENDING)) continue;
+            var id = 1L;
+
+            when(missione.getStato()).thenReturn(stato);
+
+            when(missioneRepository.findById(id)).thenReturn(Optional.of(missione));
+
+            assertThrows(MissioneNotAcceptableException.class, () -> gestioneMissione.acceptMissione(id));
+            verify(missione, never()).accettaMissione();
+        }
+    }
+
+    @Test
+    void acceptMissioneNotExists() {
+
+        var id = 1L;
+
+        when(missioneRepository.findById(id)).thenReturn(Optional.empty());
+
+        assertThrows(Exception.class, () -> gestioneMissione.acceptMissione(id));
     }
 
 }
