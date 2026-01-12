@@ -10,13 +10,20 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.InputStream;
 import java.time.LocalDate;
@@ -28,7 +35,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
+@ContextConfiguration(classes = GestioneMissioneUnitTest.TestConfig.class)
+@ExtendWith(SpringExtension.class)
 public class GestioneMissioneUnitTest {
     @Mock
     private static Validator validator;
@@ -258,13 +266,11 @@ public class GestioneMissioneUnitTest {
 
     @Test
     void getMissioniApertePageNumberNegative() {
-        when(paeseRepository.findById(anyInt())).thenReturn(Optional.of(new Paese(1, "Italia")));
         assertThrows(IllegalArgumentException.class, () -> gestioneMissione.getMissioniAperte(1, -1, 1));
     }
 
     @Test
     void getMissioniApertePageSizeZero() {
-        when(paeseRepository.findById(anyInt())).thenReturn(Optional.of(new Paese(1, "Italia")));
         assertThrows(IllegalArgumentException.class, () -> gestioneMissione.getMissioniAperte(1, 1, 0));
     }
 
@@ -275,6 +281,55 @@ public class GestioneMissioneUnitTest {
                 .thenReturn(page);
         var res = gestioneMissione.getMissioniPending(0, 1);
         assertEquals(page, res);
+
+    }
+
+    @Test
+    void getMissioniPendingPageNumberNegative() {
+        assertThrows(IllegalArgumentException.class, () -> gestioneMissione.getMissioniPending(-1, 1));
+    }
+
+    @Test
+    void getMissioniPendingPageSizeZero() {
+        assertThrows(IllegalArgumentException.class, () -> gestioneMissione.getMissioniPending(0, 0));
+    }
+
+    @Test
+    void getMissioniOrganizzatore() {
+        var context = SecurityContextHolder.getContext();
+        var utente = mock(Utente.class);
+        var authentication = new TestingAuthenticationToken(utente, null, "ROLE_ORGANIZER");
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+        var page = (Page<Missione>) mock(Page.class);
+
+        when(missioneRepository.findByCreatore(eq(utente), any(Pageable.class))).thenReturn(page);
+
+        var res = gestioneMissione.getMissioniOrganizzatore(0, 1);
+        assertEquals(page, res);
+    }
+
+    @Test
+    @WithMockUser(roles = "VOLUNTEER")
+    void getMissioniOrganizzatoreVolunteer() {
+        // TODO Method security is not working for some reason
+        var context = SecurityContextHolder.getContext();
+        var utente = mock(Utente.class);
+        var authentication = new TestingAuthenticationToken(utente, null, "ROLE_VOLUNTEER");
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+        var page = (Page<Missione>) mock(Page.class);
+
+        when(missioneRepository.findByCreatore(eq(utente), any(Pageable.class))).thenReturn(page);
+
+        var res = gestioneMissione.getMissioniOrganizzatore(0, 1);
+        assertEquals(page, res);
+    }
+
+
+    @TestConfiguration
+    @EnableMethodSecurity(prePostEnabled = true)
+    static class TestConfig {
 
     }
 

@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -120,7 +121,8 @@ public class GestioneMissione {
     }
 
 
-    public Page<Missione> getMissioniOrganizzatore(Integer page, Integer pageSize) {
+    @PreAuthorize("hasRole('ORGANIZER')")
+    public Page<Missione> getMissioniOrganizzatore(int page, int pageSize) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Utente utente = (Utente) auth.getPrincipal();
