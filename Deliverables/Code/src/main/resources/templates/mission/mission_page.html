@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html layout:decorate="~{fragments/layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:th="https://www.thymeleaf.org"
+>
+<th:block layout:fragment="content">
+    <div class="mt-5">
+        <div class="row g-5">
+            <div class="col-lg-6 d-flex justify-content-center align-items-center">
+                <img alt="Immagine sito"
+                     class="card-img-top rounded-5"
+                     th:src="@{/mission/image/{path}(path = ${mission.immagine})}">
+            </div>
+            <div class="col-lg-6 d-flex flex-column justify-content-between">
+                <div class="mb-auto">
+
+                    <h1 class="fw-bold mb-4 fs-1" th:text="${mission.nome}"></h1>
+                    <div class="fw-light fs-5 mb-4">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <span th:text="${mission.citta}"></span>, <span th:text="${mission.paese.nome}"></span>
+                    </div>
+                    <hr class="mb-4"/>
+                    <div class="row row-cols-2 fs-5 mb-4 g-2">
+                        <div class="col">
+                            <div class="border rounded-3 p-3">
+                                <div class="">
+                                    Data inizio
+                                </div>
+                                <div class="fw-bold">
+                                    <i class="fa-regular fa-calendar-minus"></i>
+                                    <span th:text="${#temporals.format(mission.dataInizio)}"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="border rounded-3 p-3">
+                                <div class="">
+                                    Data fine
+                                </div>
+                                <div class="fw-bold">
+                                    <i class="fa-regular fa-calendar-xmark"></i>
+                                    <span th:text="${#temporals.format(mission.dataFine)}"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-5">
+                        <h3 class="fw-bold">Descrizione del progetto</h3>
+                        <div class="fs-5 text-secondary" th:text="${mission.descrizione}"></div>
+                    </div>
+                    <div class="mb-5">
+                        <h3 class="fw-bold">Competenze richieste</h3>
+                        <div class="fs-5 text-secondary" th:text="${mission.competenzeRichieste}"></div>
+                    </div>
+                    <div class="mb-4" th:if="${mission.requisitiExtra != null && mission.requisitiExtra.length() > 0}">
+                        <h3 class="fw-bold">Requisiti extra</h3>
+                        <div class="fs-5 text-secondary" th:text="${mission.requisitiExtra}"></div>
+                    </div>
+                </div>
+                <th:block th:if="${giaCandidato}">
+                    <form method="post" th:action="@{/mission/candidatura/remove}">
+                        <input name="id" th:value="${mission.id}" type="hidden"/>
+                        <button class="btn btn-secondary w-100 rounded-pill fs-4"
+                                data-bs-target="#rejectModal"
+                                data-bs-toggle="modal"
+                                type="button">
+                            <i class="fa-solid fa-xmark"></i>
+                            Annulla candidatura
+                        </button>
+                        <div aria-hidden="true" aria-labelledby="exampleModalLabel" class="modal fade fs-5"
+                             id="rejectModal"
+                             tabindex="-1">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h1 class="modal-title fs-5" id="rejectModalLabel">Sei sicuro?</h1>
+                                        <button aria-label="Close" class="btn-close" data-bs-dismiss="modal"
+                                                type="button"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Sicuro di voler annullare la candidatura?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">
+                                            Chiudi
+                                        </button>
+                                        <button class="btn btn-danger" type="submit">Annulla candidatura</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </th:block>
+                <th:block th:if="${mission.stato.equals(mission.stato.RIFIUTATA)}">
+                    <div class="bg-danger text-center w-100 rounded-pill fs-4 py-2">
+                        Missione rifiutata
+                    </div>
+                </th:block>
+                <th:block th:if="${mission.stato.equals(mission.stato.COMPLETATA)}">
+                    <div class="bg-success text-center w-100 rounded-pill fs-4 py-2">
+                        Missione completata
+                    </div>
+                </th:block>
+                <th:block th:if="${mission.stato.equals(mission.stato.ACCETTATA)}">
+
+                    <th:block th:unless="${giaCandidato}">
+                        <div sec:authorize="hasRole('VOLUNTEER') || hasRole('ANONYMOUS')">
+                            <!-- TODO: Connettere tasto iscrizione -->
+                            <form method="post" th:action="@{/mission/candidatura}">
+                                <input name="id" th:value="${mission.id}" type="hidden"/>
+                                <button class="btn btn-primary w-100 rounded-pill fs-4" data-bs-target="#exampleModal"
+                                        data-bs-toggle="modal"
+                                        type="button">
+                                    Candidati ora!
+                                </button>
+
+                                <!-- Modal -->
+                                <div aria-hidden="true" aria-labelledby="exampleModalLabel" class="modal fade fs-5"
+                                     id="exampleModal"
+                                     tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h1 class="modal-title fs-5" id="exampleModalLabel">Sei sicuro?</h1>
+                                                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal"
+                                                        type="button"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Sicuro di volerti candidare?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">
+                                                    Chiudi
+                                                </button>
+                                                <button class="btn btn-primary" type="submit">Candidati</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </th:block>
+                </th:block>
+            </div>
+        </div>
+    </div>
+</th:block>
+</html>
