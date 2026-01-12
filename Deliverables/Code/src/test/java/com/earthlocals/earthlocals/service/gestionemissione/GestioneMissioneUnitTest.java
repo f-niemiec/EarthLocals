@@ -11,6 +11,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockMultipartFile;
 
 import java.io.InputStream;
@@ -18,8 +20,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -172,5 +173,70 @@ public class GestioneMissioneUnitTest {
 
         assertThrows(Exception.class, () -> gestioneMissione.rejectMissione(id));
     }
+
+    @Test
+    void getMissioniAperte() {
+        var page = (Page<Missione>) mock(Page.class);
+        when(missioneRepository.findByPaeseAndInternalStatoAndDataFineAfter(any(Paese.class), any(Missione.InternalMissioneStato.class), any(LocalDate.class), any(Pageable.class)))
+                .thenReturn(page);
+        when(paeseRepository.findById(anyInt())).thenReturn(Optional.of(new Paese(1, "Italia")));
+        var res = gestioneMissione.getMissioniAperte(1, 0, 1);
+        assertEquals(page, res);
+    }
+
+    @Test
+    void getMissioniApertePaeseNotFound() {
+        var page1 = (Page<Missione>) mock(Page.class);
+        var page2 = (Page<Missione>) mock(Page.class);
+        when(missioneRepository.findByPaeseAndInternalStatoAndDataFineAfter(any(Paese.class), any(Missione.InternalMissioneStato.class), any(LocalDate.class), any(Pageable.class)))
+                .thenReturn(page1);
+        when(missioneRepository.findByInternalStatoAndDataFineAfter(any(Missione.InternalMissioneStato.class), any(LocalDate.class), any(Pageable.class)))
+                .thenReturn(page2);
+        when(paeseRepository.findById(anyInt())).thenReturn(Optional.empty());
+        var res = gestioneMissione.getMissioniAperte(1, 0, 1);
+        assertSame(page2, res);
+        assertNotSame(page1, res);
+    }
+
+    @Test
+    void getMissioniApertePaeseNull() {
+        var page1 = (Page<Missione>) mock(Page.class);
+        var page2 = (Page<Missione>) mock(Page.class);
+        when(missioneRepository.findByPaeseAndInternalStatoAndDataFineAfter(any(Paese.class), any(Missione.InternalMissioneStato.class), any(LocalDate.class), any(Pageable.class)))
+                .thenReturn(page1);
+        when(missioneRepository.findByInternalStatoAndDataFineAfter(any(Missione.InternalMissioneStato.class), any(LocalDate.class), any(Pageable.class)))
+                .thenReturn(page2);
+        when(paeseRepository.findById(anyInt())).thenReturn(Optional.of(new Paese(1, "Italia")));
+        var res = gestioneMissione.getMissioniAperte(null, 0, 1);
+        assertSame(page2, res);
+        assertNotSame(page1, res);
+    }
+
+    @Test
+    void getMissioniApertePaeseZero() {
+        var page1 = (Page<Missione>) mock(Page.class);
+        var page2 = (Page<Missione>) mock(Page.class);
+        when(missioneRepository.findByPaeseAndInternalStatoAndDataFineAfter(any(Paese.class), any(Missione.InternalMissioneStato.class), any(LocalDate.class), any(Pageable.class)))
+                .thenReturn(page1);
+        when(missioneRepository.findByInternalStatoAndDataFineAfter(any(Missione.InternalMissioneStato.class), any(LocalDate.class), any(Pageable.class)))
+                .thenReturn(page2);
+        when(paeseRepository.findById(anyInt())).thenReturn(Optional.of(new Paese(1, "Italia")));
+        var res = gestioneMissione.getMissioniAperte(0, 0, 1);
+        assertSame(page2, res);
+        assertNotSame(page1, res);
+    }
+
+    @Test
+    void getMissioniApertePageNumberNegative() {
+        when(paeseRepository.findById(anyInt())).thenReturn(Optional.of(new Paese(1, "Italia")));
+        assertThrows(IllegalArgumentException.class, () -> gestioneMissione.getMissioniAperte(1, -1, 1));
+    }
+
+    @Test
+    void getMissioniApertePageSizeZero() {
+        when(paeseRepository.findById(anyInt())).thenReturn(Optional.of(new Paese(1, "Italia")));
+        assertThrows(IllegalArgumentException.class, () -> gestioneMissione.getMissioniAperte(1, 1, 0));
+    }
+
 
 }

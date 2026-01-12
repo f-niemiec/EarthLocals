@@ -71,6 +71,12 @@ public class GestioneMissione {
 
 
     public Page<Missione> getMissioniAperte(Integer paeseId, int pageNumber, int pageSize) {
+        if (pageNumber < 0) {
+            throw new IllegalArgumentException("pageNumber cannot be negative");
+        }
+        if (pageSize < 1) {
+            throw new IllegalArgumentException("pageSize must be positive");
+        }
         final var statoAperto = Missione.InternalMissioneStato.ACCETTATA;
         // Creiamo l'oggetto per la paginazione
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("dataInizio").ascending());
