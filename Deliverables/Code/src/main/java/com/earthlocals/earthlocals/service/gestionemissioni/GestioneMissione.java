@@ -5,6 +5,8 @@ import com.earthlocals.earthlocals.service.gestionemissioni.dto.MissioneDTO;
 import com.earthlocals.earthlocals.service.gestionemissioni.exceptions.MissioneNotAcceptableException;
 import com.earthlocals.earthlocals.service.gestionemissioni.pictures.PicturesStorageService;
 import jakarta.transaction.Transactional;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -23,11 +25,18 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 public class GestioneMissione {
 
+    final private Validator validator;
     final private MissioneRepository missioneRepository;
     final private PicturesStorageService storageService;
     final private PaeseRepository paeseRepository;
 
+
     public Missione registerMissione(MissioneDTO missioneDTO) throws Exception {
+        var constraintViolation = validator.validate(missioneDTO);
+        if (!constraintViolation.isEmpty()) {
+            throw new ConstraintViolationException(constraintViolation);
+        }
+
         var missioneBuilder = Missione.missioneBuilder();
         String fileName = storageService.acceptUpload(missioneDTO.getFoto());
         Paese paese = paeseRepository.findById(missioneDTO.getPaese()).orElseThrow();
@@ -98,6 +107,12 @@ public class GestioneMissione {
     }
 
     public Page<Missione> getMissioniPending(int pageNumber, int pageSize) {
+        if (pageNumber < 0) {
+            throw new IllegalArgumentException("pageNumber cannot be negative");
+        }
+        if (pageSize < 1) {
+            throw new IllegalArgumentException("pageSize must be positive");
+        }
         final var stato = Missione.InternalMissioneStato.PENDING;
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("dataInizio").ascending());
         var now = LocalDate.now();

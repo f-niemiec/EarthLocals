@@ -5,6 +5,9 @@ import com.earthlocals.earthlocals.service.gestionemissioni.GestioneMissione;
 import com.earthlocals.earthlocals.service.gestionemissioni.dto.MissioneDTO;
 import com.earthlocals.earthlocals.service.gestionemissioni.exceptions.MissioneNotAcceptableException;
 import com.earthlocals.earthlocals.service.gestionemissioni.pictures.PicturesFilesystemStorage;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Validator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -19,6 +22,7 @@ import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -26,6 +30,8 @@ import static org.mockito.Mockito.*;
 
 @SpringBootTest
 public class GestioneMissioneUnitTest {
+    @Mock
+    private static Validator validator;
     @Mock
     private MissioneRepository missioneRepository;
     @Mock
@@ -46,15 +52,11 @@ public class GestioneMissioneUnitTest {
         var file = new MockMultipartFile("File", InputStream.nullInputStream());
         var fileName = "file";
         var missioneDTO = mock(MissioneDTO.class);
-        var paese = mock(Paese.class);
-
-        when(paese.getId()).thenReturn(1);
-        when(paese.getNome()).thenReturn("Italia");
 
         when(missioneDTO.getNome()).thenReturn("Help teaching a Pechino ");
         when(missioneDTO.getPaese()).thenReturn(1);
-        when(missioneDTO.getCitta()).thenReturn("Salerno");
-        when(missioneDTO.getDescrizione()).thenReturn("Salerno");
+        when(missioneDTO.getCitta()).thenReturn("Pechino");
+        when(missioneDTO.getDescrizione()).thenReturn("Descrizione di almeno 20 caratteri");
         when(missioneDTO.getDataInizio()).thenReturn(LocalDate.now().plusDays(2));
         when(missioneDTO.getDataFine()).thenReturn(LocalDate.now().plusDays(3));
         when(missioneDTO.getCompetenzeRichieste()).thenReturn("Competenze richieste");
@@ -62,11 +64,29 @@ public class GestioneMissioneUnitTest {
         when(missioneDTO.getFoto()).thenReturn(file);
         when(missioneDTO.getCreatore()).thenReturn(utente);
 
+//        missioneDTO.setNome("Help teaching a Pechino ");
+//        missioneDTO.setPaese(1);
+//        missioneDTO.setCitta("Pechino");
+//        missioneDTO.setDescrizione("Descrizione di almeno 20 caratteri");
+//        missioneDTO.setDataInizio(LocalDate.now().plusDays(2));
+//        missioneDTO.setDataFine(LocalDate.now().plusDays(3));
+//        missioneDTO.setCompetenzeRichieste("Competenze richieste");
+//        missioneDTO.setRequisitiExtra("Requisiti extra");
+//        missioneDTO.setFoto(file);
+//        missioneDTO.setCreatore(utente);
+        var paese = mock(Paese.class);
+
+        when(paese.getId()).thenReturn(1);
+        when(paese.getNome()).thenReturn("Italia");
+
+
         when(storageService.acceptUpload(file)).thenReturn(fileName);
         when(paeseRepository.findById(1)).thenReturn(Optional.of(paese));
         when(missioneRepository.save(any(Missione.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(validator.validate(missioneDTO)).thenReturn(Set.of());
 
         var missione = gestioneMissione.registerMissione(missioneDTO);
+        verify(validator).validate(missioneDTO);
 
         verify(missioneRepository).save(argThat(m -> Objects.equals(m.getId(), null)
                 && Objects.equals(m.getNome(), missioneDTO.getNome())
@@ -92,6 +112,16 @@ public class GestioneMissioneUnitTest {
         assertEquals(fileName, missione.getImmagine());
         assertEquals(Missione.MissioneStato.PENDING, missione.getStato());
         assertEquals(utente, missione.getCreatore());
+    }
+
+    @Test
+    void registerMissioneValidationFails() throws Exception {
+        var missioneDTO = mock(MissioneDTO.class);
+        var constraintViolation = (ConstraintViolation<MissioneDTO>) mock(ConstraintViolation.class);
+        when(validator.validate(missioneDTO)).thenReturn(Set.of(constraintViolation));
+
+        assertThrows(ConstraintViolationException.class, () -> gestioneMissione.registerMissione(missioneDTO));
+        verify(validator).validate(missioneDTO);
     }
 
     @Test
@@ -236,6 +266,16 @@ public class GestioneMissioneUnitTest {
     void getMissioniApertePageSizeZero() {
         when(paeseRepository.findById(anyInt())).thenReturn(Optional.of(new Paese(1, "Italia")));
         assertThrows(IllegalArgumentException.class, () -> gestioneMissione.getMissioniAperte(1, 1, 0));
+    }
+
+    @Test
+    void getMissioniPending() {
+        var page = (Page<Missione>) mock(Page.class);
+        when(missioneRepository.findByInternalStatoAndDataFineAfter(any(Missione.InternalMissioneStato.class), any(LocalDate.class), any(Pageable.class)))
+                .thenReturn(page);
+        var res = gestioneMissione.getMissioniPending(0, 1);
+        assertEquals(page, res);
+
     }
 
 
