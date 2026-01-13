@@ -288,6 +288,44 @@ public class GestioneCandidaturaUnitTest {
         verify(candidaturaRepository, times(0)).save(any());
     }
 
-    
+    @Test
+    void removeCandidatureMissionDoesntExist() throws Exception{
+        var candidaturaDTO = mock(CandidaturaDTO.class);
+        var missioneId = 1L;
+        var candidatoId = 1L;
 
+        when(candidaturaDTO.getMissioneId()).thenReturn(missioneId);
+        when(candidaturaDTO.getCandidatoId()).thenReturn(candidatoId);
+
+        when(missioneRepository.findById(missioneId))
+                .thenReturn(Optional.empty());
+
+        var exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> gestioneCandidatura.removeCandidatura(candidaturaDTO)
+        );
+
+        verify(candidaturaRepository, never()).delete(any());
+    }
+
+    @Test
+    void removeCandidatureCandidateDoesntExist() throws Exception{
+        var candidaturaDTO = mock(CandidaturaDTO.class);
+        var missioneId = 1L;
+        var candidatoId = 1L;
+
+        when(candidaturaDTO.getMissioneId()).thenReturn(missioneId);
+        when(candidaturaDTO.getCandidatoId()).thenReturn(candidatoId);
+
+        when(missioneRepository.findById(candidatoId))
+                .thenReturn(Optional.empty());
+
+        var exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> gestioneCandidatura.removeCandidatura(candidaturaDTO)
+        );
+
+        verify(candidaturaRepository, never()).delete(any());
+    }
+    
 }
