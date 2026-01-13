@@ -3,6 +3,7 @@ package com.earthlocals.earthlocals.service.gestionecandidatura;
 import com.earthlocals.earthlocals.model.*;
 import com.earthlocals.earthlocals.service.gestionecandidature.GestioneCandidatura;
 import com.earthlocals.earthlocals.service.gestionecandidature.dto.CandidaturaDTO;
+import com.earthlocals.earthlocals.service.gestionecandidature.exceptions.CandidaturaAlreadyExistsException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
@@ -79,7 +80,7 @@ public class GestioneCandidaturaUnitTest {
     }
 
     @Test
-    void registerCandidatureMissionDoesntExists() {
+    void registerCandidatureMissionDoesntExists(){
         var candidaturaDTO = mock(CandidaturaDTO.class);
         Long missioneId = 1L;
         Long candidatoId = 1L;
@@ -97,5 +98,53 @@ public class GestioneCandidaturaUnitTest {
 
         verify(candidaturaRepository, never()).save(any());
     }
+
+    @Test
+    void registerCandidatureVolontarioDoesntExists(){
+        var candidaturaDTO = mock(CandidaturaDTO.class);
+        Long missioneId = 1L;
+        Long candidatoId = 1L;
+
+        when(candidaturaDTO.getMissioneId()).thenReturn(missioneId);
+        when(candidaturaDTO.getCandidatoId()).thenReturn(candidatoId);
+
+        when(candidaturaRepository.findById(candidatoId))
+                .thenReturn(Optional.empty());
+
+        var exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> gestioneCandidatura.registerCandidatura(candidaturaDTO)
+        );
+
+        verify(candidaturaRepository, never()).save(any());
+    }
+
+    @Test
+    void registerCandidatureAlreadyPresent() throws Exception{
+        var candidaturaDTO = mock(CandidaturaDTO.class);
+        var missione = mock(Missione.class);
+        var volontario = mock(Volontario.class);
+
+        Long missioneId = 1L;
+        Long candidatoId = 1L;
+
+        when(candidaturaDTO.getMissioneId()).thenReturn(missioneId);
+        when(candidaturaDTO.getCandidatoId()).thenReturn(candidatoId);
+
+        when(missione.getStato()).thenReturn(Missione.MissioneStato.ACCETTATA);
+        when(missioneRepository.findById(missioneId)).thenReturn(Optional.of(missione));
+        when(volontarioRepository.findById(candidatoId)).thenReturn(Optional.of(volontario));
+
+        when(gestioneCandidatura.hasVolontarioAlreadyApplied(missione, volontario))
+                .thenReturn(true);
+
+        var exception = assertThrows(
+                CandidaturaAlreadyExistsException.class,
+                () -> gestioneCandidatura.registerCandidatura(candidaturaDTO)
+        );
+
+        verify(candidaturaRepository, never()).save(any());
+    }
+
 
 }
