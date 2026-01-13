@@ -1,6 +1,7 @@
 package com.earthlocals.earthlocals.service.gestioneutente;
 
 import com.earthlocals.earthlocals.model.*;
+import com.earthlocals.earthlocals.service.gestioneutente.dto.EditUtenteDTO;
 import com.earthlocals.earthlocals.service.gestioneutente.dto.UtenteDTO;
 import com.earthlocals.earthlocals.service.gestioneutente.dto.VolontarioDTO;
 import com.earthlocals.earthlocals.service.gestioneutente.exceptions.UserAlreadyExistsException;
@@ -14,7 +15,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -341,6 +344,101 @@ public class GestioneUnitUtenteTest {
         assertSame(savedUtente, res);
 
     }
+
+    @Test
+    void registerOrganizerPaeseNotFound() throws Exception {
+        var utenteDTO = mock(UtenteDTO.class);
+        var nazioneId = 1;
+        var paese = mock(Paese.class);
+        var ruolo = mock(Ruolo.class);
+
+        when(utenteDTO.getEmail()).thenReturn("email@example.com");
+        when(utenteDTO.getNazionalita()).thenReturn(nazioneId);
+
+        when(paeseRepository.findById(nazioneId)).thenReturn(Optional.empty());
+
+        assertThrows(Exception.class, () -> gestioneUtente.registerOrganizer(utenteDTO));
+
+    }
+
+    @Test
+    void editUser() {
+        var editUtenteDTO = mock(EditUtenteDTO.class);
+        var context = SecurityContextHolder.getContext();
+        var utente = mock(Utente.class);
+        var authentication = new TestingAuthenticationToken(utente, null, "ROLE_VOLUNTEER");
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+        var paese = mock(Paese.class);
+        var paeseId = 1;
+        when(editUtenteDTO.getNome()).thenReturn("Nome");
+        when(editUtenteDTO.getCognome()).thenReturn("Cognome");
+        when(editUtenteDTO.getEmail()).thenReturn("email@example.com");
+        when(editUtenteDTO.getDataNascita()).thenReturn(LocalDate.of(2004, Month.APRIL, 1));
+        when(editUtenteDTO.getSesso()).thenReturn('M');
+        when(editUtenteDTO.getNazionalita()).thenReturn(paeseId);
+
+        when(paeseRepository.findById(paeseId)).thenReturn(Optional.of(paese));
+        when(utenteRepository.save(any(Utente.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        var res = gestioneUtente.editUser(editUtenteDTO);
+        var utenteCaptor = ArgumentCaptor.forClass(Utente.class);
+        verify(utenteRepository, times(1)).save(utenteCaptor.capture());
+        var savedUtente = utenteCaptor.getValue();
+        assertSame(savedUtente, res);
+
+        var nomeCaptor = ArgumentCaptor.forClass(String.class);
+        verify(utente, times(1)).setNome(nomeCaptor.capture());
+        assertEquals(editUtenteDTO.getNome(), nomeCaptor.getValue());
+
+        var cognomeCaptor = ArgumentCaptor.forClass(String.class);
+        verify(utente, times(1)).setCognome(cognomeCaptor.capture());
+        assertEquals(editUtenteDTO.getCognome(), cognomeCaptor.getValue());
+
+        var emailCaptor = ArgumentCaptor.forClass(String.class);
+        verify(utente, times(1)).setEmail(emailCaptor.capture());
+        assertEquals(editUtenteDTO.getEmail(), emailCaptor.getValue());
+
+        var dataNascitaCaptor = ArgumentCaptor.forClass(LocalDate.class);
+        verify(utente, times(1)).setDataNascita(dataNascitaCaptor.capture());
+        assertEquals(editUtenteDTO.getDataNascita(), dataNascitaCaptor.getValue());
+
+        var sessoCaptor = ArgumentCaptor.forClass(Character.class);
+        verify(utente, times(1)).setSesso(sessoCaptor.capture());
+        assertEquals(editUtenteDTO.getSesso(), sessoCaptor.getValue());
+
+        var nazionalitaCaptor = ArgumentCaptor.forClass(Paese.class);
+        verify(utente, times(1)).setNazionalita(nazionalitaCaptor.capture());
+        assertEquals(paese, nazionalitaCaptor.getValue());
+    }
+
+    @Test
+    void editUserValidatorFails() {
+        var editUtenteDTO = mock(EditUtenteDTO.class);
+        var constraintViolation = (ConstraintViolation<EditUtenteDTO>) mock(ConstraintViolation.class);
+        when(validator.validate(editUtenteDTO)).thenReturn(Set.of(constraintViolation));
+
+        assertThrows(ConstraintViolationException.class, () -> gestioneUtente.editUser(editUtenteDTO));
+    }
+
+    // TODO: Test for unauthenticated user in editUser when Method Security will work
+
+    @Test
+    void editUserPaeseNotFound() {
+        var editUtenteDTO = mock(EditUtenteDTO.class);
+        var context = SecurityContextHolder.getContext();
+        var utente = mock(Utente.class);
+        var authentication = new TestingAuthenticationToken(utente, null, "ROLE_VOLUNTEER");
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+        var paeseId = 1;
+
+        when(paeseRepository.findById(paeseId)).thenReturn(Optional.empty());
+        when(editUtenteDTO.getNazionalita()).thenReturn(paeseId);
+
+        assertThrows(Exception.class, () -> gestioneUtente.editUser(editUtenteDTO));
+    }
+
 
     @Test
     void createVerificationToken() {

@@ -101,6 +101,7 @@ public class GestioneUtente {
         return utente;
     }
 
+    @PreAuthorize("isAuthenticated()")
     public Utente editUser(EditUtenteDTO editUtenteDTO) {
         var constraintViolation = validator.validate(editUtenteDTO);
         if (!constraintViolation.isEmpty()) {
@@ -119,6 +120,7 @@ public class GestioneUtente {
         return utenteRepository.save(utente);
     }
 
+    @PreAuthorize("isAuthenticated()")
     public Utente editPassword(EditPasswordDTO editPasswordDTO) throws WrongPasswordException {
         var constraintViolation = validator.validate(editPasswordDTO);
         if (!constraintViolation.isEmpty()) {
