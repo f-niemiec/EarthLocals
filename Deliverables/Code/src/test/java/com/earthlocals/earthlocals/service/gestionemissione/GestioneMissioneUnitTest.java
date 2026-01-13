@@ -346,6 +346,7 @@ public class GestioneMissioneUnitTest {
         assertInstanceOf(Resource.class, res);
     }
 
+    @Test
     void getMissioniId() {
         var missione = mock(Missione.class);
         var id = 1L;
@@ -355,6 +356,7 @@ public class GestioneMissioneUnitTest {
         assertEquals(missione, res);
     }
 
+    @Test
     void getMissioniIdNotFound() {
         var id = 1L;
         when(missioneRepository.findById(id)).thenReturn(Optional.empty());
