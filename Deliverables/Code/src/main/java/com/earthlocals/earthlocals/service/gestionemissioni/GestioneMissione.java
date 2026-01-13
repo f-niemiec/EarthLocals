@@ -31,7 +31,7 @@ public class GestioneMissione {
     final private PicturesStorageService storageService;
     final private PaeseRepository paeseRepository;
 
-
+    @PreAuthorize("hasRole('ORGANIZER')")
     public Missione registerMissione(MissioneDTO missioneDTO) throws Exception {
         var constraintViolation = validator.validate(missioneDTO);
         if (!constraintViolation.isEmpty()) {
@@ -61,6 +61,7 @@ public class GestioneMissione {
         return missione;
     }
 
+    @PreAuthorize("hasRole('MODERATOR')")
     public boolean acceptMissione(Long id) {
         var missione = missioneRepository.findById(id).orElseThrow();
         if (!missione.getStato().equals(Missione.MissioneStato.PENDING)) {
@@ -70,6 +71,7 @@ public class GestioneMissione {
         return true;
     }
 
+    @PreAuthorize("hasRole('MODERATOR')")
     public boolean rejectMissione(Long id) {
         var missione = missioneRepository.findById(id).orElseThrow();
         if (!missione.getStato().equals(Missione.MissioneStato.PENDING)) {
@@ -108,6 +110,7 @@ public class GestioneMissione {
         }
     }
 
+    @PreAuthorize("hasRole('MODERATOR')")
     public Page<Missione> getMissioniPending(int pageNumber, int pageSize) {
         if (pageNumber < 0) {
             throw new IllegalArgumentException("pageNumber cannot be negative");
