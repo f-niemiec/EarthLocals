@@ -1,7 +1,9 @@
 package com.earthlocals.earthlocals.service.gestioneutente;
 
 import com.earthlocals.earthlocals.model.*;
+import com.earthlocals.earthlocals.service.gestioneutente.dto.UtenteDTO;
 import com.earthlocals.earthlocals.service.gestioneutente.dto.VolontarioDTO;
+import com.earthlocals.earthlocals.service.gestioneutente.exceptions.UserAlreadyExistsException;
 import com.earthlocals.earthlocals.service.gestioneutente.passport.PassportStorageService;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -85,6 +87,7 @@ public class GestioneUnitUtenteTest {
         when(passportStorageService.acceptUpload(passport)).thenReturn("test.pdf");
         when(volontarioRepository.save(any(Volontario.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(validator.validate(volontarioDTO)).thenReturn(Set.of());
+        when(utenteRepository.findByEmail(any())).thenReturn(null);
 
 
         var res = assertDoesNotThrow(() -> gestioneUtente.registerVolunteer(volontarioDTO));
@@ -136,10 +139,209 @@ public class GestioneUnitUtenteTest {
         when(passportStorageService.acceptUpload(passport)).thenThrow(new Exception());
         when(volontarioRepository.save(any(Volontario.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(validator.validate(volontarioDTO)).thenReturn(Set.of());
+        when(utenteRepository.findByEmail(any())).thenReturn(null);
 
         assertThrows(Exception.class, () -> gestioneUtente.registerVolunteer(volontarioDTO));
 
         verify(volontarioRepository, times(0)).save(any());
+    }
+
+    @Test
+    void registerVolunteerAlreadyExistsNotPending() throws Exception {
+        var volontarioDTO = mock(VolontarioDTO.class);
+        var volontario = mock(Volontario.class);
+
+
+        var passport = new MockMultipartFile("File", "test.pdf", "application/pdf", new byte[0]);
+        var nazioneId = 1;
+        var paese = mock(Paese.class);
+        var ruolo = mock(Ruolo.class);
+
+        when(volontarioDTO.getNome()).thenReturn("Nome");
+        when(volontarioDTO.getCognome()).thenReturn("Cognome");
+        when(volontarioDTO.getEmail()).thenReturn("email@example.com");
+        when(volontarioDTO.getPassword()).thenReturn("password");
+        when(volontarioDTO.getMatchingPassword()).thenReturn("matchingPassword");
+        when(volontarioDTO.getNazionalita()).thenReturn(nazioneId);
+        when(volontarioDTO.getDataNascita()).thenReturn(LocalDate.of(2004, Month.APRIL, 1));
+        when(volontarioDTO.getSesso()).thenReturn('M');
+        when(volontarioDTO.getNumeroPassaporto()).thenReturn("1234567890");
+        when(volontarioDTO.getDataScadenzaPassaporto()).thenReturn(LocalDate.of(2027, Month.APRIL, 1));
+        when(volontarioDTO.getDataEmissionePassaporto()).thenReturn(LocalDate.of(2022, Month.APRIL, 1));
+        when(volontarioDTO.getPassaporto()).thenReturn(passport);
+
+        when(paeseRepository.findById(nazioneId)).thenReturn(Optional.of(paese));
+        when(ruoloRepository.findByNome(Ruolo.VOLUNTEER)).thenReturn(ruolo);
+        when(passwordEncoder.encode(anyString())).thenAnswer(invocation -> invocation.getArgument(0));
+        when(passportStorageService.acceptUpload(passport)).thenThrow(new Exception());
+        when(volontarioRepository.save(any(Volontario.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(validator.validate(volontarioDTO)).thenReturn(Set.of());
+        when(utenteRepository.findByEmail(any())).thenReturn(volontario);
+        when(volontario.getPending()).thenReturn(false);
+
+        assertThrows(UserAlreadyExistsException.class, () -> gestioneUtente.registerVolunteer(volontarioDTO));
+
+        verify(volontarioRepository, times(0)).save(any());
+
+    }
+
+    @Test
+    void registerVolunteerAlreadyExistsPending() throws Exception {
+        var volontarioDTO = mock(VolontarioDTO.class);
+        var volontario = mock(Volontario.class);
+        var passport = new MockMultipartFile("File", "test.pdf", "application/pdf", new byte[0]);
+        var nazioneId = 1;
+        var paese = mock(Paese.class);
+        var ruolo = mock(Ruolo.class);
+
+        when(volontarioDTO.getNome()).thenReturn("Nome");
+        when(volontarioDTO.getCognome()).thenReturn("Cognome");
+        when(volontarioDTO.getEmail()).thenReturn("email@example.com");
+        when(volontarioDTO.getPassword()).thenReturn("password");
+        when(volontarioDTO.getMatchingPassword()).thenReturn("matchingPassword");
+        when(volontarioDTO.getNazionalita()).thenReturn(nazioneId);
+        when(volontarioDTO.getDataNascita()).thenReturn(LocalDate.of(2004, Month.APRIL, 1));
+        when(volontarioDTO.getSesso()).thenReturn('M');
+        when(volontarioDTO.getNumeroPassaporto()).thenReturn("1234567890");
+        when(volontarioDTO.getDataScadenzaPassaporto()).thenReturn(LocalDate.of(2027, Month.APRIL, 1));
+        when(volontarioDTO.getDataEmissionePassaporto()).thenReturn(LocalDate.of(2022, Month.APRIL, 1));
+        when(volontarioDTO.getPassaporto()).thenReturn(passport);
+
+        when(paeseRepository.findById(nazioneId)).thenReturn(Optional.of(paese));
+        when(ruoloRepository.findByNome(Ruolo.VOLUNTEER)).thenReturn(ruolo);
+        when(passwordEncoder.encode(anyString())).thenAnswer(invocation -> invocation.getArgument(0));
+        when(passportStorageService.acceptUpload(passport)).thenReturn("test.pdf");
+        when(volontarioRepository.save(any(Volontario.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(validator.validate(volontarioDTO)).thenReturn(Set.of());
+
+        when(utenteRepository.findByEmail(any())).thenReturn(volontario);
+        when(volontario.getPending()).thenReturn(true);
+
+
+        var res = assertDoesNotThrow(() -> gestioneUtente.registerVolunteer(volontarioDTO));
+
+        var utenteCaptor = ArgumentCaptor.forClass(Volontario.class);
+        verify(volontarioRepository, times(1)).save(utenteCaptor.capture());
+        var savedUtente = utenteCaptor.getValue();
+
+        assertSame(savedUtente, res);
+
+    }
+
+    @Test
+    void registerOrganizer() throws Exception {
+        var utenteDTO = mock(UtenteDTO.class);
+        var nazioneId = 1;
+        var paese = mock(Paese.class);
+        var ruolo = mock(Ruolo.class);
+
+        when(utenteDTO.getNome()).thenReturn("Nome");
+        when(utenteDTO.getCognome()).thenReturn("Cognome");
+        when(utenteDTO.getEmail()).thenReturn("email@example.com");
+        when(utenteDTO.getPassword()).thenReturn("password");
+        when(utenteDTO.getMatchingPassword()).thenReturn("matchingPassword");
+        when(utenteDTO.getNazionalita()).thenReturn(nazioneId);
+        when(utenteDTO.getDataNascita()).thenReturn(LocalDate.of(2004, Month.APRIL, 1));
+        when(utenteDTO.getSesso()).thenReturn('M');
+
+        when(paeseRepository.findById(nazioneId)).thenReturn(Optional.of(paese));
+        when(ruoloRepository.findByNome(Ruolo.ORGANIZER)).thenReturn(ruolo);
+        when(passwordEncoder.encode(anyString())).thenAnswer(invocation -> invocation.getArgument(0));
+        when(utenteRepository.save(any(Utente.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(validator.validate(utenteDTO)).thenReturn(Set.of());
+
+
+        var res = assertDoesNotThrow(() -> gestioneUtente.registerOrganizer(utenteDTO));
+
+        var utenteCaptor = ArgumentCaptor.forClass(Utente.class);
+        verify(utenteRepository, times(1)).save(utenteCaptor.capture());
+        var savedUtente = utenteCaptor.getValue();
+
+        assertSame(savedUtente, res);
+
+    }
+
+    @Test
+    void registerOrganizerConstraintValidationFails() throws Exception {
+        var utenteDTO = mock(UtenteDTO.class);
+
+        var constraintViolation = (ConstraintViolation<UtenteDTO>) mock(ConstraintViolation.class);
+        when(validator.validate(utenteDTO)).thenReturn(Set.of(constraintViolation));
+
+        assertThrows(ConstraintViolationException.class, () -> gestioneUtente.registerOrganizer(utenteDTO));
+
+        verify(utenteRepository, times(0)).save(any());
+    }
+
+    @Test
+    void registerOrganizerAlreadyExistsNotPending() throws Exception {
+        var utenteDTO = mock(UtenteDTO.class);
+        var utente = mock(Utente.class);
+
+
+        var passport = new MockMultipartFile("File", "test.pdf", "application/pdf", new byte[0]);
+        var nazioneId = 1;
+        var paese = mock(Paese.class);
+        var ruolo = mock(Ruolo.class);
+
+        when(utenteDTO.getNome()).thenReturn("Nome");
+        when(utenteDTO.getCognome()).thenReturn("Cognome");
+        when(utenteDTO.getEmail()).thenReturn("email@example.com");
+        when(utenteDTO.getPassword()).thenReturn("password");
+        when(utenteDTO.getMatchingPassword()).thenReturn("matchingPassword");
+        when(utenteDTO.getNazionalita()).thenReturn(nazioneId);
+        when(utenteDTO.getDataNascita()).thenReturn(LocalDate.of(2004, Month.APRIL, 1));
+        when(utenteDTO.getSesso()).thenReturn('M');
+
+        when(paeseRepository.findById(nazioneId)).thenReturn(Optional.of(paese));
+        when(ruoloRepository.findByNome(Ruolo.VOLUNTEER)).thenReturn(ruolo);
+        when(passwordEncoder.encode(anyString())).thenAnswer(invocation -> invocation.getArgument(0));
+        when(passportStorageService.acceptUpload(passport)).thenThrow(new Exception());
+        when(utenteRepository.save(any(Utente.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(validator.validate(utenteDTO)).thenReturn(Set.of());
+        when(utenteRepository.findByEmail(any())).thenReturn(utente);
+        when(utente.getPending()).thenReturn(false);
+
+        assertThrows(UserAlreadyExistsException.class, () -> gestioneUtente.registerOrganizer(utenteDTO));
+
+        verify(utenteRepository, times(0)).save(any());
+
+    }
+
+    @Test
+    void registerOrganizerAlreadyExistsPending() throws Exception {
+        var utenteDTO = mock(UtenteDTO.class);
+        var utente = mock(Utente.class);
+        var nazioneId = 1;
+        var paese = mock(Paese.class);
+        var ruolo = mock(Ruolo.class);
+
+        when(utenteDTO.getNome()).thenReturn("Nome");
+        when(utenteDTO.getCognome()).thenReturn("Cognome");
+        when(utenteDTO.getEmail()).thenReturn("email@example.com");
+        when(utenteDTO.getPassword()).thenReturn("password");
+        when(utenteDTO.getMatchingPassword()).thenReturn("matchingPassword");
+        when(utenteDTO.getNazionalita()).thenReturn(nazioneId);
+        when(utenteDTO.getDataNascita()).thenReturn(LocalDate.of(2004, Month.APRIL, 1));
+        when(utenteDTO.getSesso()).thenReturn('M');
+
+        when(paeseRepository.findById(nazioneId)).thenReturn(Optional.of(paese));
+        when(ruoloRepository.findByNome(Ruolo.ORGANIZER)).thenReturn(ruolo);
+        when(passwordEncoder.encode(anyString())).thenAnswer(invocation -> invocation.getArgument(0));
+        when(utenteRepository.save(any(Utente.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(validator.validate(utenteDTO)).thenReturn(Set.of());
+        when(utenteRepository.findByEmail(any())).thenReturn(utente);
+        when(utente.getPending()).thenReturn(true);
+
+
+        var res = assertDoesNotThrow(() -> gestioneUtente.registerOrganizer(utenteDTO));
+
+        var utenteCaptor = ArgumentCaptor.forClass(Utente.class);
+        verify(utenteRepository, times(1)).save(utenteCaptor.capture());
+        var savedUtente = utenteCaptor.getValue();
+
+        assertSame(savedUtente, res);
+
     }
 
 
