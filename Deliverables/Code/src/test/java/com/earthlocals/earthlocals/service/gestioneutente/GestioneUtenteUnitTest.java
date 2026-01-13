@@ -35,7 +35,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
-public class GestioneUnitUtenteTest {
+public class GestioneUtenteUnitTest {
     @Mock
     private VolontarioRepository volontarioRepository;
     @Mock
@@ -636,7 +636,7 @@ public class GestioneUnitUtenteTest {
 
         inOrder.verify(utente, times(1)).setPassword(captor.capture());
         String res = captor.getValue();
-        assertEquals(res, hashPassword);
+        assertEquals(hashPassword, res);
 
         inOrder.verify(utenteRepository).save(utente);
 
