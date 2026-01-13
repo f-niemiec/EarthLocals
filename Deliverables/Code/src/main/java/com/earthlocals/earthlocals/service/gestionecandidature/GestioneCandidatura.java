@@ -5,6 +5,8 @@ import com.earthlocals.earthlocals.service.gestionecandidature.dto.CandidaturaDT
 import com.earthlocals.earthlocals.service.gestionecandidature.exceptions.CandidaturaAlreadyExistsException;
 import com.earthlocals.earthlocals.service.gestionecandidature.exceptions.CandidaturaNotAcceptableException;
 import jakarta.transaction.Transactional;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,8 +26,13 @@ public class GestioneCandidatura {
     final private CandidaturaRepository candidaturaRepository;
     final private MissioneRepository missioneRepository;
     final private VolontarioRepository volontarioRepository;
+    final private Validator validator;
 
     public Candidatura registerCandidatura(CandidaturaDTO candidaturaDTO) {
+        var constraintViolation = validator.validate(candidaturaDTO);
+        if (!constraintViolation.isEmpty()) {
+            throw new ConstraintViolationException(constraintViolation);
+        }
         Missione missione = missioneRepository
                 .findById(candidaturaDTO.getMissioneId())
                 .orElseThrow(() -> new IllegalArgumentException("Missione non trovata"));
@@ -52,6 +59,10 @@ public class GestioneCandidatura {
     }
 
     public boolean hasVolontarioAlreadyApplied(CandidaturaDTO dto) {
+        var constraintViolation = validator.validate(dto);
+        if (!constraintViolation.isEmpty()) {
+            throw new ConstraintViolationException(constraintViolation);
+        }
         Missione missione = missioneRepository
                 .findById(dto.getMissioneId())
                 .orElseThrow(() -> new IllegalArgumentException("Missione non trovata"));
