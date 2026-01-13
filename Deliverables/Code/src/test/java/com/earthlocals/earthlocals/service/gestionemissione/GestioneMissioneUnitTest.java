@@ -346,12 +346,26 @@ public class GestioneMissioneUnitTest {
         assertInstanceOf(Resource.class, res);
     }
 
+    void getMissioniId() {
+        var missione = mock(Missione.class);
+        var id = 1L;
+        when(missioneRepository.findById(id)).thenReturn(Optional.of(missione));
+
+        var res = gestioneMissione.getMissioneById(id);
+        assertEquals(missione, res);
+    }
+
+    void getMissioniIdNotFound() {
+        var id = 1L;
+        when(missioneRepository.findById(id)).thenReturn(Optional.empty());
+
+        assertThrows(Exception.class, () -> gestioneMissione.getMissioneById(id));
+    }
 
     @TestConfiguration
     @EnableMethodSecurity(prePostEnabled = true)
     static class TestConfig {
 
     }
-
 
 }
