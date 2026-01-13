@@ -15,6 +15,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockMultipartFile;
@@ -25,6 +27,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -324,6 +327,23 @@ public class GestioneMissioneUnitTest {
 
         var res = gestioneMissione.getMissioniOrganizzatore(0, 1);
         assertEquals(page, res);
+    }
+
+    @Test
+    void getImmagineMissione() throws IOException {
+        var filename = "immagine";
+        var resource = mock(FileSystemResource.class);
+        when(storageService.downloadFile(any(String.class))).thenReturn(resource);
+        var res = gestioneMissione.getImmagineMissione(filename);
+        assertEquals(resource, res);
+    }
+
+    @Test
+    void getImmagineMissioneImageNotFound() throws IOException {
+        var filename = "immagine";
+        when(storageService.downloadFile(any(String.class))).thenThrow(new IOException());
+        var res = assertDoesNotThrow(() -> gestioneMissione.getImmagineMissione(filename));
+        assertInstanceOf(Resource.class, res);
     }
 
 

@@ -38,18 +38,19 @@ public class GestioneMissione {
             throw new ConstraintViolationException(constraintViolation);
         }
 
-        var missioneBuilder = Missione.missioneBuilder();
         String fileName = storageService.acceptUpload(missioneDTO.getFoto());
         Paese paese = paeseRepository.findById(missioneDTO.getPaese()).orElseThrow();
-        missioneBuilder.dataFine(missioneDTO.getDataFine());
-        missioneBuilder.creatore(missioneDTO.getCreatore());
-        missioneBuilder.citta(missioneDTO.getCitta());
-        missioneBuilder.competenzeRichieste(missioneDTO.getCompetenzeRichieste());
-        missioneBuilder.dataInizio(missioneDTO.getDataInizio());
-        missioneBuilder.descrizione(missioneDTO.getDescrizione());
-        missioneBuilder.immagine(fileName);
-        missioneBuilder.nome(missioneDTO.getNome());
-        missioneBuilder.paese(paese);
+        var missioneBuilder = Missione.missioneBuilder()
+                .dataFine(missioneDTO.getDataFine())
+                .creatore(missioneDTO.getCreatore())
+                .citta(missioneDTO.getCitta())
+                .competenzeRichieste(missioneDTO.getCompetenzeRichieste())
+                .dataInizio(missioneDTO.getDataInizio())
+                .descrizione(missioneDTO.getDescrizione())
+                .immagine(fileName)
+                .nome(missioneDTO.getNome())
+                .paese(paese);
+
         if (missioneDTO.getRequisitiExtra() != null) {
             missioneBuilder.requisitiExtra(missioneDTO.getRequisitiExtra());
         }
@@ -134,7 +135,7 @@ public class GestioneMissione {
     }
 
 
-    public Resource getImmagineMissione(String immagine) throws Exception {
+    public Resource getImmagineMissione(String immagine) {
         try {
             return storageService.downloadFile(immagine);
         } catch (Exception e) {
