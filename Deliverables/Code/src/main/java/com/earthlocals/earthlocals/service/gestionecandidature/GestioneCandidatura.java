@@ -62,7 +62,7 @@ public class GestioneCandidatura {
         return candidaturaRepository.existsByMissioneAndCandidato(missione, candidato);
     }
 
-    private boolean hasVolontarioAlreadyApplied(Missione missione, Volontario candidato) {
+    public boolean hasVolontarioAlreadyApplied(Missione missione, Volontario candidato) {
         return candidaturaRepository.existsByMissioneAndCandidato(missione, candidato);
     }
 
