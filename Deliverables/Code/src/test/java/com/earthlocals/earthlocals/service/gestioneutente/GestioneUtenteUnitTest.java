@@ -1,10 +1,9 @@
 package com.earthlocals.earthlocals.service.gestioneutente;
 
 import com.earthlocals.earthlocals.model.*;
-import com.earthlocals.earthlocals.service.gestioneutente.dto.EditPasswordDTO;
-import com.earthlocals.earthlocals.service.gestioneutente.dto.EditUtenteDTO;
-import com.earthlocals.earthlocals.service.gestioneutente.dto.UtenteDTO;
-import com.earthlocals.earthlocals.service.gestioneutente.dto.VolontarioDTO;
+import com.earthlocals.earthlocals.service.gestioneutente.dto.*;
+import com.earthlocals.earthlocals.service.gestioneutente.exceptions.ExpiredResetTokenException;
+import com.earthlocals.earthlocals.service.gestioneutente.exceptions.PasswordResetTokenNotFoundException;
 import com.earthlocals.earthlocals.service.gestioneutente.exceptions.UserAlreadyExistsException;
 import com.earthlocals.earthlocals.service.gestioneutente.exceptions.WrongPasswordException;
 import com.earthlocals.earthlocals.service.gestioneutente.passport.PassportStorageService;
@@ -26,6 +25,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
@@ -35,7 +35,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
-public class GestioneUnitUtenteTest {
+public class GestioneUtenteUnitTest {
     @Mock
     private VolontarioRepository volontarioRepository;
     @Mock
@@ -611,6 +611,72 @@ public class GestioneUnitUtenteTest {
         assertEquals(res, Optional.of(verToken.getToken()));
     }
 
+    @Test
+    void resetPassword() {
+        var dto = mock(ResetPasswordDTO.class);
+        when(validator.validate(dto)).thenReturn(Collections.emptySet());
+
+        var token = "abc";
+        when(dto.getToken()).thenReturn(token);
+        var passToken = mock(PasswordResetToken.class);
+        when(passwordResetTokenRepository.findByToken(dto.getToken())).thenReturn(Optional.of(passToken));
+        when(passToken.isExpired()).thenReturn(false);
+
+        var utente = mock(Utente.class);
+        when(passToken.getUtente()).thenReturn(utente);
+
+        var hashPassword = "encodedPassword";
+        when(dto.getNewPassword()).thenReturn("abcDEF123!!!");
+        when(passwordEncoder.encode(dto.getNewPassword())).thenReturn(hashPassword);
+
+        assertDoesNotThrow(() -> gestioneUtente.resetPassword(dto));
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        InOrder inOrder = inOrder(utente, utenteRepository);
+
+        inOrder.verify(utente, times(1)).setPassword(captor.capture());
+        String res = captor.getValue();
+        assertEquals(hashPassword, res);
+
+        inOrder.verify(utenteRepository).save(utente);
+
+        verify(passwordResetTokenRepository).delete(passToken);
+    }
+
+    @Test
+    void resetPasswordConstraintViolation() {
+        var dto = mock(ResetPasswordDTO.class);
+        var constraintViolation = (ConstraintViolation<ResetPasswordDTO>) mock(ConstraintViolation.class);
+        when(validator.validate(dto)).thenReturn(Set.of(constraintViolation));
+
+        assertThrows(ConstraintViolationException.class, () -> gestioneUtente.resetPassword(dto));
+    }
+
+    @Test
+    void resetPasswordTokenNotFound() {
+        var dto = mock(ResetPasswordDTO.class);
+        when(validator.validate(dto)).thenReturn(Collections.emptySet());
+
+        var token = "abc";
+        when(dto.getToken()).thenReturn(token);
+        when(passwordResetTokenRepository.findByToken(dto.getToken())).thenReturn(Optional.empty());
+        assertThrows(PasswordResetTokenNotFoundException.class, () -> gestioneUtente.resetPassword(dto));
+
+    }
+
+    @Test
+    void resetPasswordTokenIsExpired() {
+        var dto = mock(ResetPasswordDTO.class);
+        when(validator.validate(dto)).thenReturn(Collections.emptySet());
+
+        var token = "abc";
+        when(dto.getToken()).thenReturn(token);
+        var passToken = mock(PasswordResetToken.class);
+        when(passwordResetTokenRepository.findByToken(dto.getToken())).thenReturn(Optional.of(passToken));
+        when(passToken.isExpired()).thenReturn(true);
+
+        assertThrows(ExpiredResetTokenException.class, () -> gestioneUtente.resetPassword(dto));
+    }
 
     @TestConfiguration
     @EnableMethodSecurity(prePostEnabled = true)
