@@ -12,7 +12,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -66,4 +68,42 @@ public class MissionController {
 
         return gestioneMissione.getImmagineMissione(path);
     }
+
+    @PostMapping("/candidatura")
+    @PreAuthorize("hasRole('VOLUNTEER')")
+    public String effettuaCandidatura(@RequestParam(name = "id") Long id, @AuthenticationPrincipal Volontario volontario) {
+        var candidaturaDTO = new CandidaturaDTO(volontario.getId(), id);
+        var candidatura = gestioneCandidatura.registerCandidatura(candidaturaDTO);
+        emailService.inviaEmailCandidatura(candidatura.getId());
+        return "redirect:/mission?id=" + id;
+
+    }
+
+    @PostMapping("/candidatura/remove")
+    @PreAuthorize("hasRole('VOLUNTEER')")
+    public String rimuoviCandidatura(@RequestParam(name = "id") Long id, @AuthenticationPrincipal Volontario volontario) {
+        var candidaturaDTO = new CandidaturaDTO(volontario.getId(), id);
+        gestioneCandidatura.removeCandidatura(candidaturaDTO);
+        return "redirect:/mission?id=" + id;
+
+    }
+
+    @PostMapping("/candidatura/reject")
+    @PreAuthorize("hasRole('ORGANIZER')")
+    public String rejectCandidatura(@RequestParam(name = "id") Long id, @RequestHeader(value = "referer", required = false) final String referer) {
+        if (gestioneCandidatura.rejectCandidatura(id)) {
+            emailService.inviaEmailRifiutoCandidatura(id);
+        }
+        return "redirect:" + referer;
+    }
+
+    @PostMapping("/candidatura/accept")
+    @PreAuthorize("hasRole('ORGANIZER')")
+    public String acceptCandidatura(@RequestParam(name = "id") Long id, @RequestHeader(value = "referer", required = false) final String referer) {
+        if (gestioneCandidatura.acceptCandidatura(id)) {
+            emailService.inviaEmailAccettazioneCandidatura(id);
+        }
+        return "redirect:" + referer;
+    }
+
 }
