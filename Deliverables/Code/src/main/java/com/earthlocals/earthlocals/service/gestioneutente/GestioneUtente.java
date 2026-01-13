@@ -69,7 +69,7 @@ public class GestioneUtente {
 
         var utente = utenteBuilder.build();
 
-        utenteRepository.save(utente);
+        volontarioRepository.save(utente);
         return utente;
     }
 
