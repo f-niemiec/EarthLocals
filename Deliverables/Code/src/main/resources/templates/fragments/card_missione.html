@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="it"
+      xmlns:th="https://www.thymeleaf.org">
+<th:block th:fragment="card_missione(missione, cardButton, afterImage)">
+  <div class="card h-100 shadow-sm border-0 hover-effect">
+    <div class="position-relative card-img-top-3-2">
+      <!--TODO: aggiungere loader se rimane tempo-->
+      <img alt="Immagine card"
+           class="card-img card-img-top-3-2 "
+           onerror="this.onerror=null; this.src='https://picsum.photos/300/200'"
+           style="font-size: 0;"
+           th:src="@{/mission/image/{path}(path = ${missione.immagine})}"
+      />
+      <th:block th:replace="${afterImage}"></th:block>
+    </div>
+    <div class="card-body">
+      <h5 class="card-title fw-bold" th:text="${missione.nome}"></h5>
+
+      <div class="mb-3 text-secondary small">
+        <div class="mb-1">
+          <i class="fa-solid fa-location-dot text-primary me-2"></i>
+          <span th:text="${missione.citta}"></span>, <span
+                th:text="${missione.paese.nome}"></span>
+        </div>
+        <div>
+          <i class="fa-regular fa-calendar text-primary me-2"></i>
+          <span th:text="${#dates.format(missione.dataInizio, 'dd/MM/yyyy')}"></span>
+          -
+          <span th:text="${#dates.format(missione.dataFine, 'dd/MM/yyyy')}"></span>
+        </div>
+      </div>
+      <p class="card-text text-muted card-clamp" th:text="${missione.descrizione}">
+      </p>
+    </div>
+    <div class="card-footer border-top-0 py-3">
+      <th:block th:replace="${cardButton}"></th:block>
+    </div>
+  </div>
+</th:block>
+</html>

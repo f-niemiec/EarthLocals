@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{account/fragments/account_layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="https://www.thymeleaf.org"
+>
+<head>
+    <link rel="stylesheet" th:href="@{/resources/css/card.css}"/>
+</head>
+<body>
+<th:block layout:fragment="account_content">
+    <div class="d-flex justify-content-between mb-4 flex-column flex-md-row">
+        <h1 class="mb-4 mb-md-0">Gestione missioni</h1>
+        <div class="d-flex justify-content-md-center align-items-center g-4">
+            <a class="btn btn-primary" href="/account/organizer/mission/new">Nuova missione</a>
+        </div>
+    </div>
+    <!--TODO: L'intera pagina, più magari il paginig-->
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4 mb-4">
+        <th:block th:each="missione : ${missioni}">
+            <div class="col">
+                <th:block
+                        th:replace="fragments/card_missione :: card_missione(${missione}, ~{ :: #missionButton}, ~{:: badge})">
+                    <a class="btn btn-primary w-100 rounded-pill" id="missionButton"
+                       th:href="@{/mission(id = ${missione.id})}">
+                        Visualizza Dettagli <i class="fa-solid fa-arrow-right ms-1"></i>
+                    </a>
+                    <div class="position-absolute top-0 end-0 me-2 mt-2" th:fragment="badge">
+                        <th:block th:switch="${missione.stato}">
+                            <th:block th:case="${missione.stato.ACCETTATA}">
+                                <span class="badge text-bg-primary">Accettata</span>
+                            </th:block>
+                            <th:block th:case="${missione.stato.COMPLETATA}">
+                                <span class="badge text-bg-success">Completata</span>
+                            </th:block>
+                            <th:block th:case="${missione.stato.RIFIUTATA}">
+                                <span class="badge text-bg-secondary">Rifiutata</span>
+                            </th:block>
+                            <th:block th:case="${missione.stato.PENDING}">
+                                <span class="badge text-bg-warning">Pending</span>
+                            </th:block>
+                        </th:block>
+                    </div>
+                </th:block>
+            </div>
+
+        </th:block>
+    </div>
+
+    <th:block th:replace="fragments/pagination :: pagination(${missioni})"></th:block>
+</th:block>
+</body>
+</html>

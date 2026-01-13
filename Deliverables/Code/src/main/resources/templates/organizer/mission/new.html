@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{account/fragments/account_layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="https://www.thymeleaf.org"
+>
+<body>
+<th:block layout:fragment="account_content">
+    <h1 class="mb-4">Nuova missione</h1>
+    <div class="alert alert-success mb-4" th:if="${param.success}">
+        <strong>Creazione missione effettuata con successo!</strong> <br/>
+    </div>
+    <form enctype="multipart/form-data" method="post" th:action="@{/account/organizer/mission/new}"
+          th:object="${missioneDTO}">
+
+        <div class="mb-4">
+            <!--TODO: Aggiungere controllo client side per la dimensione del file-->
+            <!-- TODO: Aggiungere preview immagine -->
+            <label class="form-label" for="passaportoEditPassportForm">Foto</label>
+            <input class="form-control" id="passaportoEditPassportForm"
+                   required
+                   th:classappend="${#fields.hasErrors('foto')} ? 'is-invalid' : ''"
+                   th:field="*{foto}"
+                   type="file">
+            <div class="invalid-feedback" th:each="error : ${#fields.errors('foto')}"
+                 th:text="${error}"></div>
+        </div>
+        <div class="mb-4">
+            <label class="form-label" for="title">Titolo</label>
+            <input class="form-control" id="title" required
+                   th:classappend="${#fields.hasErrors('nome')} ? 'is-invalid' : ''" th:field="*{nome}"
+                   type="text"
+            >
+            <div class="invalid-feedback" th:each="error : ${#fields.errors('nome')}"
+                 th:text="${error}"></div>
+        </div>
+        <div class="mb-4">
+            <label class="form-label" for="description">Descrizione</label>
+            <!-- TODO: Decidere un limite ragionevole di caratteri per questo e altri field -->
+            <textarea class="form-control" id="description" required
+                      rows="3" th:classappend="${#fields.hasErrors('descrizione')} ? 'is-invalid' : ''"
+                      th:field="*{descrizione}"></textarea>
+            <div class="invalid-feedback" th:each="error : ${#fields.errors('descrizione')}"
+                 th:text="${error}"></div>
+        </div>
+        <div class="row row-cols-1 row-cols-md-2 g-4 mb-4">
+            <!-- TODO: Rendere select -->
+            <div>
+                <label class="form-label" for="paese">Paese</label>
+                <select class="form-select" id="paese" required
+                        th:classappend="${#fields.hasErrors('paese')} ? 'is-invalid' : ''" th:field="*{paese}">
+                    <th:block th:each="paese:${paesi}">
+                        <option th:value="${paese.id}" th:text="${paese.nome}"></option>
+                    </th:block>
+                </select>
+                <div class="invalid-feedback" th:each="error : ${#fields.errors('paese')}"
+                     th:text="${error}"></div>
+            </div>
+            <div>
+                <label class="form-label" for="citta">Città</label>
+                <input class="form-control" id="citta"
+                       required th:classappend="${#fields.hasErrors('citta')} ? 'is-invalid' : ''" th:field="*{citta}"
+                       type="text">
+                <div class="invalid-feedback" th:each="error : ${#fields.errors('citta')}"
+                     th:text="${error}"></div>
+            </div>
+            <div>
+                <label class="form-label" for="dataInizio">Data inizio</label>
+                <input class="form-control" id="dataInizio"
+                       required th:classappend="${#fields.hasErrors('dataInizio')} ? 'is-invalid' : ''"
+                       th:field="*{dataInizio}" type="date">
+                <div class="invalid-feedback" th:each="error : ${#fields.errors('dataInizio')}"
+                     th:text="${error}"></div>
+            </div>
+            <div>
+                <label class="form-label" for="dataFine">Data fine</label>
+                <input class="form-control" id="dataFine"
+                       required th:classappend="${#fields.hasErrors('dataFine')} ? 'is-invalid' : ''"
+                       th:field="*{dataFine}" type="date">
+                <div class="invalid-feedback" th:each="error : ${#fields.errors('dataFine')}"
+                     th:text="${error}"></div>
+            </div>
+        </div>
+        <div class="mb-4">
+            <label class="form-label" for="competenze">Competenze richieste</label>
+            <textarea class="form-control" id="competenze" required
+                      rows="3"
+                      th:classappend="${#fields.hasErrors('competenzeRichieste')} ? 'is-invalid' : ''"
+                      th:field="*{competenzeRichieste}"></textarea>
+            <div class="invalid-feedback" th:each="error : ${#fields.errors('competenzeRichieste')}"
+                 th:text="${error}"></div>
+        </div>
+        <div class="mb-4">
+            <label class="form-label" for="extra">Requisiti extra</label>
+            <textarea class="form-control" id="extra"
+                      rows="3"
+                      th:classappend="${#fields.hasErrors('requisitiExtra')} ? 'is-invalid' : ''"
+                      th:field="*{requisitiExtra}"></textarea>
+            <div class="invalid-feedback" th:each="error : ${#fields.errors('requisitiExtra')}"
+                 th:text="${error}"></div>
+        </div>
+
+
+        <div class="d-flex justify-content-end">
+            <th:block th:replace="fragments/submit_button.html :: submitButton ('Crea')"></th:block>
+        </div>
+    </form>
+</th:block>
+</body>
+</html>
