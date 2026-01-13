@@ -160,7 +160,10 @@ public class GestioneUtente {
         if (!user.getPending()) {
             throw new UserAlreadyExistsException();
         }
-        //TODO
+        var verification = verificationTokenRepository.findByUtente(user);
+        if (verification != null) {
+            verificationTokenRepository.delete(verification);
+        }
         utenteRepository.delete(user);
     }
 

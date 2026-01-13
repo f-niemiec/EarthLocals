@@ -11,10 +11,7 @@ import jakarta.validation.Validator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -22,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.Optional;
 import java.util.Set;
@@ -342,6 +340,56 @@ public class GestioneUnitUtenteTest {
 
         assertSame(savedUtente, res);
 
+    }
+
+    @Test
+    void createVerificationToken() {
+        var utente = mock(Utente.class);
+        var res = gestioneUtente.createVerificationToken(utente);
+        ArgumentCaptor<VerificationToken> captor = ArgumentCaptor.forClass(VerificationToken.class);
+        verify(verificationTokenRepository, times(1)).save(captor.capture());
+        var verToken = captor.getValue();
+        assertEquals(res, verToken.getToken());
+    }
+
+    @Test
+    void activateAccount() {
+        String token = "abc";
+        var verToken = mock(VerificationToken.class);
+        var utente = mock(Utente.class);
+        when(verificationTokenRepository.findByToken(token)).thenReturn(Optional.of(verToken));
+        when(verToken.getUtente()).thenReturn(utente);
+        when(verToken.getExpiryDate()).thenReturn(LocalDateTime.now().plusDays(1));
+
+        gestioneUtente.activateAccount(token);
+
+        InOrder inOrder = inOrder(utente, utenteRepository);
+        inOrder.verify(utente).setPending(false);
+        inOrder.verify(utenteRepository).save(utente);
+        verify(utente, never()).setPending(true);
+
+        verify(verificationTokenRepository).delete(verToken);
+
+    }
+
+    @Test
+    void activateAccountTokenNotFound() {
+        String token = "abc";
+        when(verificationTokenRepository.findByToken(token)).thenReturn(Optional.empty());
+
+        assertThrows(Exception.class, () -> gestioneUtente.activateAccount(token));
+    }
+
+    @Test
+    void activateAccountTokenExpired() {
+        String token = "abc";
+        var verToken = mock(VerificationToken.class);
+        var utente = mock(Utente.class);
+        when(verificationTokenRepository.findByToken(token)).thenReturn(Optional.of(verToken));
+        when(verToken.getUtente()).thenReturn(utente);
+        when(verToken.getExpiryDate()).thenReturn(LocalDateTime.now().minusDays(1));
+
+        assertThrows(RuntimeException.class, () -> gestioneUtente.activateAccount(token));
     }
 
 
