@@ -43,7 +43,7 @@ public class GestioneUtente {
         if (!constraintViolation.isEmpty()) {
             throw new ConstraintViolationException(constraintViolation);
         }
-        checkUserExists(volontarioDTO.getEmail());
+        registrationChecks(volontarioDTO.getEmail());
         Paese p = paeseRepository.findById(volontarioDTO.getNazionalita()).orElseThrow();
         Ruolo ruolo = ruoloRepository.findByNome(Ruolo.VOLUNTEER);
 
@@ -78,7 +78,7 @@ public class GestioneUtente {
         if (!constraintViolation.isEmpty()) {
             throw new ConstraintViolationException(constraintViolation);
         }
-        checkUserExists(utenteDTO.getEmail());
+        registrationChecks(utenteDTO.getEmail());
 
         Paese p = paeseRepository.findById(utenteDTO.getNazionalita()).orElseThrow();
         Ruolo ruolo = ruoloRepository.findByNome(Ruolo.ORGANIZER);
@@ -154,7 +154,7 @@ public class GestioneUtente {
         return volontarioRepository.save(volontario);
     }
 
-    private void checkUserExists(String email) throws UserAlreadyExistsException {
+    private void registrationChecks(String email) throws UserAlreadyExistsException {
         var user = utenteRepository.findByEmail(email);
         if (user == null) {
             return;
