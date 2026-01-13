@@ -490,6 +490,47 @@ public class GestioneUnitUtenteTest {
         assertThrows(RuntimeException.class, () -> gestioneUtente.activateAccount(token));
     }
 
+    @Test
+    void createPasswordResetToken() {
+        String email = "utente@email.com";
+        var utente = mock(Utente.class);
+        when(utenteRepository.findByEmail(email)).thenReturn(utente);
+        when(passwordResetTokenRepository.findByUtente(utente)).thenReturn(Optional.empty());
+
+        var res = gestioneUtente.createPasswordResetToken(email);
+        ArgumentCaptor<PasswordResetToken> captor = ArgumentCaptor.forClass(PasswordResetToken.class);
+        verify(passwordResetTokenRepository, times(1)).save(captor.capture());
+        var verToken = captor.getValue();
+        assertEquals(res, Optional.of(verToken.getToken()));
+    }
+
+    @Test
+    void createPasswordResetTokenUtenteNull() {
+        String email = "utente@email.com";
+        when(utenteRepository.findByEmail(email)).thenReturn(null);
+
+        var res = gestioneUtente.createPasswordResetToken(email);
+
+        assertEquals(res, Optional.empty());
+    }
+
+    @Test
+    void createPasswordResetTokenFindByUtentePresent() {
+        String email = "utente@email.com";
+        var utente = mock(Utente.class);
+        var pwResetToken = mock(PasswordResetToken.class);
+
+        when(utenteRepository.findByEmail(email)).thenReturn(utente);
+        when(passwordResetTokenRepository.findByUtente(utente)).thenReturn(Optional.of(pwResetToken));
+
+        var res = gestioneUtente.createPasswordResetToken(email);
+        verify(passwordResetTokenRepository).delete(pwResetToken);
+        ArgumentCaptor<PasswordResetToken> captor = ArgumentCaptor.forClass(PasswordResetToken.class);
+        verify(passwordResetTokenRepository, times(1)).save(captor.capture());
+        var verToken = captor.getValue();
+        assertEquals(res, Optional.of(verToken.getToken()));
+    }
+
 
     @TestConfiguration
     @EnableMethodSecurity(prePostEnabled = true)
