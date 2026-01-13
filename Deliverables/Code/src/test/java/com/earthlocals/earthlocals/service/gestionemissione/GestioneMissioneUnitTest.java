@@ -75,16 +75,6 @@ public class GestioneMissioneUnitTest {
         when(missioneDTO.getFoto()).thenReturn(file);
         when(missioneDTO.getCreatore()).thenReturn(utente);
 
-//        missioneDTO.setNome("Help teaching a Pechino ");
-//        missioneDTO.setPaese(1);
-//        missioneDTO.setCitta("Pechino");
-//        missioneDTO.setDescrizione("Descrizione di almeno 20 caratteri");
-//        missioneDTO.setDataInizio(LocalDate.now().plusDays(2));
-//        missioneDTO.setDataFine(LocalDate.now().plusDays(3));
-//        missioneDTO.setCompetenzeRichieste("Competenze richieste");
-//        missioneDTO.setRequisitiExtra("Requisiti extra");
-//        missioneDTO.setFoto(file);
-//        missioneDTO.setCreatore(utente);
         var paese = mock(Paese.class);
 
         when(paese.getId()).thenReturn(1);
