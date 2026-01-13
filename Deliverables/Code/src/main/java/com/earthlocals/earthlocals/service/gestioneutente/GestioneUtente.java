@@ -135,6 +135,7 @@ public class GestioneUtente {
         return utenteRepository.save(utente);
     }
 
+    @PreAuthorize("isAuthenticated() and hasRole('VOLUNTEER')")
     public Volontario editPassport(EditPassportDTO editPassportDTO) {
         var constraintViolation = validator.validate(editPassportDTO);
         if (!constraintViolation.isEmpty()) {
