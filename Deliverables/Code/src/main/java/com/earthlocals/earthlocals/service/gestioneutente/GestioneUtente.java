@@ -8,6 +8,8 @@ import com.earthlocals.earthlocals.service.gestioneutente.exceptions.UserAlready
 import com.earthlocals.earthlocals.service.gestioneutente.exceptions.WrongPasswordException;
 import com.earthlocals.earthlocals.service.gestioneutente.passport.PassportStorageService;
 import jakarta.transaction.Transactional;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,8 +36,13 @@ public class GestioneUtente {
     final private PaeseRepository paeseRepository;
     final private VerificationTokenRepository verificationTokenRepository;
     final private PasswordResetTokenRepository passwordResetTokenRepository;
+    final private Validator validator;
 
     public Utente registerVolunteer(VolontarioDTO volontarioDTO) throws UserAlreadyExistsException {
+        var constraintViolation = validator.validate(volontarioDTO);
+        if (!constraintViolation.isEmpty()) {
+            throw new ConstraintViolationException(constraintViolation);
+        }
         checkUserExists(volontarioDTO.getEmail());
         Paese p = paeseRepository.findById(volontarioDTO.getNazionalita()).orElseThrow();
         Ruolo ruolo = ruoloRepository.findByNome(Ruolo.VOLUNTEER);
@@ -67,6 +74,10 @@ public class GestioneUtente {
     }
 
     public Utente registerOrganizer(UtenteDTO utenteDTO) throws UserAlreadyExistsException {
+        var constraintViolation = validator.validate(utenteDTO);
+        if (!constraintViolation.isEmpty()) {
+            throw new ConstraintViolationException(constraintViolation);
+        }
         checkUserExists(utenteDTO.getEmail());
 
         Paese p = paeseRepository.findById(utenteDTO.getNazionalita()).orElseThrow();
@@ -92,6 +103,10 @@ public class GestioneUtente {
     }
 
     public Utente editUser(EditUtenteDTO editUtenteDTO) {
+        var constraintViolation = validator.validate(editUtenteDTO);
+        if (!constraintViolation.isEmpty()) {
+            throw new ConstraintViolationException(constraintViolation);
+        }
         var auth = SecurityContextHolder.getContext().getAuthentication();
         var utente = (Utente) auth.getPrincipal();
         var p = paeseRepository.findById(editUtenteDTO.getNazionalita()).orElseThrow();
@@ -106,6 +121,10 @@ public class GestioneUtente {
     }
 
     public Utente editPassword(EditPasswordDTO editPasswordDTO) throws WrongPasswordException {
+        var constraintViolation = validator.validate(editPasswordDTO);
+        if (!constraintViolation.isEmpty()) {
+            throw new ConstraintViolationException(constraintViolation);
+        }
         var auth = SecurityContextHolder.getContext().getAuthentication();
         var utente = (Utente) auth.getPrincipal();
         if (!passwordEncoder.matches(editPasswordDTO.getCurrentPassword(), utente.getPassword())) {
@@ -116,6 +135,10 @@ public class GestioneUtente {
     }
 
     public Volontario editPassport(EditPassportDTO editPassportDTO) {
+        var constraintViolation = validator.validate(editPassportDTO);
+        if (!constraintViolation.isEmpty()) {
+            throw new ConstraintViolationException(constraintViolation);
+        }
         var auth = SecurityContextHolder.getContext().getAuthentication();
         var volontario = (Volontario) auth.getPrincipal();
         volontario.setNumeroPassaporto(editPassportDTO.getNumeroPassaporto());
@@ -144,6 +167,8 @@ public class GestioneUtente {
 
     @PreAuthorize("hasRole('VOLUNTEER')")
     public FileSystemResource getPassportVolontarioFileResource() throws Exception {
+
+
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Volontario volontario = (Volontario) auth.getPrincipal();
         return passportStorageService.downloadFile(volontario.getPathPassaporto());
@@ -181,6 +206,10 @@ public class GestioneUtente {
     }
 
     public void resetPassword(ResetPasswordDTO dto) throws PasswordResetTokenNotFoundException, ExpiredResetTokenException {
+        var constraintViolation = validator.validate(dto);
+        if (!constraintViolation.isEmpty()) {
+            throw new ConstraintViolationException(constraintViolation);
+        }
         var passToken = passwordResetTokenRepository.findByToken(dto.getToken()).orElseThrow(PasswordResetTokenNotFoundException::new);
         if (passToken.isExpired()) {
             throw new ExpiredResetTokenException();

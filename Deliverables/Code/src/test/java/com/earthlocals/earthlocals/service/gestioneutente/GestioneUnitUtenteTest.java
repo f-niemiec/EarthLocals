@@ -2,6 +2,7 @@ package com.earthlocals.earthlocals.service.gestioneutente;
 
 import com.earthlocals.earthlocals.model.*;
 import com.earthlocals.earthlocals.service.gestioneutente.passport.PassportStorageService;
+import jakarta.validation.Validator;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -27,6 +28,8 @@ public class GestioneUnitUtenteTest {
     private VerificationTokenRepository verificationTokenRepository;
     @Mock
     private PasswordResetTokenRepository passwordResetTokenRepository;
+    @Mock
+    private Validator validator;
     @InjectMocks
     private GestioneUtente gestioneUtente;
 
