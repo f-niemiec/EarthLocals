@@ -47,20 +47,20 @@ public class GestioneUtente {
         Paese p = paeseRepository.findById(volontarioDTO.getNazionalita()).orElseThrow();
         Ruolo ruolo = ruoloRepository.findByNome(Ruolo.VOLUNTEER);
 
-        var utenteBuilder = Volontario.volontarioBuilder();
+        var utenteBuilder = Volontario.volontarioBuilder()
+                .nome(volontarioDTO.getNome())
+                .cognome(volontarioDTO.getCognome())
+                .email(volontarioDTO.getEmail())
+                .password(passwordEncoder.encode(volontarioDTO.getPassword()))
+                .dataNascita(volontarioDTO.getDataNascita())
+                .sesso(volontarioDTO.getSesso())
+                .nazionalita(p)
+                .pending(true)
+                .ruoli(Collections.singletonList(ruolo))
+                .numeroPassaporto(volontarioDTO.getNumeroPassaporto())
+                .dataScadenzaPassaporto(volontarioDTO.getDataScadenzaPassaporto())
+                .dataEmissionePassaporto(volontarioDTO.getDataEmissionePassaporto());
 
-        utenteBuilder.nome(volontarioDTO.getNome());
-        utenteBuilder.cognome(volontarioDTO.getCognome());
-        utenteBuilder.email(volontarioDTO.getEmail());
-        utenteBuilder.password(passwordEncoder.encode(volontarioDTO.getPassword()));
-        utenteBuilder.dataNascita(volontarioDTO.getDataNascita());
-        utenteBuilder.sesso(volontarioDTO.getSesso());
-        utenteBuilder.nazionalita(p);
-        utenteBuilder.pending(true);
-        utenteBuilder.ruoli(Collections.singletonList(ruolo));
-        utenteBuilder.numeroPassaporto(volontarioDTO.getNumeroPassaporto());
-        utenteBuilder.dataScadenzaPassaporto(volontarioDTO.getDataScadenzaPassaporto());
-        utenteBuilder.dataEmissionePassaporto(volontarioDTO.getDataEmissionePassaporto());
         try {
             utenteBuilder.pathPassaporto(passportStorageService.acceptUpload(volontarioDTO.getPassaporto()));
         } catch (Exception e) {
@@ -84,17 +84,16 @@ public class GestioneUtente {
         Ruolo ruolo = ruoloRepository.findByNome(Ruolo.ORGANIZER);
 
         // TODO: Evitare ripetizione codice
-        var utenteBuilder = Utente.utenteBuilder();
-
-        utenteBuilder.nome(utenteDTO.getNome());
-        utenteBuilder.cognome(utenteDTO.getCognome());
-        utenteBuilder.email(utenteDTO.getEmail());
-        utenteBuilder.password(passwordEncoder.encode(utenteDTO.getPassword()));
-        utenteBuilder.dataNascita(utenteDTO.getDataNascita());
-        utenteBuilder.sesso(utenteDTO.getSesso());
-        utenteBuilder.nazionalita(p);
-        utenteBuilder.pending(true);
-        utenteBuilder.ruoli(Collections.singletonList(ruolo));
+        var utenteBuilder = Utente.utenteBuilder()
+                .nome(utenteDTO.getNome())
+                .cognome(utenteDTO.getCognome())
+                .email(utenteDTO.getEmail())
+                .password(passwordEncoder.encode(utenteDTO.getPassword()))
+                .dataNascita(utenteDTO.getDataNascita())
+                .sesso(utenteDTO.getSesso())
+                .nazionalita(p)
+                .pending(true)
+                .ruoli(Collections.singletonList(ruolo));
 
         var utente = utenteBuilder.build();
 
