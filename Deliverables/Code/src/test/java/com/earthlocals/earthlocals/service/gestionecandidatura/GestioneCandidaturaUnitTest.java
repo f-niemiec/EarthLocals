@@ -223,5 +223,34 @@ public class GestioneCandidaturaUnitTest {
         verify(candidaturaRepository, never()).save(any());
     }
 
-    
+    @Test
+    void hasVolontarioAlreadyAppliedTwo() throws Exception{
+        var missione = mock(Missione.class);
+        var volontario = mock(Volontario.class);
+
+        when(candidaturaRepository.existsByMissioneAndCandidato(missione, volontario))
+                .thenReturn(false);
+
+        boolean result = gestioneCandidatura.hasVolontarioAlreadyApplied(missione, volontario);
+
+        assertFalse(result);
+
+        verify(candidaturaRepository).existsByMissioneAndCandidato(missione, volontario);
+    }
+
+    @Test
+    void alreadyAppliedTwoCostraintFails() throws Exception{
+        var missione = mock(Missione.class);
+        var volontario = mock(Volontario.class);
+
+        when(candidaturaRepository.existsByMissioneAndCandidato(missione, volontario))
+                .thenReturn(true);
+
+        boolean result = gestioneCandidatura.hasVolontarioAlreadyApplied(missione, volontario);
+
+        assertTrue(result);
+
+        verify(candidaturaRepository).existsByMissioneAndCandidato(missione, volontario);
+    }
+
 }
