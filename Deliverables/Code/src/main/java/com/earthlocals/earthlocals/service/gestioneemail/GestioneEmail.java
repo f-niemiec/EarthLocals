@@ -100,6 +100,18 @@ public class GestioneEmail {
         mailSender.send(mail);
     }
 
+    public void inviaEmailConferma(Long id, String token) {
+        Utente utente = utenteRepository.findById(id).orElseThrow();
+        SimpleMailMessage mail = new SimpleMailMessage();
+
+        mail.setTo(utente.getEmail());
+        mail.setSubject("[Conferma registrazione] Account EarthLocals");
+        mail.setText("Gentile, " + utente.getNome() + ", di seguito le inviamo" +
+                " un link per confermare la propria registrazione: " + linkBase +
+                "registration/registrationConfirm?token=" + token + "\n" + warning);
+        mailSender.send(mail);
+    }
+
     public void inviaEmailRecuperoPassword(String email, String token) {
         Utente utente = Objects.requireNonNull(utenteRepository.findByEmail(email));
         SimpleMailMessage mail = new SimpleMailMessage();
@@ -111,5 +123,6 @@ public class GestioneEmail {
                 "resetPasswordConfirm?token=" + token + "\n" + warning);
         mailSender.send(mail);
     }
+
 
 }
