@@ -146,5 +146,82 @@ public class GestioneCandidaturaUnitTest {
         verify(candidaturaRepository, never()).save(any());
     }
 
+    @Test
+    public void hasVolontarioAlreadyApplied() throws Exception{
+        var candidaturaDTO = mock(CandidaturaDTO.class);
+        var volontario = mock(Volontario.class);
+        var missione = mock(Missione.class);
+        var missioneId = 1L;
+        var candidatoId = 1L;
 
+        when(candidaturaDTO.getMissioneId()).thenReturn(missioneId);
+        when(candidaturaDTO.getCandidatoId()).thenReturn(candidatoId);
+        when(missione.getStato()).thenReturn(Missione.MissioneStato.ACCETTATA);
+        when(missioneRepository.findById(missioneId)).thenReturn(Optional.of(missione));
+        when(volontarioRepository.findById(candidatoId)).thenReturn(Optional.of(volontario));
+        when(candidaturaRepository.existsByMissioneAndCandidato(missione, volontario)).thenReturn(false);
+
+        boolean res = assertDoesNotThrow(() -> gestioneCandidatura.hasVolontarioAlreadyApplied(candidaturaDTO));
+
+        assertFalse(res);
+        verify(missioneRepository).findById(missioneId);
+        verify(volontarioRepository).findById(candidatoId);
+        verify(candidaturaRepository).existsByMissioneAndCandidato(missione, volontario);
+    }
+
+    @Test
+    public void alreadyAppliedCostraintFails() throws Exception{
+        var candidaturaDTO = mock(CandidaturaDTO.class);
+        var constraintViolation = (ConstraintViolation<CandidaturaDTO>) mock(ConstraintViolation.class);
+
+        when(validator.validate(candidaturaDTO)).thenReturn(Set.of(constraintViolation));
+
+        assertThrows(ConstraintViolationException.class, () -> gestioneCandidatura.hasVolontarioAlreadyApplied(candidaturaDTO));
+
+        verify(candidaturaRepository, times(0)).save(any());
+    }
+
+    @Test
+    public void alreadyAppliedMissionDoesntExist() throws Exception{
+        var candidaturaDTO = mock(CandidaturaDTO.class);
+        var missioneId = 1L;
+        var candidatoId = 1L;
+
+        when(candidaturaDTO.getMissioneId()).thenReturn(missioneId);
+        when(candidaturaDTO.getCandidatoId()).thenReturn(candidatoId);
+
+        when(missioneRepository.findById(missioneId))
+                .thenReturn(Optional.empty());
+
+        var exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> gestioneCandidatura.hasVolontarioAlreadyApplied(candidaturaDTO)
+        );
+
+        verify(candidaturaRepository, never()).save(any());
+    }
+
+    @Test
+    public void alreadyAppliedCandidateDoesntExist() throws Exception{
+        var candidaturaDTO = mock(CandidaturaDTO.class);
+        var missioneId = 1L;
+        var candidatoId = 1L;
+
+        when(candidaturaDTO.getMissioneId()).thenReturn(missioneId);
+        when(candidaturaDTO.getCandidatoId()).thenReturn(candidatoId);
+        when(candidaturaDTO.getMissioneId()).thenReturn(missioneId);
+        when(candidaturaDTO.getCandidatoId()).thenReturn(candidatoId);
+
+        when(missioneRepository.findById(candidatoId))
+                .thenReturn(Optional.empty());
+
+        var exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> gestioneCandidatura.hasVolontarioAlreadyApplied(candidaturaDTO)
+        );
+
+        verify(candidaturaRepository, never()).save(any());
+    }
+
+    
 }
