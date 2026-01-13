@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{account/fragments/account_layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="https://www.thymeleaf.org"
+>
+<head>
+    <link rel="stylesheet" th:href="@{/resources/css/card.css}"/>
+</head>
+<body>
+<th:block layout:fragment="account_content">
+    <div class="d-flex justify-content-between mb-4 flex-column flex-md-row">
+        <h1 class="mb-4 mb-md-0">Gestione candidature</h1>
+    </div>
+    <div>
+        <table class="table table-striped table-hover">
+            <thead>
+            <tr>
+                <th scope="col">Candidato</th>
+                <th scope="col">Missione</th>
+                <th scope="col">Azioni</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="candidatura : ${candidature}">
+                <td>
+                    <span th:text="${candidatura.candidato.cognome}"></span> <span
+                        th:text="${candidatura.candidato.nome}"></span>
+                </td>
+                <td>
+                    <a th:href="@{/mission(id=${candidatura.missione.id})}"
+                       th:text="${candidatura.missione.nome}"></a>
+                </td>
+                <td>
+                    <th:block th:switch="${candidatura.stato}">
+                        <th:block th:case="${candidatura.stato.ACCETTATA}">
+                            Accettata
+                        </th:block>
+                        <th:block th:case="${candidatura.stato.RIFIUTATA}">
+                            Rifiutata
+                        </th:block>
+                        <th:block th:case="${candidatura.stato.IN_CORSO}">
+                            <button class="btn" data-bs-toggle="modal"
+                                    th:data-bs-target="'#confirmModal' + ${candidatura.id}"
+                                    title="Accetta">
+                                <i class="fa-solid fa-check"></i>
+                            </button>
+                            <div aria-hidden="true" aria-labelledby="confirmModal" class="modal fade"
+                                 tabindex="-1"
+                                 th:id="'confirmModal' + ${candidatura.id}">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h1 class="modal-title fs-5"
+                                                th:id="'confirmModalLabel' + ${candidatura.id}">Accetta candidatura</h1>
+                                            <button aria-label="Close" class="btn-close" data-bs-dismiss="modal"
+                                                    type="button"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Sei sicuro di voler accettare la candidatura?
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">
+                                                Chiudi
+                                            </button>
+                                            <form method="post" th:action="@{/mission/candidatura/accept}">
+                                                <input name="id" th:value="${candidatura.id}" type="hidden"/>
+                                                <button class="btn btn-primary" type="submit">Accetta</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="btn" data-bs-toggle="modal"
+                                    th:data-bs-target="'#rejectModal' + ${candidatura.id}" title="Rifiuta">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                            <div aria-hidden="true" aria-labelledby="rejectModal" class="modal fade"
+                                 tabindex="-1"
+                                 th:id="'rejectModal' + ${candidatura.id}">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h1 class="modal-title fs-5" th:id="'rejectModalLabel' + ${candidatura.id}">
+                                                Rifiuta candidatura</h1>
+                                            <button aria-label="Close" class="btn-close" data-bs-dismiss="modal"
+                                                    type="button"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Sei sicuro di voler rifiutare la candidatura?
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">
+                                                Chiudi
+                                            </button>
+                                            <form method="post" th:action="@{/mission/candidatura/reject}">
+                                                <input name="id" th:value="${candidatura.id}" type="hidden"/>
+                                                <button class="btn btn-danger" type="submit">Rifiuta</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </th:block>
+
+                    </th:block>
+
+                </td>
+
+            </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+    <th:block th:replace="fragments/pagination :: pagination(${candidature})"></th:block>
+</th:block>
+</body>
+</html>
