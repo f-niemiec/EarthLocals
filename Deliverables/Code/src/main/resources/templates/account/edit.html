@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{account/fragments/account_layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="https://www.thymeleaf.org"
+>
+<head>
+    <link rel="stylesheet" th:href="@{/resources/css/account/edit.css}"/>
+</head>
+<body>
+<th:block layout:fragment="account_content">
+    <h1 class="mb-4">Informazioni profilo</h1>
+    <form class="" enctype="multipart/form-data" id="editForm" method="post"
+          th:action="@{/account/edit}"
+          th:object="${user}">
+        <div>
+            <label class="form-label" for="firstNameEditForm">Nome</label>
+            <input class="form-control" id="firstNameEditForm" placeholder="Mario" required
+                   th:classappend="${#fields.hasErrors('nome')} ? 'is-invalid' : ''"
+                   th:field="*{nome}"
+                   type="text"/>
+            <div class="invalid-feedback" th:each="error : ${#fields.errors('nome')}"
+                 th:text="${error}"></div>
+        </div>
+        <div>
+            <label class="form-label" for="lastNameEditForm">Cognome</label>
+            <input class="form-control" id="lastNameEditForm" placeholder="Rossi" required
+                   th:classappend="${#fields.hasErrors('cognome')} ? 'is-invalid' : ''"
+                   th:field="*{cognome}" type="text"/>
+            <div class="invalid-feedback" th:each="error : ${#fields.errors('cognome')}"
+                 th:text="${error}"></div>
+        </div>
+        <div>
+            <label class="form-label" for="emailEditForm">E-mail</label>
+            <input class="form-control" id="emailEditForm" placeholder="mario.rossi@example.com"
+                   required
+                   th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''"
+                   th:field="*{email}" type="email"/>
+            <div class="invalid-feedback" th:each="error : ${#fields.errors('email')}"
+                 th:text="${error}"></div>
+        </div>
+        <div>
+            <label class="form-label" for="nazionalitaEditForm">Nazionalità</label>
+            <select class="form-select" id="nazionalitaEditForm" required
+                    th:classappend="${#fields.hasErrors('nazionalita')} ? 'is-invalid' : ''" th:field="*{nazionalita}">
+                <th:block th:each="paese:${paesi}">
+                    <option th:text="${paese.nome}" th:value="${paese.id}"></option>
+                </th:block>
+            </select>
+            <div class="invalid-feedback" th:each="error : ${#fields.errors('nazionalita')}"
+                 th:text="${error}"></div>
+        </div>
+        <div>
+            <label class="form-label" for="dataNascitaEditForm">Data di nascita</label>
+            <input class="form-control" id="dataNascitaEditForm"
+                   required
+                   th:classappend="${#fields.hasErrors('dataNascita')} ? 'is-invalid' : ''"
+                   th:field="*{dataNascita}"
+                   type="date">
+            <div class="invalid-feedback" th:each="error : ${#fields.errors('dataNascita')}"
+                 th:text="${error}"></div>
+        </div>
+        <div>
+            <label class="form-label" for="sessoEditForm">Sesso</label>
+            <select class="form-select" id="sessoEditForm" required
+                    th:classappend="${#fields.hasErrors('sesso')} ? 'is-invalid' : ''"
+                    th:field="*{sesso}">
+                <option selected value="F">Femmina</option>
+                <option value="M">Maschio</option>
+            </select>
+            <div class="invalid-feedback" th:each="error : ${#fields.errors('sesso')}"
+                 th:text="${error}"></div>
+        </div>
+        <div class="d-none d-lg-block">
+        </div>
+        <!--TODO: Aggiungere pulsante di annullamento operazione (?)-->
+        <div class="mt-4" id="submitContainerEditForm">
+            <div class="d-flex justify-content-end">
+                <th:block th:replace="fragments/submit_button.html :: submitButton ('Salva modifiche')"></th:block>
+            </div>
+        </div>
+    </form>
+</th:block>
+</body>
+</html>
