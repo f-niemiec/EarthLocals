@@ -1,10 +1,12 @@
 package com.earthlocals.earthlocals.service.gestioneutente;
 
 import com.earthlocals.earthlocals.model.*;
+import com.earthlocals.earthlocals.service.gestioneutente.dto.EditPasswordDTO;
 import com.earthlocals.earthlocals.service.gestioneutente.dto.EditUtenteDTO;
 import com.earthlocals.earthlocals.service.gestioneutente.dto.UtenteDTO;
 import com.earthlocals.earthlocals.service.gestioneutente.dto.VolontarioDTO;
 import com.earthlocals.earthlocals.service.gestioneutente.exceptions.UserAlreadyExistsException;
+import com.earthlocals.earthlocals.service.gestioneutente.exceptions.WrongPasswordException;
 import com.earthlocals.earthlocals.service.gestioneutente.passport.PassportStorageService;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -110,7 +112,7 @@ public class GestioneUnitUtenteTest {
 
         assertThrows(ConstraintViolationException.class, () -> gestioneUtente.registerVolunteer(volontarioDTO));
 
-        verify(volontarioRepository, times(0)).save(any());
+        verify(volontarioRepository, never()).save(any());
     }
 
     @Test
@@ -144,7 +146,7 @@ public class GestioneUnitUtenteTest {
 
         assertThrows(Exception.class, () -> gestioneUtente.registerVolunteer(volontarioDTO));
 
-        verify(volontarioRepository, times(0)).save(any());
+        verify(volontarioRepository, never()).save(any());
     }
 
     @Test
@@ -182,7 +184,7 @@ public class GestioneUnitUtenteTest {
 
         assertThrows(UserAlreadyExistsException.class, () -> gestioneUtente.registerVolunteer(volontarioDTO));
 
-        verify(volontarioRepository, times(0)).save(any());
+        verify(volontarioRepository, never()).save(any());
 
     }
 
@@ -271,7 +273,7 @@ public class GestioneUnitUtenteTest {
 
         assertThrows(ConstraintViolationException.class, () -> gestioneUtente.registerOrganizer(utenteDTO));
 
-        verify(utenteRepository, times(0)).save(any());
+        verify(utenteRepository, never()).save(any());
     }
 
     @Test
@@ -305,7 +307,7 @@ public class GestioneUnitUtenteTest {
 
         assertThrows(UserAlreadyExistsException.class, () -> gestioneUtente.registerOrganizer(utenteDTO));
 
-        verify(utenteRepository, times(0)).save(any());
+        verify(utenteRepository, never()).save(any());
 
     }
 
@@ -358,6 +360,7 @@ public class GestioneUnitUtenteTest {
         when(paeseRepository.findById(nazioneId)).thenReturn(Optional.empty());
 
         assertThrows(Exception.class, () -> gestioneUtente.registerOrganizer(utenteDTO));
+        verify(utenteRepository, never()).save(any());
 
     }
 
@@ -413,12 +416,14 @@ public class GestioneUnitUtenteTest {
     }
 
     @Test
-    void editUserValidatorFails() {
+    void editUserValidationFails() {
         var editUtenteDTO = mock(EditUtenteDTO.class);
         var constraintViolation = (ConstraintViolation<EditUtenteDTO>) mock(ConstraintViolation.class);
         when(validator.validate(editUtenteDTO)).thenReturn(Set.of(constraintViolation));
 
         assertThrows(ConstraintViolationException.class, () -> gestioneUtente.editUser(editUtenteDTO));
+
+        verify(utenteRepository, never()).save(any());
     }
 
     // TODO: Test for unauthenticated user in editUser when Method Security will work
@@ -437,6 +442,81 @@ public class GestioneUnitUtenteTest {
         when(editUtenteDTO.getNazionalita()).thenReturn(paeseId);
 
         assertThrows(Exception.class, () -> gestioneUtente.editUser(editUtenteDTO));
+
+        verify(utenteRepository, never()).save(any());
+    }
+
+    @Test
+    void editPassword() {
+        var editPasswordDTO = mock(EditPasswordDTO.class);
+        var encodedPassword = "encodedNewPassword";
+        var currentPassword = "currentPassword";
+        var context = SecurityContextHolder.getContext();
+        var utente = mock(Utente.class);
+        var authentication = new TestingAuthenticationToken(utente, null, "ROLE_VOLUNTEER");
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+
+        when(editPasswordDTO.getNewPassword()).thenReturn("newPassword");
+        when(editPasswordDTO.getCurrentPassword()).thenReturn(currentPassword);
+        when(utente.getPassword()).thenReturn(currentPassword);
+
+        when(passwordEncoder.matches(editPasswordDTO.getCurrentPassword(), utente.getPassword())).thenReturn(true);
+        when(passwordEncoder.encode(editPasswordDTO.getNewPassword())).thenReturn(encodedPassword);
+        when(utenteRepository.save(utente)).thenAnswer(invocation -> invocation.getArgument(0));
+
+        var res = assertDoesNotThrow(() -> gestioneUtente.editPassword(editPasswordDTO));
+
+        var passwordCaptor = ArgumentCaptor.forClass(String.class);
+        var inOrder = inOrder(utente, utenteRepository);
+        inOrder.verify(utente, times(1)).setPassword(passwordCaptor.capture());
+        inOrder.verify(utenteRepository, times(1)).save(utente);
+        assertEquals(encodedPassword, passwordCaptor.getValue());
+
+        assertEquals(res, utente);
+    }
+
+    // TODO: Test for unauthenticated user in editPassword when Method Security will work
+
+    @Test
+    void editPasswordValidationFails() {
+        var editPasswordDTO = mock(EditPasswordDTO.class);
+
+        var context = SecurityContextHolder.getContext();
+        var utente = mock(Utente.class);
+        var authentication = new TestingAuthenticationToken(utente, null, "ROLE_VOLUNTEER");
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+
+        var constraintViolation = (ConstraintViolation<EditPasswordDTO>) mock(ConstraintViolation.class);
+        when(validator.validate(editPasswordDTO)).thenReturn(Set.of(constraintViolation));
+
+
+        assertThrows(ConstraintViolationException.class, () -> gestioneUtente.editPassword(editPasswordDTO));
+        verify(utenteRepository, never()).save(any());
+
+    }
+
+    @Test
+    void editPasswordNotMatching() {
+        var editPasswordDTO = mock(EditPasswordDTO.class);
+        var currentPassword = "currentPassword";
+        var context = SecurityContextHolder.getContext();
+        var utente = mock(Utente.class);
+        var authentication = new TestingAuthenticationToken(utente, null, "ROLE_VOLUNTEER");
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+
+        when(editPasswordDTO.getNewPassword()).thenReturn("newPassword");
+        when(editPasswordDTO.getCurrentPassword()).thenReturn(currentPassword);
+        when(utente.getPassword()).thenReturn(currentPassword);
+
+        when(passwordEncoder.matches(editPasswordDTO.getCurrentPassword(), utente.getPassword())).thenReturn(false);
+
+        assertThrows(WrongPasswordException.class, () -> gestioneUtente.editPassword(editPasswordDTO));
+
+        verify(utenteRepository, never()).save(any());
+
     }
 
 
