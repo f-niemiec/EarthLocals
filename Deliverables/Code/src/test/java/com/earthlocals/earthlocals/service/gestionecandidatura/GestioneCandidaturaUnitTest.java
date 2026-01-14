@@ -621,7 +621,46 @@ public class GestioneCandidaturaUnitTest {
                         any(LocalDate.class),
                         any(Pageable.class));
     }
+    @Test
+    void getRichiesteCandidatura() {
+        var auth = mock(Authentication.class);
+        var utente = mock(Utente.class);
+        var page = mock(Page.class);
+        int pageNumber = 1;
+        int pageSize = 6;
 
-    
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        when(auth.getPrincipal()).thenReturn(utente);
+
+        when(candidaturaRepository.findByOrganizzatore(eq(utente), any(Pageable.class)))
+                .thenReturn(page);
+
+        var result = gestioneCandidatura.getRichiesteCandidatura(pageNumber, pageSize);
+
+        assertEquals(page, result);
+        verify(candidaturaRepository)
+                .findByOrganizzatore(eq(utente), any(Pageable.class));
+    }
+    @Test
+    void getRichiesteCandidaturaEmptyPage() {
+        var auth = mock(Authentication.class);
+        var utente = mock(Utente.class);
+        var emptyPage = mock(Page.class);
+        int pageNumber = 1;
+        int pageSize = 6;
+
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        when(auth.getPrincipal()).thenReturn(utente);
+
+        when(candidaturaRepository.findByOrganizzatore(eq(utente), any(Pageable.class)))
+                .thenReturn(emptyPage);
+
+        var result = gestioneCandidatura.getRichiesteCandidatura(pageNumber, pageSize);
+
+        assertEquals(emptyPage, result);
+        verify(candidaturaRepository)
+                .findByOrganizzatore(eq(utente), any(Pageable.class));
+    }
+
 
 }
