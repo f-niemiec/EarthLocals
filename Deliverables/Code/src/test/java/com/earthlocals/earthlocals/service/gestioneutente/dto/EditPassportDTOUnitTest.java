@@ -72,6 +72,22 @@ public class EditPassportDTOUnitTest {
         assertEquals(constraintValidations, constraintValidationsNome);
     }
 
+    @Test
+    void EditPassportDTOFinalFails(){
+        var editPassportDTO = new EditPassportDTO(
+                "YA9200000",
+                LocalDate.ofEpochDay(-3),
+                LocalDate.ofEpochDay(-1),
+                passport
+        );
+
+        var constraintValidations = validator.validate(editPassportDTO);
+        var constraintValidationsNome = validator.validateProperty(editPassportDTO, "dataScadenzaPassaporto");
+        assertFalse(constraintValidations.isEmpty());
+        assertEquals(constraintValidations, constraintValidationsNome);
+    }
+
+
     @TestConfiguration
     @EnableMethodSecurity(prePostEnabled = true)
     static class TestConfig {
