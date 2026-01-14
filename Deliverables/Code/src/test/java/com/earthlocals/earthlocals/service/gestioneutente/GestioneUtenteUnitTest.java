@@ -18,12 +18,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.authorization.AuthorizationDeniedException;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithAnonymousUser;
@@ -630,17 +628,19 @@ public class GestioneUtenteUnitTest {
     }
 
     @Test
-    @WithAnonymousUser
-    void editPassportAnonymousFails() {
-        var editPassportDTO = mock(EditPassportDTO.class);
-        assertThrows(AuthorizationDeniedException.class, () -> gestioneUtente.editPassport(editPassportDTO));
-    }
-
-    @Test
     @WithMockUser(roles = {"ORGANIZER", "MODERATOR", "ACCOUNT_MANAGER"})
     void editPassportNotVolunteerFails() {
         var editPassportDTO = mock(EditPassportDTO.class);
         assertThrows(AuthorizationDeniedException.class, () -> gestioneUtente.editPassport(editPassportDTO));
+        verify(volontarioRepository, never()).save(any());
+    }
+
+    @Test
+    @WithAnonymousUser
+    void editPassportAnonymousFails() {
+        var editPassportDTO = mock(EditPassportDTO.class);
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneUtente.editPassport(editPassportDTO));
+        verify(volontarioRepository, never()).save(any());
     }
 
     @Test
@@ -715,6 +715,12 @@ public class GestioneUtenteUnitTest {
     @Test
     @WithMockUser(roles = {"ORGANIZER", "MODERATOR", "ACCOUNT_MANAGER"})
     void getPassaportVolontarioFileResourceNotVolunteerFails() {
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneUtente.getPassportVolontarioFileResource());
+    }
+
+    @Test
+    @WithAnonymousUser
+    void getPassaportVolontarioFileResourceAnonymousFails() {
         assertThrows(AuthorizationDeniedException.class, () -> gestioneUtente.getPassportVolontarioFileResource());
     }
 
@@ -888,12 +894,6 @@ public class GestioneUtenteUnitTest {
         when(passToken.isExpired()).thenReturn(true);
 
         assertThrows(ExpiredVerificationTokenException.class, () -> gestioneUtente.resetPassword(dto));
-    }
-
-    @TestConfiguration
-    @EnableMethodSecurity(prePostEnabled = true)
-    static class TestConfig {
-
     }
 
 }

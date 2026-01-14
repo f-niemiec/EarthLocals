@@ -23,6 +23,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -121,9 +122,18 @@ public class GestioneMissioneUnitTest {
     }
 
     @Test
-    @WithMockUser(roles = {"VOLUNTEER", "MODERATOR", "ACCOUNT_MANAGER", "ANONYMOUS"})
-    void registerMissioneNotOrganizerFails() throws Exception {
+    @WithMockUser(roles = {"VOLUNTEER", "MODERATOR", "ACCOUNT_MANAGER"})
+    void registerMissioneNotOrganizerFails() {
         assertThrows(AuthorizationDeniedException.class, () -> gestioneMissione.registerMissione(mock(MissioneDTO.class)));
+        verify(missioneRepository, never()).save(any(Missione.class));
+
+    }
+
+    @Test
+    @WithAnonymousUser
+    void registerMissioneAnonymousFails() {
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneMissione.registerMissione(mock(MissioneDTO.class)));
+        verify(missioneRepository, never()).save(any(Missione.class));
 
     }
 
@@ -153,10 +163,17 @@ public class GestioneMissioneUnitTest {
     }
 
     @Test
-    @WithMockUser(roles = {"VOLUNTEER", "ORGANIZER", "ACCOUNT_MANAGER", "ANONYMOUS"})
+    @WithMockUser(roles = {"VOLUNTEER", "ORGANIZER", "ACCOUNT_MANAGER"})
     void acceptMissioneNotModeratorFails() {
         assertThrows(AuthorizationDeniedException.class, () -> gestioneMissione.acceptMissione(1L));
+        verify(missioneRepository, never()).save(any());
+    }
 
+    @Test
+    @WithAnonymousUser
+    void acceptMissioneAnonymousFails() {
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneMissione.acceptMissione(1L));
+        verify(missioneRepository, never()).save(any());
     }
 
     @Test
@@ -200,9 +217,17 @@ public class GestioneMissioneUnitTest {
     }
 
     @Test
-    @WithMockUser(roles = {"VOLUNTEER", "ORGANIZER", "ACCOUNT_MANAGER", "ANONYMOUS"})
-    void rejectMissioneNotModerator() {
+    @WithMockUser(roles = {"VOLUNTEER", "ORGANIZER", "ACCOUNT_MANAGER"})
+    void rejectMissioneNotModeratorFails() {
         assertThrows(AuthorizationDeniedException.class, () -> gestioneMissione.rejectMissione(1L));
+        verify(missioneRepository, never()).save(any());
+    }
+
+    @Test
+    @WithAnonymousUser
+    void rejectMissioneAnonymousFails() {
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneMissione.rejectMissione(1L));
+        verify(missioneRepository, never()).save(any());
     }
 
     @Test
@@ -308,8 +333,15 @@ public class GestioneMissioneUnitTest {
     }
 
     @Test
-    @WithMockUser(roles = {"VOLUNTEER", "ORGANIZER", "ACCOUNT_MANAGER", "ANONYMOUS"})
-    void getMissioniPendingNotModerator() {
+    @WithMockUser(roles = {"VOLUNTEER", "ORGANIZER", "ACCOUNT_MANAGER"})
+    void getMissioniPendingNotModeratorFails() {
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneMissione.getMissioniPending(0, 1));
+
+    }
+
+    @Test
+    @WithAnonymousUser
+    void getMissioniPendingAnonymousFails() {
         assertThrows(AuthorizationDeniedException.class, () -> gestioneMissione.getMissioniPending(0, 1));
 
     }
@@ -342,8 +374,14 @@ public class GestioneMissioneUnitTest {
     }
 
     @Test
-    @WithMockUser(roles = {"VOLUNTEER", "MODERATOR", "ACCOUNT_MANAGER", "ANONYMOUS"})
-    void getMissioniOrganizzatoreNotOrganizer() {
+    @WithMockUser(roles = {"VOLUNTEER", "MODERATOR", "ACCOUNT_MANAGER"})
+    void getMissioniOrganizzatoreNotOrganizerFails() {
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneMissione.getMissioniOrganizzatore(0, 1));
+    }
+
+    @Test
+    @WithAnonymousUser
+    void getMissioniOrganizzatoreAnonymousFails() {
         assertThrows(AuthorizationDeniedException.class, () -> gestioneMissione.getMissioniOrganizzatore(0, 1));
     }
 
