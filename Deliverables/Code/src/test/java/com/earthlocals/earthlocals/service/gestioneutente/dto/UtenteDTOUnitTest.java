@@ -121,5 +121,100 @@ public class UtenteDTOUnitTest {
         assertEquals(constraintValidations, constraintValidationsCognome);
     }
 
+    @Test
+    void UtenteDTONullEmailFails() {
+        var utenteDTO = new UtenteDTO(
+                "nome",
+                "cognome",
+                null,
+                "abcYZ17!?",
+                "abcYZ17!?",
+                1,
+                LocalDate.ofEpochDay(-1),
+                'F'
+        );
+
+        var constraintValidations = validator.validate(utenteDTO);
+        var constraintValidationsEmail = validator.validateProperty(utenteDTO, "email");
+        assertFalse(constraintValidationsEmail.isEmpty());
+        assertEquals(constraintValidations, constraintValidationsEmail);
+    }
+
+    @Test
+    void UtenteDTOEmptyEmailFails() {
+        var utenteDTO = new UtenteDTO(
+                "nome",
+                "cognome",
+                "",
+                "abcYZ17!?",
+                "abcYZ17!?",
+                1,
+                LocalDate.ofEpochDay(-1),
+                'F'
+        );
+
+        var constraintValidations = validator.validate(utenteDTO);
+        var constraintValidationsEmail = validator.validateProperty(utenteDTO, "email");
+        assertFalse(constraintValidationsEmail.isEmpty());
+        assertEquals(constraintValidations, constraintValidationsEmail);
+    }
+
+    @Test
+    void UtenteDTOMissingChiocciolaEmailFails() {
+        var utenteDTO = new UtenteDTO(
+                "nome",
+                "cognome",
+                "user.domain",
+                "abcYZ17!?",
+                "abcYZ17!?",
+                1,
+                LocalDate.ofEpochDay(-1),
+                'F'
+        );
+
+        var constraintValidations = validator.validate(utenteDTO);
+        var constraintValidationsEmail = validator.validateProperty(utenteDTO, "email");
+        assertFalse(constraintValidationsEmail.isEmpty());
+        assertEquals(constraintValidations, constraintValidationsEmail);
+    }
+
+    @Test
+    void UtenteDTOMissingUsernameEmailFails() {
+        var utenteDTO = new UtenteDTO(
+                "nome",
+                "cognome",
+                "@domain",
+                "abcYZ17!?",
+                "abcYZ17!?",
+                1,
+                LocalDate.ofEpochDay(-1),
+                'F'
+        );
+
+        var constraintValidations = validator.validate(utenteDTO);
+        var constraintValidationsEmail = validator.validateProperty(utenteDTO, "email");
+        assertFalse(constraintValidationsEmail.isEmpty());
+        assertEquals(constraintValidations, constraintValidationsEmail);
+    }
+
+    @Test
+    void UtenteDTOMissingDomainEmailFails() {
+        var utenteDTO = new UtenteDTO(
+                "nome",
+                "cognome",
+                "utente@",
+                "abcYZ17!?",
+                "abcYZ17!?",
+                1,
+                LocalDate.ofEpochDay(-1),
+                'F'
+        );
+
+        var constraintValidations = validator.validate(utenteDTO);
+        var constraintValidationsEmail = validator.validateProperty(utenteDTO, "email");
+        assertFalse(constraintValidationsEmail.isEmpty());
+        assertEquals(constraintValidations, constraintValidationsEmail);
+    }
+
 
 }
