@@ -2,7 +2,6 @@ package com.earthlocals.earthlocals.service.gestioneutente;
 
 import com.earthlocals.earthlocals.model.*;
 import com.earthlocals.earthlocals.service.gestioneutente.dto.*;
-import com.earthlocals.earthlocals.service.gestioneutente.dto.*;
 import com.earthlocals.earthlocals.service.gestioneutente.exceptions.ExpiredResetTokenException;
 import com.earthlocals.earthlocals.service.gestioneutente.exceptions.PasswordResetTokenNotFoundException;
 import com.earthlocals.earthlocals.service.gestioneutente.exceptions.UserAlreadyExistsException;
@@ -16,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -630,6 +630,34 @@ public class GestioneUtenteUnitTest {
         var res = assertThrows(Exception.class, () -> gestioneUtente.editPassport(editPassportDTO));
 
         verify(volontarioRepository, never()).save(any());
+    }
+
+    @Test
+    void getPassportVolontarioFileResource() {
+        var context = SecurityContextHolder.getContext();
+        var volontario = mock(Volontario.class);
+        var authentication = new TestingAuthenticationToken(volontario, null, "ROLE_VOLUNTEER");
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+        var pathPassaporto = "pathPassaporto";
+        when(volontario.getPathPassaporto()).thenReturn(pathPassaporto);
+        var fileSystemResource = mock(FileSystemResource.class);
+        when(passportStorageService.downloadFile(pathPassaporto)).thenReturn(fileSystemResource);
+        var res = assertDoesNotThrow(() -> gestioneUtente.getPassportVolontarioFileResource());
+        assertEquals(res, fileSystemResource);
+    }
+
+    @Test
+    void getPassportVolontarioFileResourceDownloadFileFails() {
+        var context = SecurityContextHolder.getContext();
+        var volontario = mock(Volontario.class);
+        var authentication = new TestingAuthenticationToken(volontario, null, "ROLE_VOLUNTEER");
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+        var pathPassaporto = "pathPassaporto";
+        when(volontario.getPathPassaporto()).thenReturn(pathPassaporto);
+        when(passportStorageService.downloadFile(pathPassaporto)).thenThrow(RuntimeException.class);
+        assertThrows(Exception.class, () -> gestioneUtente.getPassportVolontarioFileResource());
     }
 
 
