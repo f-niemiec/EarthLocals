@@ -96,6 +96,7 @@ public class GestioneCandidatura {
         candidaturaRepository.delete(candidatura);
     }
 
+    @PreAuthorize("hasRole('ORGANIZER')")
     public boolean acceptCandidatura(Long id) {
         var candidatura = candidaturaRepository
                 .findById(id)
@@ -109,6 +110,7 @@ public class GestioneCandidatura {
         return true;
     }
 
+    @PreAuthorize("hasRole('ORGANIZER')")
     public boolean rejectCandidatura(Long id) {
         var candidatura = candidaturaRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Candidatura non trovata"));
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -128,6 +130,7 @@ public class GestioneCandidatura {
         return candidaturaRepository.findByCandidato(volontario, pageable);
     }
 
+    @PreAuthorize("hasRole('VOLUNTEER')")
     public Page<Candidatura> getEsperienzeVolontario(int page, int pageSize) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Utente utente = (Utente) auth.getPrincipal();
@@ -141,6 +144,7 @@ public class GestioneCandidatura {
 
     }
 
+    @PreAuthorize("hasRole('ORGANIZER')")
     public Page<Candidatura> getRichiesteCandidatura(int page, int pageSize) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Utente utente = (Utente) auth.getPrincipal();

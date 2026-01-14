@@ -1,5 +1,6 @@
 package com.earthlocals.earthlocals.service.gestionecandidatura;
 
+import com.earthlocals.earthlocals.config.TestAppConfig;
 import com.earthlocals.earthlocals.model.*;
 import com.earthlocals.earthlocals.service.gestionecandidature.GestioneCandidatura;
 import com.earthlocals.earthlocals.service.gestionecandidature.dto.CandidaturaDTO;
@@ -9,31 +10,47 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Answers;
+import org.mockito.ArgumentCaptor;
+import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Set;
 
-
-import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
+@ContextConfiguration(classes = {
+        TestAppConfig.class,
+        GestioneCandidatura.class
+})
+@ExtendWith(SpringExtension.class)
 public class GestioneCandidaturaUnitTest {
-    @Mock
+    @MockitoBean(answers = Answers.RETURNS_SMART_NULLS)
     private CandidaturaRepository candidaturaRepository;
-    @Mock
+    @MockitoBean
     private MissioneRepository missioneRepository;
-    @Mock
+    @MockitoBean
     private VolontarioRepository volontarioRepository;
-    @Mock
+    @MockitoBean
     private Validator validator;
-    @Spy
-    @InjectMocks
+
+    @MockitoSpyBean
+    @Autowired
     private GestioneCandidatura gestioneCandidatura;
 
     @BeforeEach
@@ -42,7 +59,7 @@ public class GestioneCandidaturaUnitTest {
     }
 
     @Test
-    void registerCandidatura() throws Exception{
+    void registerCandidatura() throws Exception {
         var candidaturaDTO = mock(CandidaturaDTO.class);
         var volontario = mock(Volontario.class);
         var missione = mock(Missione.class);
@@ -73,7 +90,7 @@ public class GestioneCandidaturaUnitTest {
     }
 
     @Test
-    void registerCandidatureConstraintFails() throws Exception{
+    void registerCandidatureConstraintFails() throws Exception {
         var candidaturaDTO = mock(CandidaturaDTO.class);
         var constraintViolation = (ConstraintViolation<CandidaturaDTO>) mock(ConstraintViolation.class);
 
@@ -85,7 +102,7 @@ public class GestioneCandidaturaUnitTest {
     }
 
     @Test
-    void registerCandidatureMissionDoesntExists(){
+    void registerCandidatureMissionDoesntExists() {
         var candidaturaDTO = mock(CandidaturaDTO.class);
         Long missioneId = 1L;
         Long candidatoId = 1L;
@@ -105,7 +122,7 @@ public class GestioneCandidaturaUnitTest {
     }
 
     @Test
-    void registerCandidatureVolontarioDoesntExists(){
+    void registerCandidatureVolontarioDoesntExists() {
         var candidaturaDTO = mock(CandidaturaDTO.class);
         Long missioneId = 1L;
         Long candidatoId = 1L;
@@ -125,7 +142,7 @@ public class GestioneCandidaturaUnitTest {
     }
 
     @Test
-    void registerCandidatureAlreadyPresent() throws Exception{
+    void registerCandidatureAlreadyPresent() throws Exception {
         var candidaturaDTO = mock(CandidaturaDTO.class);
         var missione = mock(Missione.class);
         var volontario = mock(Volontario.class);
@@ -152,7 +169,7 @@ public class GestioneCandidaturaUnitTest {
     }
 
     @Test
-    public void hasVolontarioAlreadyApplied() throws Exception{
+    public void hasVolontarioAlreadyApplied() throws Exception {
         var candidaturaDTO = mock(CandidaturaDTO.class);
         var volontario = mock(Volontario.class);
         var missione = mock(Missione.class);
@@ -175,7 +192,7 @@ public class GestioneCandidaturaUnitTest {
     }
 
     @Test
-    void alreadyAppliedCostraintFails() throws Exception{
+    void alreadyAppliedCostraintFails() throws Exception {
         var candidaturaDTO = mock(CandidaturaDTO.class);
         var constraintViolation = (ConstraintViolation<CandidaturaDTO>) mock(ConstraintViolation.class);
 
@@ -187,7 +204,7 @@ public class GestioneCandidaturaUnitTest {
     }
 
     @Test
-    void alreadyAppliedMissionDoesntExist() throws Exception{
+    void alreadyAppliedMissionDoesntExist() throws Exception {
         var candidaturaDTO = mock(CandidaturaDTO.class);
         var missioneId = 1L;
         var candidatoId = 1L;
@@ -207,7 +224,7 @@ public class GestioneCandidaturaUnitTest {
     }
 
     @Test
-    void alreadyAppliedCandidateDoesntExist() throws Exception{
+    void alreadyAppliedCandidateDoesntExist() throws Exception {
         var candidaturaDTO = mock(CandidaturaDTO.class);
         var missioneId = 1L;
         var candidatoId = 1L;
@@ -229,7 +246,7 @@ public class GestioneCandidaturaUnitTest {
     }
 
     @Test
-    void hasVolontarioAlreadyAppliedTwo() throws Exception{
+    void hasVolontarioAlreadyAppliedTwo() throws Exception {
         var missione = mock(Missione.class);
         var volontario = mock(Volontario.class);
 
@@ -244,7 +261,7 @@ public class GestioneCandidaturaUnitTest {
     }
 
     @Test
-    void alreadyAppliedTwoCostraintFails() throws Exception{
+    void alreadyAppliedTwoCostraintFails() throws Exception {
         var missione = mock(Missione.class);
         var volontario = mock(Volontario.class);
 
@@ -259,7 +276,7 @@ public class GestioneCandidaturaUnitTest {
     }
 
     @Test
-    void removeCandidatura() throws Exception{
+    void removeCandidatura() throws Exception {
         var candidaturaDTO = mock(CandidaturaDTO.class);
         var volontario = mock(Volontario.class);
         var missione = mock(Missione.class);
@@ -282,7 +299,7 @@ public class GestioneCandidaturaUnitTest {
     }
 
     @Test
-    void removeCandidaturaConstraintFails() throws Exception{
+    void removeCandidaturaConstraintFails() throws Exception {
         var candidaturaDTO = mock(CandidaturaDTO.class);
         var constraintViolation = (ConstraintViolation<CandidaturaDTO>) mock(ConstraintViolation.class);
 
@@ -294,7 +311,7 @@ public class GestioneCandidaturaUnitTest {
     }
 
     @Test
-    void removeCandidatureMissionDoesntExist() throws Exception{
+    void removeCandidatureMissionDoesntExist() throws Exception {
         var candidaturaDTO = mock(CandidaturaDTO.class);
         var missioneId = 1L;
         var candidatoId = 1L;
@@ -314,7 +331,7 @@ public class GestioneCandidaturaUnitTest {
     }
 
     @Test
-    void removeCandidatureCandidateDoesntExist() throws Exception{
+    void removeCandidatureCandidateDoesntExist() throws Exception {
         var candidaturaDTO = mock(CandidaturaDTO.class);
         var missioneId = 1L;
         var candidatoId = 1L;
@@ -334,7 +351,7 @@ public class GestioneCandidaturaUnitTest {
     }
 
     @Test
-    void removeCandidaturaAlreadyApplied() throws Exception{
+    void removeCandidaturaAlreadyApplied() throws Exception {
         var candidaturaDTO = mock(CandidaturaDTO.class);
         var volontario = mock(Volontario.class);
         var missione = mock(Missione.class);
@@ -362,7 +379,7 @@ public class GestioneCandidaturaUnitTest {
     }
 
     @Test
-    void removeCandidaturaNotFound() throws Exception{
+    void removeCandidaturaNotFound() throws Exception {
         var candidaturaDTO = mock(CandidaturaDTO.class);
         var missione = mock(Missione.class);
         var volontario = mock(Volontario.class);
@@ -389,6 +406,7 @@ public class GestioneCandidaturaUnitTest {
 
 
     @Test
+    @WithMockUser(roles = "ORGANIZER")
     void acceptCandidatura() {
         var candidaturaId = 1L;
 
@@ -403,9 +421,8 @@ public class GestioneCandidaturaUnitTest {
         when(candidaturaRepository.findById(candidaturaId))
                 .thenReturn(Optional.of(candidatura));
 
-        var authentication = mock(Authentication.class);
+        var authentication = new TestingAuthenticationToken(creatore, null, "ROLE_ORGANIZER");
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        when(authentication.getPrincipal()).thenReturn(creatore);
 
         var result = gestioneCandidatura.acceptCandidatura(candidaturaId);
 
@@ -416,7 +433,32 @@ public class GestioneCandidaturaUnitTest {
     }
 
     @Test
-    void acceptCandidaturaDoesntExists() throws Exception{
+    @WithMockUser(roles = {"VOLUNTEER", "MODERATOR", "ACCOUNT_MANAGER"})
+    void acceptCandidaturaNotOrganizerFails() {
+        var candidaturaId = 1L;
+        var candidatura = mock(Candidatura.class);
+        when(candidaturaRepository.findById(candidaturaId))
+                .thenReturn(Optional.of(candidatura));
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneCandidatura.acceptCandidatura(candidaturaId));
+        verify(candidatura, never())
+                .setStato(any());
+    }
+
+    @Test
+    @WithAnonymousUser
+    void acceptCandidaturaAnonymousFails() {
+        var candidaturaId = 1L;
+        var candidatura = mock(Candidatura.class);
+        when(candidaturaRepository.findById(candidaturaId))
+                .thenReturn(Optional.of(candidatura));
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneCandidatura.acceptCandidatura(candidaturaId));
+        verify(candidatura, never())
+                .setStato(any());
+    }
+
+    @Test
+    @WithMockUser(roles = "ORGANIZER")
+    void acceptCandidaturaDoesntExists() throws Exception {
         Long candidaturaId = 1L;
         when(candidaturaRepository.findById(candidaturaId))
                 .thenReturn(Optional.empty());
@@ -428,7 +470,7 @@ public class GestioneCandidaturaUnitTest {
     }
 
     @Test
-    void acceptCandidaturaIsNotOrganizer() throws Exception{
+    void acceptCandidaturaIsNotCreatore() throws Exception {
         var candidatura = mock(Candidatura.class);
         var missione = mock(Missione.class);
         var creatore = mock(Utente.class);
@@ -445,9 +487,8 @@ public class GestioneCandidaturaUnitTest {
         when(candidaturaRepository.findById(1L))
                 .thenReturn(Optional.of(candidatura));
 
-        var auth = mock(Authentication.class);
+        var auth = new TestingAuthenticationToken(utenteLoggato, null, "ROLE_ORGANIZER");
         SecurityContextHolder.getContext().setAuthentication(auth);
-        when(auth.getPrincipal()).thenReturn(utenteLoggato);
 
         var result = gestioneCandidatura.acceptCandidatura(1L);
 
@@ -471,9 +512,8 @@ public class GestioneCandidaturaUnitTest {
         when(candidaturaRepository.findById(candidaturaId))
                 .thenReturn(Optional.of(candidatura));
 
-        var authentication = mock(Authentication.class);
+        var authentication = new TestingAuthenticationToken(creatore, null, "ROLE_ORGANIZER");
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        when(authentication.getPrincipal()).thenReturn(creatore);
 
         var result = gestioneCandidatura.rejectCandidatura(candidaturaId);
 
@@ -484,7 +524,33 @@ public class GestioneCandidaturaUnitTest {
     }
 
     @Test
-    void rejectCandidaturaDoesntExists() throws Exception{
+    @WithMockUser(roles = {"VOLUNTEER", "MODERATOR", "ACCOUNT_MANAGER"})
+    void rejectCandidaturaNotOrganizerFails() {
+        var candidaturaId = 1L;
+        var candidatura = mock(Candidatura.class);
+        when(candidaturaRepository.findById(candidaturaId))
+                .thenReturn(Optional.of(candidatura));
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneCandidatura.rejectCandidatura(candidaturaId));
+        verify(candidatura, never())
+                .setStato(any());
+    }
+
+    @Test
+    @WithAnonymousUser
+    void rejectCandidaturaAnonymousFails() {
+        var candidaturaId = 1L;
+        var candidatura = mock(Candidatura.class);
+        when(candidaturaRepository.findById(candidaturaId))
+                .thenReturn(Optional.of(candidatura));
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneCandidatura.rejectCandidatura(candidaturaId));
+        verify(candidatura, never())
+                .setStato(any());
+    }
+
+
+    @Test
+    @WithMockUser(roles = "ORGANIZER")
+    void rejectCandidaturaDoesntExists() throws Exception {
         Long candidaturaId = 1L;
         when(candidaturaRepository.findById(candidaturaId))
                 .thenReturn(Optional.empty());
@@ -496,7 +562,7 @@ public class GestioneCandidaturaUnitTest {
     }
 
     @Test
-    void rejectCandidaturaIsNotOrganizer() throws Exception{
+    void rejectCandidaturaIsNotCreatore() throws Exception {
         var candidatura = mock(Candidatura.class);
         var missione = mock(Missione.class);
         var creatore = mock(Utente.class);
@@ -513,9 +579,8 @@ public class GestioneCandidaturaUnitTest {
         when(candidaturaRepository.findById(1L))
                 .thenReturn(Optional.of(candidatura));
 
-        var auth = mock(Authentication.class);
+        var auth = new TestingAuthenticationToken(utenteLoggato, null, "ROLE_ORGANIZER");
         SecurityContextHolder.getContext().setAuthentication(auth);
-        when(auth.getPrincipal()).thenReturn(utenteLoggato);
 
         var result = gestioneCandidatura.rejectCandidatura(1L);
 
@@ -525,14 +590,13 @@ public class GestioneCandidaturaUnitTest {
     }
 
     @Test
-    void getCandidatureVolontario() throws Exception{
-        var auth = mock(Authentication.class);
+    void getCandidatureVolontario() throws Exception {
         var volontario = mock(Volontario.class);
-        var page =  mock(Page.class);
+        var auth = new TestingAuthenticationToken(volontario, null, "ROLE_VOLUNTEER");
+        var page = mock(Page.class);
         int pageNumber = 1;
         int pageSize = 6;
         SecurityContextHolder.getContext().setAuthentication(auth);
-        when(auth.getPrincipal()).thenReturn(volontario);
         when(candidaturaRepository.findByCandidato(eq(volontario), any(Pageable.class)))
                 .thenReturn(page);
 
@@ -542,32 +606,37 @@ public class GestioneCandidaturaUnitTest {
                 .findByCandidato(eq(volontario), any(Pageable.class));
     }
 
-    //Forse non necessario per via di @PreAuthorize
     @Test
-    void getCandidatureVolontarioNotVolunteer() {
-        var utenteGenerico = mock(Utente.class);
-        var auth = mock(Authentication.class);
+    @WithMockUser(roles = {"ORGANIZER", "MODERATOR", "ACCOUNT_MANAGER"})
+    void getCandidatureVolontarioNotVolunteerFails() {
         int pageNumber = 1;
         int pageSize = 6;
-        SecurityContextHolder.getContext().setAuthentication(auth);
 
-        when(auth.getPrincipal()).thenReturn(utenteGenerico);
+        assertThrows(AuthorizationDeniedException.class, () ->
+                gestioneCandidatura.getCandidatureVolontario(pageNumber, pageSize)
+        );
+    }
 
-        assertThrows(ClassCastException.class, () ->
+    @Test
+    @WithAnonymousUser
+    void getCandidatureVolontarioAnonymousFails() {
+        int pageNumber = 1;
+        int pageSize = 6;
+
+        assertThrows(AuthorizationDeniedException.class, () ->
                 gestioneCandidatura.getCandidatureVolontario(pageNumber, pageSize)
         );
     }
 
     @Test
     void getEsperienzeVolontario() {
-        var auth = mock(Authentication.class);
         var utente = mock(Utente.class);
+        var auth = new TestingAuthenticationToken(utente, null, "ROLE_VOLUNTEER");
         var page = mock(Page.class);
         int pageNumber = 1;
         int pageSize = 6;
 
         SecurityContextHolder.getContext().setAuthentication(auth);
-        when(auth.getPrincipal()).thenReturn(utente);
 
         when(candidaturaRepository
                 .findByCandidatoAndStatoAndMissioneInternalStatoAndMissioneDataFineBefore(
@@ -591,15 +660,26 @@ public class GestioneCandidaturaUnitTest {
     }
 
     @Test
+    @WithMockUser(roles = {"ORGANIZER", "MODERATOR", "ACCOUNT_MANAGER"})
+    void getEsperienzeVolontarioNotVolunteerFails() {
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneCandidatura.getEsperienzeVolontario(0, 6));
+    }
+
+    @Test
+    @WithAnonymousUser
+    void getEsperienzeVolontarioAnonymousFails() {
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneCandidatura.getEsperienzeVolontario(0, 6));
+    }
+
+    @Test
     void getEsperienzeVolontarioEmptyPage() {
-        var auth = mock(Authentication.class);
         var utente = mock(Utente.class);
+        var auth = new TestingAuthenticationToken(utente, null, "ROLE_VOLUNTEER");
         var emptyPage = mock(Page.class);
         int pageNumber = 1;
         int pageSize = 6;
 
         SecurityContextHolder.getContext().setAuthentication(auth);
-        when(auth.getPrincipal()).thenReturn(utente);
 
         when(candidaturaRepository
                 .findByCandidatoAndStatoAndMissioneInternalStatoAndMissioneDataFineBefore(
@@ -621,16 +701,16 @@ public class GestioneCandidaturaUnitTest {
                         any(LocalDate.class),
                         any(Pageable.class));
     }
+
     @Test
     void getRichiesteCandidatura() {
-        var auth = mock(Authentication.class);
         var utente = mock(Utente.class);
         var page = mock(Page.class);
         int pageNumber = 1;
         int pageSize = 6;
 
+        var auth = new TestingAuthenticationToken(utente, null, "ROLE_ORGANIZER");
         SecurityContextHolder.getContext().setAuthentication(auth);
-        when(auth.getPrincipal()).thenReturn(utente);
 
         when(candidaturaRepository.findByOrganizzatore(eq(utente), any(Pageable.class)))
                 .thenReturn(page);
@@ -641,16 +721,29 @@ public class GestioneCandidaturaUnitTest {
         verify(candidaturaRepository)
                 .findByOrganizzatore(eq(utente), any(Pageable.class));
     }
+
+    @Test
+    @WithMockUser(roles = {"VOLUNTEER", "MODERATOR", "ACCOUNT_MANAGER"})
+    void getRichiesteCandidaturaNotOrganizerFails() {
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneCandidatura.getRichiesteCandidatura(1, 6));
+    }
+
+    @Test
+    @WithAnonymousUser
+    void getRichiesteCandidaturaAnonymousFails() {
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneCandidatura.getRichiesteCandidatura(1, 6));
+    }
+
+
     @Test
     void getRichiesteCandidaturaEmptyPage() {
-        var auth = mock(Authentication.class);
         var utente = mock(Utente.class);
+        var auth = new TestingAuthenticationToken(utente, null, "ROLE_ORGANIZER");
         var emptyPage = mock(Page.class);
         int pageNumber = 1;
         int pageSize = 6;
 
         SecurityContextHolder.getContext().setAuthentication(auth);
-        when(auth.getPrincipal()).thenReturn(utente);
 
         when(candidaturaRepository.findByOrganizzatore(eq(utente), any(Pageable.class)))
                 .thenReturn(emptyPage);
