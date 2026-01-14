@@ -54,90 +54,6 @@ public class MissioneDTOUnitTest {
     }
 
     @Test
-    void missioneDTODataInizioNullFails() {
-        var utente = mock(Utente.class);
-        var foto = new MockMultipartFile("file", "file".getBytes());
-        var missioneDTO = new MissioneDTO(
-                "Help teaching a Pechino",
-                0,
-                "Salerno",
-                "Descrizione di più di 20 caratteri",
-                null,
-                LocalDate.ofEpochDay(2),
-                "nessuna",
-                null,
-                foto,
-                utente
-        );
-        var constraintValidation = validator.validate(missioneDTO);
-        var constraintValidationDataInizio = validator.validateProperty(missioneDTO, "dataInizio");
-        assertFalse(constraintValidationDataInizio.isEmpty());
-        assertEquals(constraintValidation, constraintValidationDataInizio);
-    }
-
-    @Test
-    void missioneDTODataInizioPastFails() {
-        var utente = mock(Utente.class);
-        var foto = new MockMultipartFile("file", "file".getBytes());
-        var missioneDTO = new MissioneDTO(
-                "Help teaching a Pechino",
-                0,
-                "Salerno",
-                "Descrizione di più di 20 caratteri",
-                LocalDate.ofEpochDay(-1),
-                LocalDate.ofEpochDay(2),
-                "nessuna",
-                null,
-                foto,
-                utente
-        );
-        var constraintValidation = validator.validate(missioneDTO);
-        var constraintValidationDataInizio = validator.validateProperty(missioneDTO, "dataInizio");
-        assertFalse(constraintValidationDataInizio.isEmpty());
-        assertEquals(constraintValidation, constraintValidationDataInizio);
-    }
-
-    @Test
-    void missioneDTODataInizioPresentSucceed() {
-        var utente = mock(Utente.class);
-        var foto = new MockMultipartFile("file", "file".getBytes());
-        var missioneDTO = new MissioneDTO(
-                "Help teaching a Pechino",
-                0,
-                "Salerno",
-                "Descrizione di più di 20 caratteri",
-                LocalDate.ofEpochDay(0),
-                LocalDate.ofEpochDay(2),
-                "nessuna",
-                null,
-                foto,
-                utente
-        );
-        var constraintValidation = validator.validate(missioneDTO);
-        assertTrue(constraintValidation.isEmpty());
-    }
-
-    @Test
-    void missioneDTODataInizioFutureSucceed() {
-        var utente = mock(Utente.class);
-        var foto = new MockMultipartFile("file", "file".getBytes());
-        var missioneDTO = new MissioneDTO(
-                "Help teaching a Pechino",
-                0,
-                "Salerno",
-                "Descrizione di più di 20 caratteri",
-                LocalDate.ofEpochDay(1),
-                LocalDate.ofEpochDay(2),
-                "nessuna",
-                null,
-                foto,
-                utente
-        );
-        var constraintValidation = validator.validate(missioneDTO);
-        assertTrue(constraintValidation.isEmpty());
-    }
-
-    @Test
     public void missioneDTONomeNullFails() {
         var foto = mock(MultipartFile.class);
         var creatore = mock(Utente.class);
@@ -247,5 +163,133 @@ public class MissioneDTOUnitTest {
         );
         var constraintValidations = validator.validate(missioneDTO);
         assertTrue(constraintValidations.isEmpty());
+    }
+
+    @Test
+    void missioneDTONegativePaeseFails() {
+        var utente = mock(Utente.class);
+        var foto = new MockMultipartFile("file", "file".getBytes());
+        var missioneDTO = new MissioneDTO(
+                "Help teaching a Pechino",
+                -1,
+                "Salerno",
+                "Descrizione di più di 20 caratteri",
+                LocalDate.ofEpochDay(1),
+                LocalDate.ofEpochDay(2),
+                "nessuna",
+                null,
+                foto,
+                utente
+        );
+        var constraintValidations = validator.validate(missioneDTO);
+        var constraintValidationsPaese = validator.validateProperty(missioneDTO, "nome");
+        assertFalse(constraintValidationsPaese.isEmpty());
+        assertEquals(constraintValidationsPaese, constraintValidations);
+    }
+
+    @Test
+    void missioneDTONullPaeseFails() {
+        var utente = mock(Utente.class);
+        var foto = new MockMultipartFile("file", "file".getBytes());
+        var missioneDTO = new MissioneDTO(
+                "Help teaching a Pechino",
+                null,
+                "Salerno",
+                "Descrizione di più di 20 caratteri",
+                LocalDate.ofEpochDay(1),
+                LocalDate.ofEpochDay(2),
+                "nessuna",
+                null,
+                foto,
+                utente
+        );
+        var constraintValidations = validator.validate(missioneDTO);
+        var constraintValidationsPaese = validator.validateProperty(missioneDTO, "nome");
+        assertFalse(constraintValidationsPaese.isEmpty());
+        assertEquals(constraintValidationsPaese, constraintValidations);
+    }
+
+    @Test
+    void missioneDTODataInizioNullFails() {
+        var utente = mock(Utente.class);
+        var foto = new MockMultipartFile("file", "file".getBytes());
+        var missioneDTO = new MissioneDTO(
+                "Help teaching a Pechino",
+                0,
+                "Salerno",
+                "Descrizione di più di 20 caratteri",
+                null,
+                LocalDate.ofEpochDay(2),
+                "nessuna",
+                null,
+                foto,
+                utente
+        );
+        var constraintValidation = validator.validate(missioneDTO);
+        var constraintValidationDataInizio = validator.validateProperty(missioneDTO, "dataInizio");
+        assertFalse(constraintValidationDataInizio.isEmpty());
+        assertEquals(constraintValidation, constraintValidationDataInizio);
+    }
+
+    @Test
+    void missioneDTODataInizioPastFails() {
+        var utente = mock(Utente.class);
+        var foto = new MockMultipartFile("file", "file".getBytes());
+        var missioneDTO = new MissioneDTO(
+                "Help teaching a Pechino",
+                0,
+                "Salerno",
+                "Descrizione di più di 20 caratteri",
+                LocalDate.ofEpochDay(-1),
+                LocalDate.ofEpochDay(2),
+                "nessuna",
+                null,
+                foto,
+                utente
+        );
+        var constraintValidation = validator.validate(missioneDTO);
+        var constraintValidationDataInizio = validator.validateProperty(missioneDTO, "dataInizio");
+        assertFalse(constraintValidationDataInizio.isEmpty());
+        assertEquals(constraintValidation, constraintValidationDataInizio);
+    }
+
+    @Test
+    void missioneDTODataInizioPresentSucceed() {
+        var utente = mock(Utente.class);
+        var foto = new MockMultipartFile("file", "file".getBytes());
+        var missioneDTO = new MissioneDTO(
+                "Help teaching a Pechino",
+                0,
+                "Salerno",
+                "Descrizione di più di 20 caratteri",
+                LocalDate.ofEpochDay(0),
+                LocalDate.ofEpochDay(2),
+                "nessuna",
+                null,
+                foto,
+                utente
+        );
+        var constraintValidation = validator.validate(missioneDTO);
+        assertTrue(constraintValidation.isEmpty());
+    }
+
+    @Test
+    void missioneDTODataInizioFutureSucceed() {
+        var utente = mock(Utente.class);
+        var foto = new MockMultipartFile("file", "file".getBytes());
+        var missioneDTO = new MissioneDTO(
+                "Help teaching a Pechino",
+                0,
+                "Salerno",
+                "Descrizione di più di 20 caratteri",
+                LocalDate.ofEpochDay(1),
+                LocalDate.ofEpochDay(2),
+                "nessuna",
+                null,
+                foto,
+                utente
+        );
+        var constraintValidation = validator.validate(missioneDTO);
+        assertTrue(constraintValidation.isEmpty());
     }
 }
