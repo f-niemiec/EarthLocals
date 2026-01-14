@@ -680,4 +680,25 @@ public class MissioneDTOUnitTest {
         var constraintValidation = validator.validate(missioneDTO);
         assertTrue(constraintValidation.isEmpty());
     }
+
+    @Test
+    void missioneDTONullFotoFails() {
+        var utente = mock(Utente.class);
+        var missioneDTO = new MissioneDTO(
+                "Help teaching a Pechino",
+                0,
+                "Salerno",
+                "Descrizione di più di 20 caratteri",
+                LocalDate.ofEpochDay(1),
+                LocalDate.ofEpochDay(2),
+                "nessuna",
+                "nessuno",
+                null,
+                utente
+        );
+        var constraintValidation = validator.validate(missioneDTO);
+        var constraintValidationFoto = validator.validateProperty(missioneDTO, "foto");
+        assertFalse(constraintValidationFoto.isEmpty());
+        assertEquals(constraintValidation, constraintValidationFoto);
+    }
 }
