@@ -4,6 +4,7 @@ import com.earthlocals.earthlocals.model.*;
 import com.earthlocals.earthlocals.service.gestionemissioni.GestioneMissione;
 import com.earthlocals.earthlocals.service.gestionemissioni.dto.MissioneDTO;
 import com.earthlocals.earthlocals.service.gestionemissioni.exceptions.MissioneNotAcceptableException;
+import com.earthlocals.earthlocals.service.gestionemissioni.exceptions.MissioneNotFoundException;
 import com.earthlocals.earthlocals.service.gestionemissioni.pictures.PicturesFilesystemStorage;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -11,9 +12,8 @@ import jakarta.validation.Validator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -21,10 +21,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.IOException;
@@ -38,18 +40,21 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@ContextConfiguration(classes = GestioneMissioneUnitTest.TestConfig.class)
+@ContextConfiguration(classes = {
+        GestioneMissioneUnitTest.TestConfig.class,
+        GestioneMissione.class
+})
 @ExtendWith(SpringExtension.class)
 public class GestioneMissioneUnitTest {
-    @Mock
-    private static Validator validator;
-    @Mock
+    @MockitoBean
+    private Validator validator;
+    @MockitoBean
     private MissioneRepository missioneRepository;
-    @Mock
+    @MockitoBean
     private PicturesFilesystemStorage storageService;
-    @Mock
+    @MockitoBean
     private PaeseRepository paeseRepository;
-    @InjectMocks
+    @Autowired
     private GestioneMissione gestioneMissione;
 
     @BeforeEach
@@ -58,6 +63,7 @@ public class GestioneMissioneUnitTest {
     }
 
     @Test
+    @WithMockUser(roles = "ORGANIZER")
     void registerMissione() throws Exception {
         var utente = mock(Utente.class);
         var file = new MockMultipartFile("File", InputStream.nullInputStream());
@@ -116,6 +122,14 @@ public class GestioneMissioneUnitTest {
     }
 
     @Test
+    @WithMockUser(roles = {"VOLUNTEER", "MODERATOR", "ACCOUNT_MANAGER", "ANONYMOUS"})
+    void registerMissioneNotOrganizerFails() throws Exception {
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneMissione.registerMissione(mock(MissioneDTO.class)));
+
+    }
+
+    @Test
+    @WithMockUser(roles = "ORGANIZER")
     void registerMissioneValidationFails() throws Exception {
         var missioneDTO = mock(MissioneDTO.class);
         var constraintViolation = (ConstraintViolation<MissioneDTO>) mock(ConstraintViolation.class);
@@ -126,6 +140,7 @@ public class GestioneMissioneUnitTest {
     }
 
     @Test
+    @WithMockUser(roles = "MODERATOR")
     void acceptMissione() {
         var id = 1L;
         var missione = mock(Missione.class);
@@ -134,11 +149,19 @@ public class GestioneMissioneUnitTest {
 
         when(missioneRepository.findById(id)).thenReturn(Optional.of(missione));
 
-        gestioneMissione.acceptMissione(id);
+        assertDoesNotThrow(() -> gestioneMissione.acceptMissione(id));
         verify(missione).accettaMissione();
     }
 
     @Test
+    @WithMockUser(roles = {"VOLUNTEER", "ORGANIZER", "ACCOUNT_MANAGER", "ANONYMOUS"})
+    void acceptMissioneNotModeratorFails() {
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneMissione.acceptMissione(1L));
+
+    }
+
+    @Test
+    @WithMockUser(roles = "MODERATOR")
     void acceptMissioneNotPending() {
         var missione = mock(Missione.class);
 
@@ -156,16 +179,15 @@ public class GestioneMissioneUnitTest {
     }
 
     @Test
+    @WithMockUser(roles = "MODERATOR")
     void acceptMissioneNotExists() {
-
         var id = 1L;
-
         when(missioneRepository.findById(id)).thenReturn(Optional.empty());
-
-        assertThrows(Exception.class, () -> gestioneMissione.acceptMissione(id));
+        assertThrows(MissioneNotFoundException.class, () -> gestioneMissione.acceptMissione(id));
     }
 
     @Test
+    @WithMockUser(roles = "MODERATOR")
     void rejectMissione() {
         var id = 1L;
         var missione = mock(Missione.class);
@@ -174,11 +196,18 @@ public class GestioneMissioneUnitTest {
 
         when(missioneRepository.findById(id)).thenReturn(Optional.of(missione));
 
-        gestioneMissione.rejectMissione(id);
+        assertDoesNotThrow(() -> gestioneMissione.rejectMissione(id));
         verify(missione).rifiutaMissione();
     }
 
     @Test
+    @WithMockUser(roles = {"VOLUNTEER", "ORGANIZER", "ACCOUNT_MANAGER", "ANONYMOUS"})
+    void rejectMissioneNotModerator() {
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneMissione.rejectMissione(1L));
+    }
+
+    @Test
+    @WithMockUser(roles = "MODERATOR")
     void rejectMissioneNotPending() {
         var missione = mock(Missione.class);
 
@@ -196,13 +225,14 @@ public class GestioneMissioneUnitTest {
     }
 
     @Test
+    @WithMockUser(roles = "MODERATOR")
     void rejectMissioneNotExists() {
 
         var id = 1L;
 
         when(missioneRepository.findById(id)).thenReturn(Optional.empty());
 
-        assertThrows(Exception.class, () -> gestioneMissione.rejectMissione(id));
+        assertThrows(MissioneNotFoundException.class, () -> gestioneMissione.rejectMissione(id));
     }
 
     @Test
@@ -268,6 +298,7 @@ public class GestioneMissioneUnitTest {
     }
 
     @Test
+    @WithMockUser(roles = "MODERATOR")
     void getMissioniPending() {
         var page = (Page<Missione>) mock(Page.class);
         when(missioneRepository.findByInternalStatoAndDataFineAfter(any(Missione.InternalMissioneStato.class), any(LocalDate.class), any(Pageable.class)))
@@ -278,11 +309,20 @@ public class GestioneMissioneUnitTest {
     }
 
     @Test
+    @WithMockUser(roles = {"VOLUNTEER", "ORGANIZER", "ACCOUNT_MANAGER", "ANONYMOUS"})
+    void getMissioniPendingNotModerator() {
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneMissione.getMissioniPending(0, 1));
+
+    }
+
+    @Test
+    @WithMockUser(roles = "MODERATOR")
     void getMissioniPendingPageNumberNegative() {
         assertThrows(IllegalArgumentException.class, () -> gestioneMissione.getMissioniPending(-1, 1));
     }
 
     @Test
+    @WithMockUser(roles = "MODERATOR")
     void getMissioniPendingPageSizeZero() {
         assertThrows(IllegalArgumentException.class, () -> gestioneMissione.getMissioniPending(0, 0));
     }
@@ -303,20 +343,9 @@ public class GestioneMissioneUnitTest {
     }
 
     @Test
-    @WithMockUser(roles = "VOLUNTEER")
-    void getMissioniOrganizzatoreVolunteer() {
-        // TODO Method security is not working for some reason
-        var context = SecurityContextHolder.getContext();
-        var utente = mock(Utente.class);
-        var authentication = new TestingAuthenticationToken(utente, null, "ROLE_VOLUNTEER");
-        context.setAuthentication(authentication);
-        SecurityContextHolder.setContext(context);
-        var page = (Page<Missione>) mock(Page.class);
-
-        when(missioneRepository.findByCreatore(eq(utente), any(Pageable.class))).thenReturn(page);
-
-        var res = gestioneMissione.getMissioniOrganizzatore(0, 1);
-        assertEquals(page, res);
+    @WithMockUser(roles = {"VOLUNTEER", "MODERATOR", "ACCOUNT_MANAGER", "ANONYMOUS"})
+    void getMissioniOrganizzatoreNotOrganizer() {
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneMissione.getMissioniOrganizzatore(0, 1));
     }
 
     @Test
@@ -342,7 +371,7 @@ public class GestioneMissioneUnitTest {
         var id = 1L;
         when(missioneRepository.findById(id)).thenReturn(Optional.of(missione));
 
-        var res = gestioneMissione.getMissioneById(id);
+        var res = assertDoesNotThrow(() -> gestioneMissione.getMissioneById(id));
         assertEquals(missione, res);
     }
 

@@ -3,6 +3,7 @@ package com.earthlocals.earthlocals.service.gestionemissioni;
 import com.earthlocals.earthlocals.model.*;
 import com.earthlocals.earthlocals.service.gestionemissioni.dto.MissioneDTO;
 import com.earthlocals.earthlocals.service.gestionemissioni.exceptions.MissioneNotAcceptableException;
+import com.earthlocals.earthlocals.service.gestionemissioni.exceptions.MissioneNotFoundException;
 import com.earthlocals.earthlocals.service.gestionemissioni.pictures.PicturesStorageService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolationException;
@@ -62,8 +63,8 @@ public class GestioneMissione {
     }
 
     @PreAuthorize("hasRole('MODERATOR')")
-    public boolean acceptMissione(Long id) {
-        var missione = missioneRepository.findById(id).orElseThrow();
+    public boolean acceptMissione(Long id) throws MissioneNotFoundException {
+        var missione = missioneRepository.findById(id).orElseThrow(MissioneNotFoundException::new);
         if (!missione.getStato().equals(Missione.MissioneStato.PENDING)) {
             throw new MissioneNotAcceptableException();
         }
@@ -72,8 +73,8 @@ public class GestioneMissione {
     }
 
     @PreAuthorize("hasRole('MODERATOR')")
-    public boolean rejectMissione(Long id) {
-        var missione = missioneRepository.findById(id).orElseThrow();
+    public boolean rejectMissione(Long id) throws MissioneNotFoundException {
+        var missione = missioneRepository.findById(id).orElseThrow(MissioneNotFoundException::new);
         if (!missione.getStato().equals(Missione.MissioneStato.PENDING)) {
             //Forse opportuno definirne un'altra
             throw new MissioneNotAcceptableException();
@@ -147,8 +148,8 @@ public class GestioneMissione {
     }
 
 
-    public Missione getMissioneById(Long id) {
-        var missione = missioneRepository.findById(id).orElseThrow();
+    public Missione getMissioneById(Long id) throws MissioneNotFoundException {
+        var missione = missioneRepository.findById(id).orElseThrow(MissioneNotFoundException::new);
         return missione;
     }
 

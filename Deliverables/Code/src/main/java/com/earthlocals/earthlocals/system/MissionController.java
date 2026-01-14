@@ -7,6 +7,7 @@ import com.earthlocals.earthlocals.service.gestionecandidature.GestioneCandidatu
 import com.earthlocals.earthlocals.service.gestionecandidature.dto.CandidaturaDTO;
 import com.earthlocals.earthlocals.service.gestioneemail.GestioneEmail;
 import com.earthlocals.earthlocals.service.gestionemissioni.GestioneMissione;
+import com.earthlocals.earthlocals.service.gestionemissioni.exceptions.MissioneNotFoundException;
 import com.earthlocals.earthlocals.service.gestionepaese.GestionePaese;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -47,7 +48,7 @@ public class MissionController {
     }
 
     @GetMapping("")
-    public String missionPage(Model model, @RequestParam(name = "id") Long id, Authentication auth) {
+    public String missionPage(Model model, @RequestParam(name = "id") Long id, Authentication auth) throws MissioneNotFoundException {
         var mission = gestioneMissione.getMissioneById(id);
         if (mission == null) {
             return "redirect:/";

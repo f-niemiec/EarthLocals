@@ -1,6 +1,7 @@
 package com.earthlocals.earthlocals.system.account;
 
 import com.earthlocals.earthlocals.service.gestionemissioni.GestioneMissione;
+import com.earthlocals.earthlocals.service.gestionemissioni.exceptions.MissioneNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -24,13 +25,13 @@ public class AccountModeratorController {
     }
 
     @PostMapping("/missions/accept")
-    public String acceptMission(@RequestParam(value = "id") Long id, @RequestHeader(value = "referer") String referer) {
+    public String acceptMission(@RequestParam(value = "id") Long id, @RequestHeader(value = "referer") String referer) throws MissioneNotFoundException {
         gestioneMissione.acceptMissione(id);
         return "redirect:" + referer;
     }
 
     @PostMapping("/missions/reject")
-    public String rejectMission(@RequestParam(value = "id") Long id, @RequestHeader(value = "referer") String referer) {
+    public String rejectMission(@RequestParam(value = "id") Long id, @RequestHeader(value = "referer") String referer) throws MissioneNotFoundException {
         gestioneMissione.rejectMissione(id);
         return "redirect:" + referer;
     }
