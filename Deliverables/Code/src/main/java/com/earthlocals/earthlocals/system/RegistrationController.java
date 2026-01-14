@@ -7,7 +7,9 @@ import com.earthlocals.earthlocals.service.gestionepaese.GestionePaese;
 import com.earthlocals.earthlocals.service.gestioneutente.GestioneUtente;
 import com.earthlocals.earthlocals.service.gestioneutente.dto.UtenteDTO;
 import com.earthlocals.earthlocals.service.gestioneutente.dto.VolontarioDTO;
+import com.earthlocals.earthlocals.service.gestioneutente.exceptions.ExpiredVerificationTokenException;
 import com.earthlocals.earthlocals.service.gestioneutente.exceptions.UserAlreadyExistsException;
+import com.earthlocals.earthlocals.service.gestioneutente.exceptions.VerificationTokenNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -97,7 +99,7 @@ public class RegistrationController {
     }
 
     @GetMapping("/registrationConfirm")
-    public String confirmRegistration(Model model, @RequestParam(value = "token") String token, WebRequest request) {
+    public String confirmRegistration(Model model, @RequestParam(value = "token") String token, WebRequest request) throws VerificationTokenNotFoundException, ExpiredVerificationTokenException {
         gestioneUtente.activateAccount(token);
         return "redirect:/login?confirmed=true";
     }

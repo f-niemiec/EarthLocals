@@ -1,5 +1,6 @@
 package com.earthlocals.earthlocals.service.gestionemissione;
 
+import com.earthlocals.earthlocals.config.TestAppConfig;
 import com.earthlocals.earthlocals.model.*;
 import com.earthlocals.earthlocals.service.gestionemissioni.GestioneMissione;
 import com.earthlocals.earthlocals.service.gestionemissioni.dto.MissioneDTO;
@@ -14,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
@@ -22,7 +22,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.authorization.AuthorizationDeniedException;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
@@ -41,7 +40,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ContextConfiguration(classes = {
-        GestioneMissioneUnitTest.TestConfig.class,
+        TestAppConfig.class,
         GestioneMissione.class
 })
 @ExtendWith(SpringExtension.class)
@@ -383,10 +382,5 @@ public class GestioneMissioneUnitTest {
         assertThrows(Exception.class, () -> gestioneMissione.getMissioneById(id));
     }
 
-    @TestConfiguration
-    @EnableMethodSecurity(prePostEnabled = true)
-    static class TestConfig {
-
-    }
 
 }

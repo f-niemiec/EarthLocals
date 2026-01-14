@@ -2,10 +2,7 @@ package com.earthlocals.earthlocals.service.gestioneutente;
 
 import com.earthlocals.earthlocals.model.*;
 import com.earthlocals.earthlocals.service.gestioneutente.dto.*;
-import com.earthlocals.earthlocals.service.gestioneutente.exceptions.ExpiredResetTokenException;
-import com.earthlocals.earthlocals.service.gestioneutente.exceptions.PasswordResetTokenNotFoundException;
-import com.earthlocals.earthlocals.service.gestioneutente.exceptions.UserAlreadyExistsException;
-import com.earthlocals.earthlocals.service.gestioneutente.exceptions.WrongPasswordException;
+import com.earthlocals.earthlocals.service.gestioneutente.exceptions.*;
 import com.earthlocals.earthlocals.service.gestioneutente.passport.PassportStorageService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolationException;
@@ -135,7 +132,7 @@ public class GestioneUtente {
         return utenteRepository.save(utente);
     }
 
-    @PreAuthorize("isAuthenticated() and hasRole('VOLUNTEER')")
+    @PreAuthorize("hasRole('VOLUNTEER')")
     public Volontario editPassport(EditPassportDTO editPassportDTO) {
         var constraintViolation = validator.validate(editPassportDTO);
         if (!constraintViolation.isEmpty()) {
@@ -186,11 +183,11 @@ public class GestioneUtente {
         return verToken.getToken();
     }
 
-    public void activateAccount(String token) {
-        var verToken = verificationTokenRepository.findByToken(token).orElseThrow();
+    public void activateAccount(String token) throws VerificationTokenNotFoundException, ExpiredVerificationTokenException {
+        var verToken = verificationTokenRepository.findByToken(token).orElseThrow(VerificationTokenNotFoundException::new);
         var utente = verToken.getUtente();
         if (verToken.getExpiryDate().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Token scaduto");
+            throw new ExpiredVerificationTokenException();
         }
         utente.setPending(false);
         utenteRepository.save(utente);
@@ -210,14 +207,14 @@ public class GestioneUtente {
         return Optional.of(resetToken.getToken());
     }
 
-    public void resetPassword(ResetPasswordDTO dto) throws PasswordResetTokenNotFoundException, ExpiredResetTokenException {
+    public void resetPassword(ResetPasswordDTO dto) throws PasswordResetTokenNotFoundException, ExpiredVerificationTokenException {
         var constraintViolation = validator.validate(dto);
         if (!constraintViolation.isEmpty()) {
             throw new ConstraintViolationException(constraintViolation);
         }
         var passToken = passwordResetTokenRepository.findByToken(dto.getToken()).orElseThrow(PasswordResetTokenNotFoundException::new);
         if (passToken.isExpired()) {
-            throw new ExpiredResetTokenException();
+            throw new ExpiredVerificationTokenException();
         }
         var utente = passToken.getUtente();
         var hashPassword = passwordEncoder.encode(dto.getNewPassword());

@@ -1,8 +1,9 @@
 package com.earthlocals.earthlocals.service.gestioneutente;
 
+import com.earthlocals.earthlocals.config.TestAppConfig;
 import com.earthlocals.earthlocals.model.*;
 import com.earthlocals.earthlocals.service.gestioneutente.dto.*;
-import com.earthlocals.earthlocals.service.gestioneutente.exceptions.ExpiredResetTokenException;
+import com.earthlocals.earthlocals.service.gestioneutente.exceptions.ExpiredVerificationTokenException;
 import com.earthlocals.earthlocals.service.gestioneutente.exceptions.PasswordResetTokenNotFoundException;
 import com.earthlocals.earthlocals.service.gestioneutente.exceptions.UserAlreadyExistsException;
 import com.earthlocals.earthlocals.service.gestioneutente.exceptions.WrongPasswordException;
@@ -13,14 +14,22 @@ import jakarta.validation.Validator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
+import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
@@ -36,26 +45,30 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {
+        TestAppConfig.class,
+        GestioneUtente.class
+})
 public class GestioneUtenteUnitTest {
-    @Mock
+    @MockitoBean
     private VolontarioRepository volontarioRepository;
-    @Mock
+    @MockitoBean
     private UtenteRepository utenteRepository;
-    @Mock
+    @MockitoBean
     private RuoloRepository ruoloRepository;
-    @Mock
+    @MockitoBean
     private PasswordEncoder passwordEncoder;
-    @Mock
+    @MockitoBean
     private PassportStorageService passportStorageService;
-    @Mock
+    @MockitoBean
     private PaeseRepository paeseRepository;
-    @Mock
+    @MockitoBean
     private VerificationTokenRepository verificationTokenRepository;
-    @Mock
+    @MockitoBean
     private PasswordResetTokenRepository passwordResetTokenRepository;
-    @Mock
+    @MockitoBean
     private Validator validator;
-    @InjectMocks
+    @Autowired
     private GestioneUtente gestioneUtente;
 
 
@@ -384,7 +397,7 @@ public class GestioneUtenteUnitTest {
         var editUtenteDTO = mock(EditUtenteDTO.class);
         var context = SecurityContextHolder.getContext();
         var utente = mock(Utente.class);
-        var authentication = new TestingAuthenticationToken(utente, null, "ROLE_VOLUNTEER");
+        var authentication = new TestingAuthenticationToken(utente, null, "ROLE_USER");
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
         var paese = mock(Paese.class);
@@ -432,6 +445,12 @@ public class GestioneUtenteUnitTest {
 
     @Test
     void editUserValidationFails() {
+        var context = SecurityContextHolder.getContext();
+        var utente = mock(Utente.class);
+        var authentication = new TestingAuthenticationToken(utente, null, "ROLE_USER");
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+
         var editUtenteDTO = mock(EditUtenteDTO.class);
         var constraintViolation = (ConstraintViolation<EditUtenteDTO>) mock(ConstraintViolation.class);
         when(validator.validate(editUtenteDTO)).thenReturn(Set.of(constraintViolation));
@@ -441,14 +460,20 @@ public class GestioneUtenteUnitTest {
         verify(utenteRepository, never()).save(any());
     }
 
-    // TODO: Test for unauthenticated user in editUser when Method Security will work
+    @Test
+    @WithAnonymousUser
+    void editUserAnonymousFails() {
+        var editUtenteDTO = mock(EditUtenteDTO.class);
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneUtente.editUser(editUtenteDTO));
+    }
+
 
     @Test
     void editUserPaeseNotFound() {
         var editUtenteDTO = mock(EditUtenteDTO.class);
         var context = SecurityContextHolder.getContext();
         var utente = mock(Utente.class);
-        var authentication = new TestingAuthenticationToken(utente, null, "ROLE_VOLUNTEER");
+        var authentication = new TestingAuthenticationToken(utente, null, "ROLE_USER");
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
         var paeseId = 1;
@@ -468,7 +493,7 @@ public class GestioneUtenteUnitTest {
         var currentPassword = "currentPassword";
         var context = SecurityContextHolder.getContext();
         var utente = mock(Utente.class);
-        var authentication = new TestingAuthenticationToken(utente, null, "ROLE_VOLUNTEER");
+        var authentication = new TestingAuthenticationToken(utente, null, "ROLE_USER");
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
 
@@ -491,7 +516,13 @@ public class GestioneUtenteUnitTest {
         assertEquals(res, utente);
     }
 
-    // TODO: Test for unauthenticated user in editPassword when Method Security will work
+    @Test
+    @WithAnonymousUser
+    void editPasswordAnonymousFails() {
+        var editPasswordDTO = mock(EditPasswordDTO.class);
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneUtente.editPassword(editPasswordDTO));
+    }
+
 
     @Test
     void editPasswordValidationFails() {
@@ -499,7 +530,7 @@ public class GestioneUtenteUnitTest {
 
         var context = SecurityContextHolder.getContext();
         var utente = mock(Utente.class);
-        var authentication = new TestingAuthenticationToken(utente, null, "ROLE_VOLUNTEER");
+        var authentication = new TestingAuthenticationToken(utente, null, "ROLE_USER");
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
 
@@ -518,7 +549,7 @@ public class GestioneUtenteUnitTest {
         var currentPassword = "currentPassword";
         var context = SecurityContextHolder.getContext();
         var utente = mock(Utente.class);
-        var authentication = new TestingAuthenticationToken(utente, null, "ROLE_VOLUNTEER");
+        var authentication = new TestingAuthenticationToken(utente, null, "ROLE_USER");
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
 
@@ -599,7 +630,21 @@ public class GestioneUtenteUnitTest {
     }
 
     @Test
-    void editPassportValidationFails() throws Exception {
+    @WithAnonymousUser
+    void editPassportAnonymousFails() {
+        var editPassportDTO = mock(EditPassportDTO.class);
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneUtente.editPassport(editPassportDTO));
+    }
+
+    @Test
+    @WithMockUser(roles = {"ORGANIZER", "MODERATOR", "ACCOUNT_MANAGER"})
+    void editPassportNotVolunteerFails() {
+        var editPassportDTO = mock(EditPassportDTO.class);
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneUtente.editPassport(editPassportDTO));
+    }
+
+    @Test
+    void editPassportValidationFails() {
 
         var context = SecurityContextHolder.getContext();
         var volontario = mock(Volontario.class);
@@ -662,6 +707,18 @@ public class GestioneUtenteUnitTest {
     }
 
     @Test
+    @WithAnonymousUser
+    void getPassportVolontarioFileResourceAnonymousFails() {
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneUtente.getPassportVolontarioFileResource());
+    }
+
+    @Test
+    @WithMockUser(roles = {"ORGANIZER", "MODERATOR", "ACCOUNT_MANAGER"})
+    void getPassaportVolontarioFileResourceNotVolunteerFails() {
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneUtente.getPassportVolontarioFileResource());
+    }
+
+    @Test
     void getPassportVolontarioFileResourceDownloadFileFails() {
         var context = SecurityContextHolder.getContext();
         var volontario = mock(Volontario.class);
@@ -694,7 +751,7 @@ public class GestioneUtenteUnitTest {
         when(verToken.getUtente()).thenReturn(utente);
         when(verToken.getExpiryDate()).thenReturn(LocalDateTime.now().plusDays(1));
 
-        gestioneUtente.activateAccount(token);
+        assertDoesNotThrow(() -> gestioneUtente.activateAccount(token));
 
         InOrder inOrder = inOrder(utente, utenteRepository);
         inOrder.verify(utente).setPending(false);
@@ -722,7 +779,7 @@ public class GestioneUtenteUnitTest {
         when(verToken.getUtente()).thenReturn(utente);
         when(verToken.getExpiryDate()).thenReturn(LocalDateTime.now().minusDays(1));
 
-        assertThrows(RuntimeException.class, () -> gestioneUtente.activateAccount(token));
+        assertThrows(ExpiredVerificationTokenException.class, () -> gestioneUtente.activateAccount(token));
     }
 
     @Test
@@ -830,7 +887,7 @@ public class GestioneUtenteUnitTest {
         when(passwordResetTokenRepository.findByToken(dto.getToken())).thenReturn(Optional.of(passToken));
         when(passToken.isExpired()).thenReturn(true);
 
-        assertThrows(ExpiredResetTokenException.class, () -> gestioneUtente.resetPassword(dto));
+        assertThrows(ExpiredVerificationTokenException.class, () -> gestioneUtente.resetPassword(dto));
     }
 
     @TestConfiguration
