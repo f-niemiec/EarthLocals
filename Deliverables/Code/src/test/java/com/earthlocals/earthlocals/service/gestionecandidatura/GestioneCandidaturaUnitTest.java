@@ -356,6 +356,32 @@ public class GestioneCandidaturaUnitTest {
         verify(candidaturaRepository).delete(candidatura);
     }
 
+    @Test
+    void removeCandidaturaNotFound() {
+        var candidaturaDTO = mock(CandidaturaDTO.class);
+        var missione = mock(Missione.class);
+        var volontario = mock(Volontario.class);
+        Long missioneId = 1L;
+        Long candidatoId = 1L;
+        when(candidaturaDTO.getMissioneId()).thenReturn(missioneId);
+        when(candidaturaDTO.getCandidatoId()).thenReturn(candidatoId);
+
+        when(missioneRepository.findById(missioneId))
+                .thenReturn(Optional.of(missione));
+        when(volontarioRepository.findById(candidatoId))
+                .thenReturn(Optional.of(volontario));
+
+        when(candidaturaRepository.existsByMissioneAndCandidato(missione, volontario))
+                .thenReturn(false);
+
+        gestioneCandidatura.removeCandidatura(candidaturaDTO);
+
+        verify(candidaturaRepository, never())
+                .findByMissioneAndCandidato(any(), any());
+        verify(candidaturaRepository, never())
+                .delete(any());
+    }
+
 
 
 }
