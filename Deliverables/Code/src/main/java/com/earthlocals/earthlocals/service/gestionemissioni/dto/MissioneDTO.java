@@ -23,6 +23,7 @@ public class MissioneDTO implements DateOverlapVerifier {
     private String nome;
 
     @NotNull(message = "Il paese è obbligatorio")
+    @PositiveOrZero
     private Integer paese;
 
     @NotBlank(message = "La città è obbligatoria")

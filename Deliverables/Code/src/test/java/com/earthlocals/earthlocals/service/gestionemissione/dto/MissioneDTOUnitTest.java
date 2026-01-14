@@ -10,7 +10,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -55,8 +54,8 @@ public class MissioneDTOUnitTest {
 
     @Test
     public void missioneDTONomeNullFails() {
-        var foto = mock(MultipartFile.class);
-        var creatore = mock(Utente.class);
+        var utente = mock(Utente.class);
+        var foto = new MockMultipartFile("file", "file".getBytes());
 
         var missioneDTO = new MissioneDTO(
                 null,
@@ -68,7 +67,7 @@ public class MissioneDTOUnitTest {
                 "competenze richieste",
                 "requisiti extra",
                 foto,
-                creatore
+                utente
         );
         var constraintValidations = validator.validate(missioneDTO);
         var constraintValidationsName = validator.validateProperty(missioneDTO, "nome");
@@ -79,8 +78,8 @@ public class MissioneDTOUnitTest {
 
     @Test
     public void missioneDTONomeTooShortFails() {
-        var foto = mock(MultipartFile.class);
-        var creatore = mock(Utente.class);
+        var utente = mock(Utente.class);
+        var foto = new MockMultipartFile("file", "file".getBytes());
 
         var missioneDTO = new MissioneDTO(
                 "abc",
@@ -92,7 +91,7 @@ public class MissioneDTOUnitTest {
                 "competenze richieste",
                 "requisiti extra",
                 foto,
-                creatore
+                utente
         );
         var constraintValidations = validator.validate(missioneDTO);
         var constraintValidationsName = validator.validateProperty(missioneDTO, "nome");
@@ -102,8 +101,8 @@ public class MissioneDTOUnitTest {
 
     @Test
     public void missioneDTONomeLongEnoughSucceeds() {
-        var foto = mock(MultipartFile.class);
-        var creatore = mock(Utente.class);
+        var utente = mock(Utente.class);
+        var foto = new MockMultipartFile("file", "file".getBytes());
 
         var missioneDTO = new MissioneDTO(
                 "abcde",
@@ -115,7 +114,7 @@ public class MissioneDTOUnitTest {
                 "competenze richieste",
                 "requisiti extra",
                 foto,
-                creatore
+                utente
         );
         var constraintValidations = validator.validate(missioneDTO);
         assertTrue(constraintValidations.isEmpty());
@@ -123,8 +122,8 @@ public class MissioneDTOUnitTest {
 
     @Test
     public void missioneDTONomeTooLongFails() {
-        var foto = mock(MultipartFile.class);
-        var creatore = mock(Utente.class);
+        var utente = mock(Utente.class);
+        var foto = new MockMultipartFile("file", "file".getBytes());
 
         var missioneDTO = new MissioneDTO(
                 "ggdafgxcrufdxerjiuecyxkoiwwuamovrzcdadrsrlupseqluvzweugrqasoerspcikevdjkjfrlsttkaszonjaqsxexhalceanty",
@@ -136,7 +135,7 @@ public class MissioneDTOUnitTest {
                 "competenze richieste",
                 "requisiti extra",
                 foto,
-                creatore
+                utente
         );
         var constraintValidations = validator.validate(missioneDTO);
         var constraintValidationsName = validator.validateProperty(missioneDTO, "nome");
@@ -146,8 +145,8 @@ public class MissioneDTOUnitTest {
 
     @Test
     public void missioneDTONomeShortEnoughSucceeds() {
-        var foto = mock(MultipartFile.class);
-        var creatore = mock(Utente.class);
+        var utente = mock(Utente.class);
+        var foto = new MockMultipartFile("file", "file".getBytes());
 
         var missioneDTO = new MissioneDTO(
                 "ggdafgxcrufdxerjiuecyxkoiwwuamovrzcdadrsrlupseqluvzweugrqasoerspcikevdjkjfrlsttkaszonjaqsxexhalceant",
@@ -159,7 +158,7 @@ public class MissioneDTOUnitTest {
                 "competenze richieste",
                 "requisiti extra",
                 foto,
-                creatore
+                utente
         );
         var constraintValidations = validator.validate(missioneDTO);
         assertTrue(constraintValidations.isEmpty());
@@ -182,7 +181,7 @@ public class MissioneDTOUnitTest {
                 utente
         );
         var constraintValidations = validator.validate(missioneDTO);
-        var constraintValidationsPaese = validator.validateProperty(missioneDTO, "nome");
+        var constraintValidationsPaese = validator.validateProperty(missioneDTO, "paese");
         assertFalse(constraintValidationsPaese.isEmpty());
         assertEquals(constraintValidationsPaese, constraintValidations);
     }
