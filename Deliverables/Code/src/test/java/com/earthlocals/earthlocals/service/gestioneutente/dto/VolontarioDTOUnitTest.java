@@ -16,7 +16,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 // TODO: Change DataJpaTest
 @DataJpaTest
@@ -52,7 +52,8 @@ public class VolontarioDTOUnitTest {
         assertTrue(constraintValidations.isEmpty());
     }
 
-    void VolontarioDTOnullNomeFails() {
+    @Test
+    void VolontarioDTONullPassportNumberFails() {
         var volontarioDTO = new VolontarioDTO(
                 "nome",
                 "cognome",
@@ -62,13 +63,15 @@ public class VolontarioDTOUnitTest {
                 1,
                 LocalDate.ofEpochDay(-1),
                 'F',
-                "AA000000",
+                null,
                 LocalDate.ofEpochDay(1),
                 LocalDate.ofEpochDay(-1),
                 passport
         );
         var constraintValidations = validator.validate(volontarioDTO);
-        assertTrue(constraintValidations.isEmpty());
+        var constraintValidationsPassportNumber = validator.validateProperty(volontarioDTO, "numeroPassaporto");
+        assertFalse(constraintValidations.isEmpty());
+        assertEquals(constraintValidations, constraintValidationsPassportNumber);
     }
 
 }
