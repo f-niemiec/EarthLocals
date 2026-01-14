@@ -16,7 +16,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 // TODO: Change DataJpaTest
 @DataJpaTest
@@ -52,7 +52,266 @@ public class VolontarioDTOUnitTest {
         assertTrue(constraintValidations.isEmpty());
     }
 
-    void VolontarioDTOnullNomeFails() {
+    @Test
+    void VolontarioDTONullPassportNumberFails() {
+        var volontarioDTO = new VolontarioDTO(
+                "nome",
+                "cognome",
+                "utente@email.com",
+                "abcYZ17!?",
+                "abcYZ17!?",
+                1,
+                LocalDate.ofEpochDay(-1),
+                'F',
+                null,
+                LocalDate.ofEpochDay(1),
+                LocalDate.ofEpochDay(-1),
+                passport
+        );
+        var constraintValidations = validator.validate(volontarioDTO);
+        var constraintValidationsPassportNumber = validator.validateProperty(volontarioDTO, "numeroPassaporto");
+        assertFalse(constraintValidations.isEmpty());
+        assertEquals(constraintValidations, constraintValidationsPassportNumber);
+    }
+
+    @Test
+    void VolontarioDTOBlankPassportNumberFail() {
+        var volontarioDTO = new VolontarioDTO(
+                "nome",
+                "cognome",
+                "utente@email.com",
+                "abcYZ17!?",
+                "abcYZ17!?",
+                1,
+                LocalDate.ofEpochDay(-1),
+                'F',
+                " ".repeat(8),
+                LocalDate.ofEpochDay(1),
+                LocalDate.ofEpochDay(-1),
+                passport
+        );
+        var constraintValidations = validator.validate(volontarioDTO);
+        var constraintValidationsPassportNumber = validator.validateProperty(volontarioDTO, "numeroPassaporto");
+        assertFalse(constraintValidations.isEmpty());
+        assertEquals(constraintValidations, constraintValidationsPassportNumber);
+    }
+
+    @Test
+    void VolontarioDTOEmptyPassportNumberFail() {
+        var volontarioDTO = new VolontarioDTO(
+                "nome",
+                "cognome",
+                "utente@email.com",
+                "abcYZ17!?",
+                "abcYZ17!?",
+                1,
+                LocalDate.ofEpochDay(-1),
+                'F',
+                "",
+                LocalDate.ofEpochDay(1),
+                LocalDate.ofEpochDay(-1),
+                passport
+        );
+        var constraintValidations = validator.validate(volontarioDTO);
+        var constraintValidationsPassportNumber = validator.validateProperty(volontarioDTO, "numeroPassaporto");
+        assertFalse(constraintValidations.isEmpty());
+        assertEquals(constraintValidations, constraintValidationsPassportNumber);
+    }
+
+    @Test
+    void VolontarioDTOTooLongPassportNumberFails() {
+        var volontarioDTO = new VolontarioDTO(
+                "nome",
+                "cognome",
+                "utente@email.com",
+                "abcYZ17!?",
+                "abcYZ17!?",
+                1,
+                LocalDate.ofEpochDay(-1),
+                'F',
+                "AAA0000000",
+                LocalDate.ofEpochDay(1),
+                LocalDate.ofEpochDay(-1),
+                passport
+        );
+        var constraintValidations = validator.validate(volontarioDTO);
+        var constraintValidationsPassportNumber = validator.validateProperty(volontarioDTO, "numeroPassaporto");
+        assertFalse(constraintValidations.isEmpty());
+        assertEquals(constraintValidations, constraintValidationsPassportNumber);
+    }
+
+    @Test
+    void VolontarioDTOWrongPatternPassportNumberFails() {
+        var volontarioDTO = new VolontarioDTO(
+                "nome",
+                "cognome",
+                "utente@email.com",
+                "abcYZ17!?",
+                "abcYZ17!?",
+                1,
+                LocalDate.ofEpochDay(-1),
+                'F',
+                "a@!!",
+                LocalDate.ofEpochDay(1),
+                LocalDate.ofEpochDay(-1),
+                passport
+        );
+        var constraintValidations = validator.validate(volontarioDTO);
+        var constraintValidationsPassportNumber = validator.validateProperty(volontarioDTO, "numeroPassaporto");
+        assertFalse(constraintValidations.isEmpty());
+        assertEquals(constraintValidations, constraintValidationsPassportNumber);
+    }
+
+    @Test
+    void VolontarioDTOOneCharPassportNumberSucceeds() {
+        var volontarioDTO = new VolontarioDTO(
+                "nome",
+                "cognome",
+                "utente@email.com",
+                "abcYZ17!?",
+                "abcYZ17!?",
+                1,
+                LocalDate.ofEpochDay(-1),
+                'F',
+                "A",
+                LocalDate.ofEpochDay(1),
+                LocalDate.ofEpochDay(-1),
+                passport
+        );
+        var constraintValidations = validator.validate(volontarioDTO);
+        assertTrue(constraintValidations.isEmpty());
+    }
+
+    @Test
+    void VolontarioDTONullDataScadenzaFails() {
+        var volontarioDTO = new VolontarioDTO(
+                "nome",
+                "cognome",
+                "utente@email.com",
+                "abcYZ17!?",
+                "abcYZ17!?",
+                1,
+                LocalDate.ofEpochDay(-1),
+                'F',
+                "AA000000",
+                null,
+                LocalDate.ofEpochDay(-1),
+                passport
+        );
+        var constraintValidations = validator.validate(volontarioDTO);
+        var constraintValidationsDataScadenza = validator.validateProperty(volontarioDTO, "dataScadenzaPassaporto");
+        assertFalse(constraintValidationsDataScadenza.isEmpty());
+        assertEquals(constraintValidations, constraintValidationsDataScadenza);
+    }
+
+    @Test
+    void VolontarioDTOPastDataScadenzaFails() {
+        var volontarioDTO = new VolontarioDTO(
+                "nome",
+                "cognome",
+                "utente@email.com",
+                "abcYZ17!?",
+                "abcYZ17!?",
+                1,
+                LocalDate.ofEpochDay(-1),
+                'F',
+                "AA000000",
+                LocalDate.ofEpochDay(-1),
+                LocalDate.ofEpochDay(-1),
+                passport
+        );
+        var constraintValidations = validator.validate(volontarioDTO);
+        var constraintValidationsDataScadenza = validator.validateProperty(volontarioDTO, "dataScadenzaPassaporto");
+        assertFalse(constraintValidationsDataScadenza.isEmpty());
+        assertEquals(constraintValidations, constraintValidationsDataScadenza);
+    }
+
+    @Test
+    void VolontarioDTOPresentDataScadenzaSucceeds() {
+        var volontarioDTO = new VolontarioDTO(
+                "nome",
+                "cognome",
+                "utente@email.com",
+                "abcYZ17!?",
+                "abcYZ17!?",
+                1,
+                LocalDate.ofEpochDay(-1),
+                'F',
+                "AA000000",
+                LocalDate.ofEpochDay(0),
+                LocalDate.ofEpochDay(-1),
+                passport
+        );
+        var constraintValidations = validator.validate(volontarioDTO);
+        assertTrue(constraintValidations.isEmpty());
+    }
+
+    @Test
+    void VolontarioDTONullDataEmissioneFails() {
+        var volontarioDTO = new VolontarioDTO(
+                "nome",
+                "cognome",
+                "utente@email.com",
+                "abcYZ17!?",
+                "abcYZ17!?",
+                1,
+                LocalDate.ofEpochDay(-1),
+                'F',
+                "AA000000",
+                LocalDate.ofEpochDay(1),
+                null,
+                passport
+        );
+        var constraintValidations = validator.validate(volontarioDTO);
+        var constraintValidationsDataEmissione = validator.validateProperty(volontarioDTO, "dataEmissionePassaporto");
+        assertFalse(constraintValidationsDataEmissione.isEmpty());
+        assertEquals(constraintValidations, constraintValidationsDataEmissione);
+    }
+
+    @Test
+    void VolontarioDTOFutureDataEmissioneFails() {
+        var volontarioDTO = new VolontarioDTO(
+                "nome",
+                "cognome",
+                "utente@email.com",
+                "abcYZ17!?",
+                "abcYZ17!?",
+                1,
+                LocalDate.ofEpochDay(-1),
+                'F',
+                "AA000000",
+                LocalDate.ofEpochDay(1),
+                LocalDate.ofEpochDay(1),
+                passport
+        );
+        var constraintValidations = validator.validate(volontarioDTO);
+        var constraintValidationsDataEmissione = validator.validateProperty(volontarioDTO, "dataEmissionePassaporto");
+        assertFalse(constraintValidationsDataEmissione.isEmpty());
+        assertEquals(constraintValidations, constraintValidationsDataEmissione);
+    }
+
+    @Test
+    void VolontarioDTOPresentDataEmissioneSucceeds() {
+        var volontarioDTO = new VolontarioDTO(
+                "nome",
+                "cognome",
+                "utente@email.com",
+                "abcYZ17!?",
+                "abcYZ17!?",
+                1,
+                LocalDate.ofEpochDay(-1),
+                'F',
+                "AA000000",
+                LocalDate.ofEpochDay(1),
+                LocalDate.ofEpochDay(0),
+                passport
+        );
+        var constraintValidations = validator.validate(volontarioDTO);
+        assertTrue(constraintValidations.isEmpty());
+    }
+
+    @Test
+    void VolontarioDTONullPassaportoFails() {
         var volontarioDTO = new VolontarioDTO(
                 "nome",
                 "cognome",
@@ -65,10 +324,13 @@ public class VolontarioDTOUnitTest {
                 "AA000000",
                 LocalDate.ofEpochDay(1),
                 LocalDate.ofEpochDay(-1),
-                passport
+                null
         );
         var constraintValidations = validator.validate(volontarioDTO);
-        assertTrue(constraintValidations.isEmpty());
+        var constraintValidationsPassaporto = validator.validateProperty(volontarioDTO, "passaporto");
+        assertFalse(constraintValidationsPassaporto.isEmpty());
+        assertEquals(constraintValidations, constraintValidationsPassaporto);
     }
+
 
 }
