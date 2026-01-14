@@ -10,9 +10,12 @@ import jakarta.validation.Validator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Set;
 
@@ -519,6 +522,144 @@ public class GestioneCandidaturaUnitTest {
         assertFalse(result);
         verify(candidatura, never())
                 .setStato(Candidatura.CandidaturaStato.RIFIUTATA);
+    }
+
+    @Test
+    void getCandidatureVolontario() throws Exception{
+        var auth = mock(Authentication.class);
+        var volontario = mock(Volontario.class);
+        var page =  mock(Page.class);
+        int pageNumber = 1;
+        int pageSize = 6;
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        when(auth.getPrincipal()).thenReturn(volontario);
+        when(candidaturaRepository.findByCandidato(eq(volontario), any(Pageable.class)))
+                .thenReturn(page);
+
+        var result = gestioneCandidatura.getCandidatureVolontario(pageNumber, pageSize);
+        assertEquals(page, result);
+        verify(candidaturaRepository)
+                .findByCandidato(eq(volontario), any(Pageable.class));
+    }
+
+    //Forse non necessario per via di @PreAuthorize
+    @Test
+    void getCandidatureVolontarioNotVolunteer() {
+        var utenteGenerico = mock(Utente.class);
+        var auth = mock(Authentication.class);
+        int pageNumber = 1;
+        int pageSize = 6;
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        when(auth.getPrincipal()).thenReturn(utenteGenerico);
+
+        assertThrows(ClassCastException.class, () ->
+                gestioneCandidatura.getCandidatureVolontario(pageNumber, pageSize)
+        );
+    }
+
+    @Test
+    void getEsperienzeVolontario() {
+        var auth = mock(Authentication.class);
+        var utente = mock(Utente.class);
+        var page = mock(Page.class);
+        int pageNumber = 1;
+        int pageSize = 6;
+
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        when(auth.getPrincipal()).thenReturn(utente);
+
+        when(candidaturaRepository
+                .findByCandidatoAndStatoAndMissioneInternalStatoAndMissioneDataFineBefore(
+                        eq(utente),
+                        eq(Candidatura.CandidaturaStato.ACCETTATA),
+                        eq(Missione.InternalMissioneStato.ACCETTATA),
+                        any(LocalDate.class),
+                        any(Pageable.class)))
+                .thenReturn(page);
+
+        var result = gestioneCandidatura.getEsperienzeVolontario(pageNumber, pageSize);
+
+        assertEquals(page, result);
+        verify(candidaturaRepository)
+                .findByCandidatoAndStatoAndMissioneInternalStatoAndMissioneDataFineBefore(
+                        eq(utente),
+                        eq(Candidatura.CandidaturaStato.ACCETTATA),
+                        eq(Missione.InternalMissioneStato.ACCETTATA),
+                        any(LocalDate.class),
+                        any(Pageable.class));
+    }
+
+    @Test
+    void getEsperienzeVolontarioEmptyPage() {
+        var auth = mock(Authentication.class);
+        var utente = mock(Utente.class);
+        var emptyPage = mock(Page.class);
+        int pageNumber = 1;
+        int pageSize = 6;
+
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        when(auth.getPrincipal()).thenReturn(utente);
+
+        when(candidaturaRepository
+                .findByCandidatoAndStatoAndMissioneInternalStatoAndMissioneDataFineBefore(
+                        eq(utente),
+                        eq(Candidatura.CandidaturaStato.ACCETTATA),
+                        eq(Missione.InternalMissioneStato.ACCETTATA),
+                        any(LocalDate.class),
+                        any(Pageable.class)))
+                .thenReturn(emptyPage);
+
+        var result = gestioneCandidatura.getEsperienzeVolontario(pageNumber, pageSize);
+
+        assertEquals(emptyPage, result);
+        verify(candidaturaRepository)
+                .findByCandidatoAndStatoAndMissioneInternalStatoAndMissioneDataFineBefore(
+                        eq(utente),
+                        eq(Candidatura.CandidaturaStato.ACCETTATA),
+                        eq(Missione.InternalMissioneStato.ACCETTATA),
+                        any(LocalDate.class),
+                        any(Pageable.class));
+    }
+    @Test
+    void getRichiesteCandidatura() {
+        var auth = mock(Authentication.class);
+        var utente = mock(Utente.class);
+        var page = mock(Page.class);
+        int pageNumber = 1;
+        int pageSize = 6;
+
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        when(auth.getPrincipal()).thenReturn(utente);
+
+        when(candidaturaRepository.findByOrganizzatore(eq(utente), any(Pageable.class)))
+                .thenReturn(page);
+
+        var result = gestioneCandidatura.getRichiesteCandidatura(pageNumber, pageSize);
+
+        assertEquals(page, result);
+        verify(candidaturaRepository)
+                .findByOrganizzatore(eq(utente), any(Pageable.class));
+    }
+    @Test
+    void getRichiesteCandidaturaEmptyPage() {
+        var auth = mock(Authentication.class);
+        var utente = mock(Utente.class);
+        var emptyPage = mock(Page.class);
+        int pageNumber = 1;
+        int pageSize = 6;
+
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        when(auth.getPrincipal()).thenReturn(utente);
+
+        when(candidaturaRepository.findByOrganizzatore(eq(utente), any(Pageable.class)))
+                .thenReturn(emptyPage);
+
+        var result = gestioneCandidatura.getRichiesteCandidatura(pageNumber, pageSize);
+
+        assertEquals(emptyPage, result);
+        verify(candidaturaRepository)
+                .findByOrganizzatore(eq(utente), any(Pageable.class));
     }
 
 

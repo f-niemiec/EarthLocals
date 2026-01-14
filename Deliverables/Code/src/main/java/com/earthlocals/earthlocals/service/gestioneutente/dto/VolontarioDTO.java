@@ -3,7 +3,6 @@ package com.earthlocals.earthlocals.service.gestioneutente.dto;
 
 import com.earthlocals.earthlocals.utility.constraints.FileType;
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -15,7 +14,6 @@ import java.time.LocalDate;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class VolontarioDTO extends UtenteDTO {
 
     @NotBlank(message = "Il numero del passaporto è obbligatorio")
@@ -24,18 +22,26 @@ public class VolontarioDTO extends UtenteDTO {
             message = "Il numero del passaporto deve contenere al massimo 9 cifre "
     )
     private String numeroPassaporto;
-
     @NotNull
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @FutureOrPresent(message = "La data di scadenza del passaporto inserita non è valida")
     private LocalDate dataScadenzaPassaporto;
-
     @NotNull
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @PastOrPresent(message = "La data di emissione del passaporto inserita non è valida")
     private LocalDate dataEmissionePassaporto;
-
     @NotNull
-    @FileType(allowedExtensions = {"application/pdf"})
+    @FileType(allowedExtensions = {"application/pdf"}, groups = {PassaportoGroup.class})
     private MultipartFile passaporto;
+
+    public VolontarioDTO(String nome, String cognome, String email, String password, String matchingPassword, Integer nazionalita, LocalDate dataNascita, Character sesso, String numeroPassaporto, LocalDate dataScadenzaPassaporto, LocalDate dataEmissionePassaporto, MultipartFile passaporto) {
+        super(nome, cognome, email, password, matchingPassword, nazionalita, dataNascita, sesso);
+        this.numeroPassaporto = numeroPassaporto;
+        this.dataScadenzaPassaporto = dataScadenzaPassaporto;
+        this.dataEmissionePassaporto = dataEmissionePassaporto;
+        this.passaporto = passaporto;
+    }
+
+    public interface PassaportoGroup {
+    }
 }
