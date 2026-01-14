@@ -45,7 +45,7 @@ public class MissioneDTOUnitTest {
                 LocalDate.ofEpochDay(1),
                 LocalDate.ofEpochDay(2),
                 "nessuna",
-                null,
+                "nessuno",
                 foto,
                 utente
         );
@@ -177,7 +177,7 @@ public class MissioneDTOUnitTest {
                 LocalDate.ofEpochDay(1),
                 LocalDate.ofEpochDay(2),
                 "nessuna",
-                null,
+                "nessuno",
                 foto,
                 utente
         );
@@ -199,7 +199,7 @@ public class MissioneDTOUnitTest {
                 LocalDate.ofEpochDay(1),
                 LocalDate.ofEpochDay(2),
                 "nessuna",
-                null,
+                "nessuno",
                 foto,
                 utente
         );
@@ -221,7 +221,7 @@ public class MissioneDTOUnitTest {
                 LocalDate.ofEpochDay(1),
                 LocalDate.ofEpochDay(2),
                 "nessuna",
-                null,
+                "nessuno",
                 foto,
                 utente
         );
@@ -241,7 +241,7 @@ public class MissioneDTOUnitTest {
                 LocalDate.ofEpochDay(1),
                 LocalDate.ofEpochDay(2),
                 "nessuna",
-                null,
+                "nessuno",
                 foto,
                 utente
         );
@@ -263,7 +263,7 @@ public class MissioneDTOUnitTest {
                 LocalDate.ofEpochDay(1),
                 LocalDate.ofEpochDay(2),
                 "nessuna",
-                null,
+                "nessuno",
                 foto,
                 utente
         );
@@ -280,12 +280,12 @@ public class MissioneDTOUnitTest {
         var missioneDTO = new MissioneDTO(
                 "Help teaching a Pechino",
                 0,
-                "A",
+                "a",
                 "Descrizione di più di 20 caratteri",
                 LocalDate.ofEpochDay(1),
                 LocalDate.ofEpochDay(2),
                 "nessuna",
-                null,
+                "nessuno",
                 foto,
                 utente
         );
@@ -305,7 +305,7 @@ public class MissioneDTOUnitTest {
                 LocalDate.ofEpochDay(1),
                 LocalDate.ofEpochDay(2),
                 "nessuna",
-                null,
+                "nessuno",
                 foto,
                 utente
         );
@@ -327,7 +327,7 @@ public class MissioneDTOUnitTest {
                 LocalDate.ofEpochDay(1),
                 LocalDate.ofEpochDay(2),
                 "nessuna",
-                null,
+                "nessuno",
                 foto,
                 utente
         );
@@ -349,7 +349,7 @@ public class MissioneDTOUnitTest {
                 LocalDate.ofEpochDay(1),
                 LocalDate.ofEpochDay(2),
                 "nessuna",
-                null,
+                "nessuno",
                 foto,
                 utente
         );
@@ -358,7 +358,7 @@ public class MissioneDTOUnitTest {
         assertFalse(constraintValidationsDescrizione.isEmpty());
         assertEquals(constraintValidationsDescrizione, constraintValidations);
     }
-    
+
     @Test
     void missioneDTODescrizioneLongEnoughSucceeds() {
         var utente = mock(Utente.class);
@@ -371,7 +371,7 @@ public class MissioneDTOUnitTest {
                 LocalDate.ofEpochDay(1),
                 LocalDate.ofEpochDay(2),
                 "nessuna",
-                null,
+                "nessuno",
                 foto,
                 utente
         );
@@ -590,6 +590,70 @@ public class MissioneDTOUnitTest {
                 LocalDate.ofEpochDay(1),
                 "nessuna",
                 null,
+                foto,
+                utente
+        );
+        var constraintValidation = validator.validate(missioneDTO);
+        assertTrue(constraintValidation.isEmpty());
+    }
+
+    @Test
+    void missioneDTONullCompetenzeRichiesteFails() {
+        var utente = mock(Utente.class);
+        var foto = new MockMultipartFile("file", "file".getBytes());
+        var missioneDTO = new MissioneDTO(
+                "Help teaching a Pechino",
+                0,
+                "Salerno",
+                "Descrizione di più di 20 caratteri",
+                LocalDate.ofEpochDay(1),
+                LocalDate.ofEpochDay(2),
+                null,
+                "nessuno",
+                foto,
+                utente
+        );
+        var constraintValidation = validator.validate(missioneDTO);
+        var constraintValidationCompetenze = validator.validateProperty(missioneDTO, "competenzeRichieste");
+        assertFalse(constraintValidationCompetenze.isEmpty());
+        assertEquals(constraintValidation, constraintValidationCompetenze);
+    }
+
+    @Test
+    void missioneDTOEmptyCompetenzeRichiesteFails() {
+        var utente = mock(Utente.class);
+        var foto = new MockMultipartFile("file", "file".getBytes());
+        var missioneDTO = new MissioneDTO(
+                "Help teaching a Pechino",
+                0,
+                "Salerno",
+                "Descrizione di più di 20 caratteri",
+                LocalDate.ofEpochDay(1),
+                LocalDate.ofEpochDay(2),
+                "",
+                "nessuno",
+                foto,
+                utente
+        );
+        var constraintValidation = validator.validate(missioneDTO);
+        var constraintValidationCompetenze = validator.validateProperty(missioneDTO, "competenzeRichieste");
+        assertFalse(constraintValidationCompetenze.isEmpty());
+        assertEquals(constraintValidation, constraintValidationCompetenze);
+    }
+
+    @Test
+    void missioneDTONotBlankCompetenzeRichiesteSucceeds() {
+        var utente = mock(Utente.class);
+        var foto = new MockMultipartFile("file", "file".getBytes());
+        var missioneDTO = new MissioneDTO(
+                "Help teaching a Pechino",
+                0,
+                "Salerno",
+                "Descrizione di più di 20 caratteri",
+                LocalDate.ofEpochDay(1),
+                LocalDate.ofEpochDay(2),
+                "a",
+                "nessuno",
                 foto,
                 utente
         );
