@@ -405,6 +405,61 @@ public class UtenteDTOUnitTest {
     }
 
     @Test
+    void UtenteDTONullNazionalitaFails() {
+        var utenteDTO = new UtenteDTO(
+                "nome",
+                "cognome",
+                "utente@email.com",
+                "abcYZ17!?",
+                "abcYZ17!?",
+                null,
+                LocalDate.ofEpochDay(-1),
+                'F'
+        );
+
+        var constraintValidations = validator.validate(utenteDTO);
+        var constraintValidationsNazionalita = validator.validateProperty(utenteDTO, "nazionalita");
+        assertFalse(constraintValidationsNazionalita.isEmpty());
+        assertEquals(constraintValidations, constraintValidationsNazionalita);
+    }
+
+    @Test
+    void UtenteDTONegativeNazionalitaFails() {
+        var utenteDTO = new UtenteDTO(
+                "nome",
+                "cognome",
+                "utente@email.com",
+                "abcYZ17!?",
+                "abcYZ17!?",
+                -1,
+                LocalDate.ofEpochDay(-1),
+                'F'
+        );
+
+        var constraintValidations = validator.validate(utenteDTO);
+        var constraintValidationsNazionalita = validator.validateProperty(utenteDTO, "nazionalita");
+        assertFalse(constraintValidationsNazionalita.isEmpty());
+        assertEquals(constraintValidations, constraintValidationsNazionalita);
+    }
+
+    @Test
+    void UtenteDTOZeroNazionalitaSucceeds() {
+        var utenteDTO = new UtenteDTO(
+                "nome",
+                "cognome",
+                "utente@email.com",
+                "abcYZ17!?",
+                "abcYZ17!?",
+                0,
+                LocalDate.ofEpochDay(-1),
+                'F'
+        );
+
+        var constraintValidations = validator.validate(utenteDTO);
+        assertTrue(constraintValidations.isEmpty());
+    }
+
+    @Test
     void UtenteDTODataNascitaNullFails() {
         var utenteDTO = new UtenteDTO(
                 "nome",
@@ -459,6 +514,25 @@ public class UtenteDTOUnitTest {
         var constraintValidations = validator.validate(utenteDTO);
         assertFalse(constraintValidationsPassword.isEmpty());
         assertEquals(constraintValidations, constraintValidationsPassword);
+    }
+
+    @Test
+    void UtenteDTONullSessoFails() {
+        var utenteDTO = new UtenteDTO(
+                "nome",
+                "cognome",
+                "utente@email.com",
+                "abcYZ17!?",
+                "abcYZ17!?",
+                1,
+                LocalDate.ofEpochDay(-1),
+                null
+        );
+
+        var constraintValidations = validator.validate(utenteDTO);
+        var constraintValidationsSesso = validator.validateProperty(utenteDTO, "sesso");
+        assertFalse(constraintValidationsSesso.isEmpty());
+        assertEquals(constraintValidations, constraintValidationsSesso);
     }
 
     @Test
