@@ -83,4 +83,43 @@ public class UtenteDTOUnitTest {
         assertEquals(constraintValidations, constraintValidationsNome);
     }
 
+    @Test
+    void UtenteDTONullCognomeFails() {
+        var utenteDTO = new UtenteDTO(
+                "nome",
+                null,
+                "utente@email.com",
+                "abcYZ17!?",
+                "abcYZ17!?",
+                1,
+                LocalDate.ofEpochDay(-1),
+                'F'
+        );
+
+        var constraintValidations = validator.validate(utenteDTO);
+        var constraintValidationsCognome = validator.validateProperty(utenteDTO, "cognome");
+        assertFalse(constraintValidationsCognome.isEmpty());
+        assertEquals(constraintValidations, constraintValidationsCognome);
+    }
+
+    @Test
+    void UtenteDTOEmptyCognomeFails() {
+        var utenteDTO = new UtenteDTO(
+                "nome",
+                "",
+                "utente@email.com",
+                "abcYZ17!?",
+                "abcYZ17!?",
+                1,
+                LocalDate.ofEpochDay(-1),
+                'F'
+        );
+
+        var constraintValidations = validator.validate(utenteDTO);
+        var constraintValidationsCognome = validator.validateProperty(utenteDTO, "cognome");
+        assertFalse(constraintValidationsCognome.isEmpty());
+        assertEquals(constraintValidations, constraintValidationsCognome);
+    }
+
+
 }
