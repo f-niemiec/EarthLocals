@@ -1,6 +1,7 @@
 package com.earthlocals.earthlocals.service.gestionecandidature.dto;
 
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,9 +11,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CandidaturaDTO {
 
-    @NotEmpty(message = "Il candidato è obbligatorio")
+    @NotNull(message = "Il candidato è obbligatorio")
+    @PositiveOrZero
     private Long candidatoId;
 
-    @NotEmpty(message = "La missione è obbligatoria")
+    @NotNull(message = "La missione è obbligatoria")
+    @PositiveOrZero
     private Long missioneId;
 }
