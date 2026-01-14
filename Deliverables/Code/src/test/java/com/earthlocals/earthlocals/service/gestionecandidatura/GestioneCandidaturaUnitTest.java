@@ -10,6 +10,8 @@ import jakarta.validation.Validator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Optional;
 import java.util.Set;
@@ -329,7 +331,7 @@ public class GestioneCandidaturaUnitTest {
     }
 
     @Test
-    void removeCandidaturaAlreadyApplied() {
+    void removeCandidaturaAlreadyApplied() throws Exception{
         var candidaturaDTO = mock(CandidaturaDTO.class);
         var volontario = mock(Volontario.class);
         var missione = mock(Missione.class);
@@ -357,7 +359,7 @@ public class GestioneCandidaturaUnitTest {
     }
 
     @Test
-    void removeCandidaturaNotFound() {
+    void removeCandidaturaNotFound() throws Exception{
         var candidaturaDTO = mock(CandidaturaDTO.class);
         var missione = mock(Missione.class);
         var volontario = mock(Volontario.class);
@@ -381,6 +383,36 @@ public class GestioneCandidaturaUnitTest {
         verify(candidaturaRepository, never())
                 .delete(any());
     }
+
+
+    @Test
+    void acceptCandidatura() {
+        var candidaturaId = 1L;
+
+        var candidatura = mock(Candidatura.class);
+        var missione = mock(Missione.class);
+        var creatore = mock(Utente.class);
+
+        when(creatore.getId()).thenReturn(1L);
+        when(missione.getCreatore()).thenReturn(creatore);
+        when(candidatura.getMissione()).thenReturn(missione);
+
+        when(candidaturaRepository.findById(candidaturaId))
+                .thenReturn(Optional.of(candidatura));
+
+        var authentication = mock(Authentication.class);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        when(authentication.getPrincipal()).thenReturn(creatore);
+
+        var result = gestioneCandidatura.acceptCandidatura(candidaturaId);
+
+        assertTrue(result);
+
+        verify(candidatura)
+                .setStato(Candidatura.CandidaturaStato.ACCETTATA);
+    }
+
+
 
 
 
