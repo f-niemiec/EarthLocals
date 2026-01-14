@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{account/fragments/account_layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="https://www.thymeleaf.org"
+>
+<head>
+    <link rel="stylesheet" th:href="@{/resources/css/account/edit-passport.css}"/>
+</head>
+<body>
+<th:block layout:fragment="account_content">
+
+    <h1 class="mb-4">Dettagli passaporto</h1>
+    <div class="alert alert-success mb-4" th:if="${param.success}">
+        <strong>Cambio dati passaporto effettuato con successo! :]</strong> <br/>
+    </div>
+    <a class="btn border rounded-2 p-0 w-100p mb-4 d-flex" th:href="@{/account/volunteer/download-passport}">
+        <div class="d-flex justify-content-center align-items-center p-4">
+            <i class="fa-regular fa-file-pdf fs-1"></i>
+        </div>
+        <div class="vr"></div>
+        <div class="p-4 d-flex flex-column justify-content-center">
+            Per scaricare il passaporto clicca qui
+        </div>
+    </a>
+    <form class="" enctype="multipart/form-data" id="editPassportForm" method="post"
+          th:action="@{/account/volunteer/edit-passport}"
+          th:object="${passportDTO}">
+        <div>
+            <label class="form-label" for="numeroPassaportoEditPassportForm">N. Passaporto</label>
+            <input class="form-control" id="numeroPassaportoEditPassportForm" placeholder="AA0000000"
+                   required
+                   th:classappend="${#fields.hasErrors('numeroPassaporto')} ? 'is-invalid' : ''"
+                   th:field="*{numeroPassaporto}" type="text"/>
+            <div class="invalid-feedback" th:each="error : ${#fields.errors('numeroPassaporto')}"
+                 th:text="${error}"></div>
+        </div>
+        <div>
+            <label class="form-label" for="dataScadenzaPassaportoEditPassportForm">Data scadenza
+                passaporto</label>
+            <input class="form-control" id="dataScadenzaPassaportoEditPassportForm"
+                   required
+                   th:classappend="${#fields.hasErrors('dataScadenzaPassaporto')} ? 'is-invalid' : ''"
+                   th:field="*{dataScadenzaPassaporto}"
+                   type="date">
+            <div class="invalid-feedback" th:each="error : ${#fields.errors('dataScadenzaPassaporto')}"
+                 th:text="${error}"></div>
+        </div>
+        <div>
+            <label class="form-label" for="dataEmissionePassaportoEditPassportForm">Data emissione
+                passaporto</label>
+            <input class="form-control" id="dataEmissionePassaportoEditPassportForm"
+                   required
+                   th:classappend="${#fields.hasErrors('dataEmissionePassaporto')} ? 'is-invalid' : ''"
+                   th:field="*{dataEmissionePassaporto}"
+                   type="date">
+            <div class="invalid-feedback" th:each="error : ${#fields.errors('dataEmissionePassaporto')}"
+                 th:text="${error}"></div>
+        </div>
+        <div>
+            <!--TODO: Aggiungere controllo client side per la dimensione del file-->
+            <label class="form-label" for="passaportoEditPassportForm">Passaporto</label>
+            <input class="form-control" id="passaportoEditPassportForm"
+                   required
+                   th:classappend="${#fields.hasErrors('passaporto')} ? 'is-invalid' : ''"
+                   th:field="*{passaporto}"
+                   type="file">
+            <div class="invalid-feedback" th:each="error : ${#fields.errors('passaporto')}"
+                 th:text="${error}"></div>
+        </div>
+        <div class="mt-4" id="submitContainerEditPassportForm">
+            <div class="d-flex justify-content-end">
+                <th:block th:replace="fragments/submit_button.html :: submitButton ('Salva modifiche')"></th:block>
+            </div>
+        </div>
+    </form>
+</th:block>
+</body>
+</html>

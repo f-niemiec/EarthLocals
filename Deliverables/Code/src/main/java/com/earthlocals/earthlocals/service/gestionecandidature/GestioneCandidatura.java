@@ -78,6 +78,10 @@ public class GestioneCandidatura {
     }
 
     public void removeCandidatura(CandidaturaDTO candidaturaDTO) {
+        var constraintViolation = validator.validate(candidaturaDTO);
+        if (!constraintViolation.isEmpty()) {
+            throw new ConstraintViolationException(constraintViolation);
+        }
         Missione missione = missioneRepository
                 .findById(candidaturaDTO.getMissioneId())
                 .orElseThrow(() -> new IllegalArgumentException("Missione non trovata"));

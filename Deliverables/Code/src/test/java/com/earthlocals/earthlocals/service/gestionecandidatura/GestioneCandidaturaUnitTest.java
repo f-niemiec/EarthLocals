@@ -170,7 +170,7 @@ public class GestioneCandidaturaUnitTest {
     }
 
     @Test
-    public void alreadyAppliedCostraintFails() throws Exception{
+    void alreadyAppliedCostraintFails() throws Exception{
         var candidaturaDTO = mock(CandidaturaDTO.class);
         var constraintViolation = (ConstraintViolation<CandidaturaDTO>) mock(ConstraintViolation.class);
 
@@ -182,7 +182,7 @@ public class GestioneCandidaturaUnitTest {
     }
 
     @Test
-    public void alreadyAppliedMissionDoesntExist() throws Exception{
+    void alreadyAppliedMissionDoesntExist() throws Exception{
         var candidaturaDTO = mock(CandidaturaDTO.class);
         var missioneId = 1L;
         var candidatoId = 1L;
@@ -202,7 +202,7 @@ public class GestioneCandidaturaUnitTest {
     }
 
     @Test
-    public void alreadyAppliedCandidateDoesntExist() throws Exception{
+    void alreadyAppliedCandidateDoesntExist() throws Exception{
         var candidaturaDTO = mock(CandidaturaDTO.class);
         var missioneId = 1L;
         var candidatoId = 1L;
@@ -253,4 +253,79 @@ public class GestioneCandidaturaUnitTest {
         verify(candidaturaRepository).existsByMissioneAndCandidato(missione, volontario);
     }
 
+    @Test
+    void removeCandidatura() throws Exception{
+        var candidaturaDTO = mock(CandidaturaDTO.class);
+        var volontario = mock(Volontario.class);
+        var missione = mock(Missione.class);
+        var candidatura = mock(Candidatura.class);
+
+        var missioneId = 1L;
+        var candidatoId = 1L;
+        when(candidaturaDTO.getMissioneId()).thenReturn(missioneId);
+        when(candidaturaDTO.getCandidatoId()).thenReturn(candidatoId);
+        when(missioneRepository.findById(missioneId)).thenReturn(Optional.of(missione));
+        when(volontarioRepository.findById(candidatoId)).thenReturn(Optional.of(volontario));
+        when(gestioneCandidatura.hasVolontarioAlreadyApplied(missione, volontario)).thenReturn(true);
+        when(candidaturaRepository.findByMissioneAndCandidato(missione, volontario))
+                .thenReturn(candidatura);
+
+        assertDoesNotThrow(() -> gestioneCandidatura.removeCandidatura(candidaturaDTO));
+
+        verify(candidaturaRepository).findByMissioneAndCandidato(missione, volontario);
+        verify(candidaturaRepository).delete(candidatura);
+    }
+
+    @Test
+    void removeCandidaturaConstraintFails() throws Exception{
+        var candidaturaDTO = mock(CandidaturaDTO.class);
+        var constraintViolation = (ConstraintViolation<CandidaturaDTO>) mock(ConstraintViolation.class);
+
+        when(validator.validate(candidaturaDTO)).thenReturn(Set.of(constraintViolation));
+
+        assertThrows(ConstraintViolationException.class, () -> gestioneCandidatura.removeCandidatura(candidaturaDTO));
+
+        verify(candidaturaRepository, times(0)).save(any());
+    }
+
+    @Test
+    void removeCandidatureMissionDoesntExist() throws Exception{
+        var candidaturaDTO = mock(CandidaturaDTO.class);
+        var missioneId = 1L;
+        var candidatoId = 1L;
+
+        when(candidaturaDTO.getMissioneId()).thenReturn(missioneId);
+        when(candidaturaDTO.getCandidatoId()).thenReturn(candidatoId);
+
+        when(missioneRepository.findById(missioneId))
+                .thenReturn(Optional.empty());
+
+        var exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> gestioneCandidatura.removeCandidatura(candidaturaDTO)
+        );
+
+        verify(candidaturaRepository, never()).delete(any());
+    }
+
+    @Test
+    void removeCandidatureCandidateDoesntExist() throws Exception{
+        var candidaturaDTO = mock(CandidaturaDTO.class);
+        var missioneId = 1L;
+        var candidatoId = 1L;
+
+        when(candidaturaDTO.getMissioneId()).thenReturn(missioneId);
+        when(candidaturaDTO.getCandidatoId()).thenReturn(candidatoId);
+
+        when(missioneRepository.findById(candidatoId))
+                .thenReturn(Optional.empty());
+
+        var exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> gestioneCandidatura.removeCandidatura(candidaturaDTO)
+        );
+
+        verify(candidaturaRepository, never()).delete(any());
+    }
+    
 }
