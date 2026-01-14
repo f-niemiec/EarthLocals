@@ -1,8 +1,10 @@
 package com.earthlocals.earthlocals.system.account;
 
 import com.earthlocals.earthlocals.model.Volontario;
+import com.earthlocals.earthlocals.service.gestionecandidature.GestioneCandidatura;
 import com.earthlocals.earthlocals.service.gestioneutente.GestioneUtente;
 import com.earthlocals.earthlocals.service.gestioneutente.dto.EditPassportDTO;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -13,10 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -25,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 public class AccountVolunteerController {
     final private GestioneUtente gestioneUtente;
+    final private GestioneCandidatura gestioneCandidatura;
 
     @GetMapping("/edit-passport")
     public String editPassport(Model model, @AuthenticationPrincipal Volontario volontario) {
@@ -53,6 +53,17 @@ public class AccountVolunteerController {
         return ResponseEntity.ok().body(gestioneUtente.getPassportVolontarioFileResource());
 
     }
-    //TODO: candidature and experience
+    
+    @GetMapping({"/candidature"})
+    @Transactional
+    public String volunteerCandidature(
+            Model model,
+            @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
+            @RequestParam(value = "size", required = false, defaultValue = "6") Integer size) {
+        model.addAttribute("currentPage", "volunteer-candidature");
+        var candidature = gestioneCandidatura.getCandidatureVolontario(page, size);
+        model.addAttribute("candidature", candidature);
+        return "account/volunteer/candidature";
+    }
 
 }
