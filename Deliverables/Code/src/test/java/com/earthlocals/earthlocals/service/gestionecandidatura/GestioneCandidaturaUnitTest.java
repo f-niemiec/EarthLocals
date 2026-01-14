@@ -10,6 +10,8 @@ import jakarta.validation.Validator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Optional;
 import java.util.Set;
@@ -327,5 +329,197 @@ public class GestioneCandidaturaUnitTest {
 
         verify(candidaturaRepository, never()).delete(any());
     }
-    
+
+    @Test
+    void removeCandidaturaAlreadyApplied() throws Exception{
+        var candidaturaDTO = mock(CandidaturaDTO.class);
+        var volontario = mock(Volontario.class);
+        var missione = mock(Missione.class);
+        var candidatura = mock(Candidatura.class);
+
+        Long missioneId = 1L;
+        Long candidatoId = 1L;
+
+        when(candidaturaDTO.getMissioneId()).thenReturn(missioneId);
+        when(candidaturaDTO.getCandidatoId()).thenReturn(candidatoId);
+
+        when(missioneRepository.findById(missioneId))
+                .thenReturn(Optional.of(missione));
+        when(volontarioRepository.findById(candidatoId))
+                .thenReturn(Optional.of(volontario));
+
+        when(candidaturaRepository.existsByMissioneAndCandidato(missione, volontario))
+                .thenReturn(true);
+        when(candidaturaRepository.findByMissioneAndCandidato(missione, volontario))
+                .thenReturn(candidatura);
+
+        gestioneCandidatura.removeCandidatura(candidaturaDTO);
+
+        verify(candidaturaRepository).delete(candidatura);
+    }
+
+    @Test
+    void removeCandidaturaNotFound() throws Exception{
+        var candidaturaDTO = mock(CandidaturaDTO.class);
+        var missione = mock(Missione.class);
+        var volontario = mock(Volontario.class);
+        Long missioneId = 1L;
+        Long candidatoId = 1L;
+        when(candidaturaDTO.getMissioneId()).thenReturn(missioneId);
+        when(candidaturaDTO.getCandidatoId()).thenReturn(candidatoId);
+
+        when(missioneRepository.findById(missioneId))
+                .thenReturn(Optional.of(missione));
+        when(volontarioRepository.findById(candidatoId))
+                .thenReturn(Optional.of(volontario));
+
+        when(candidaturaRepository.existsByMissioneAndCandidato(missione, volontario))
+                .thenReturn(false);
+
+        gestioneCandidatura.removeCandidatura(candidaturaDTO);
+
+        verify(candidaturaRepository, never())
+                .findByMissioneAndCandidato(any(), any());
+        verify(candidaturaRepository, never())
+                .delete(any());
+    }
+
+
+    @Test
+    void acceptCandidatura() {
+        var candidaturaId = 1L;
+
+        var candidatura = mock(Candidatura.class);
+        var missione = mock(Missione.class);
+        var creatore = mock(Utente.class);
+
+        when(creatore.getId()).thenReturn(1L);
+        when(missione.getCreatore()).thenReturn(creatore);
+        when(candidatura.getMissione()).thenReturn(missione);
+
+        when(candidaturaRepository.findById(candidaturaId))
+                .thenReturn(Optional.of(candidatura));
+
+        var authentication = mock(Authentication.class);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        when(authentication.getPrincipal()).thenReturn(creatore);
+
+        var result = gestioneCandidatura.acceptCandidatura(candidaturaId);
+
+        assertTrue(result);
+
+        verify(candidatura)
+                .setStato(Candidatura.CandidaturaStato.ACCETTATA);
+    }
+
+    @Test
+    void acceptCandidaturaDoesntExists() throws Exception{
+        Long candidaturaId = 1L;
+        when(candidaturaRepository.findById(candidaturaId))
+                .thenReturn(Optional.empty());
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> gestioneCandidatura.acceptCandidatura(candidaturaId)
+        );
+    }
+
+    @Test
+    void acceptCandidaturaIsNotOrganizer() throws Exception{
+        var candidatura = mock(Candidatura.class);
+        var missione = mock(Missione.class);
+        var creatore = mock(Utente.class);
+        var utenteLoggato = mock(Utente.class);
+        Long creatoreId = 1L;
+        Long utenteLoggatoId = 2L;
+
+        when(creatore.getId()).thenReturn(creatoreId);
+        when(utenteLoggato.getId()).thenReturn(utenteLoggatoId);
+
+        when(missione.getCreatore()).thenReturn(creatore);
+        when(candidatura.getMissione()).thenReturn(missione);
+
+        when(candidaturaRepository.findById(1L))
+                .thenReturn(Optional.of(candidatura));
+
+        var auth = mock(Authentication.class);
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        when(auth.getPrincipal()).thenReturn(utenteLoggato);
+
+        var result = gestioneCandidatura.acceptCandidatura(1L);
+
+        assertFalse(result);
+        verify(candidatura, never())
+                .setStato(Candidatura.CandidaturaStato.ACCETTATA);
+    }
+
+    @Test
+    void rejectCandidatura() {
+        var candidaturaId = 1L;
+
+        var candidatura = mock(Candidatura.class);
+        var missione = mock(Missione.class);
+        var creatore = mock(Utente.class);
+
+        when(creatore.getId()).thenReturn(1L);
+        when(missione.getCreatore()).thenReturn(creatore);
+        when(candidatura.getMissione()).thenReturn(missione);
+
+        when(candidaturaRepository.findById(candidaturaId))
+                .thenReturn(Optional.of(candidatura));
+
+        var authentication = mock(Authentication.class);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        when(authentication.getPrincipal()).thenReturn(creatore);
+
+        var result = gestioneCandidatura.rejectCandidatura(candidaturaId);
+
+        assertTrue(result);
+
+        verify(candidatura)
+                .setStato(Candidatura.CandidaturaStato.RIFIUTATA);
+    }
+
+    @Test
+    void rejectCandidaturaDoesntExists() throws Exception{
+        Long candidaturaId = 1L;
+        when(candidaturaRepository.findById(candidaturaId))
+                .thenReturn(Optional.empty());
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> gestioneCandidatura.rejectCandidatura(candidaturaId)
+        );
+    }
+
+    @Test
+    void rejectCandidaturaIsNotOrganizer() throws Exception{
+        var candidatura = mock(Candidatura.class);
+        var missione = mock(Missione.class);
+        var creatore = mock(Utente.class);
+        var utenteLoggato = mock(Utente.class);
+        Long creatoreId = 1L;
+        Long utenteLoggatoId = 2L;
+
+        when(creatore.getId()).thenReturn(creatoreId);
+        when(utenteLoggato.getId()).thenReturn(utenteLoggatoId);
+
+        when(missione.getCreatore()).thenReturn(creatore);
+        when(candidatura.getMissione()).thenReturn(missione);
+
+        when(candidaturaRepository.findById(1L))
+                .thenReturn(Optional.of(candidatura));
+
+        var auth = mock(Authentication.class);
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        when(auth.getPrincipal()).thenReturn(utenteLoggato);
+
+        var result = gestioneCandidatura.rejectCandidatura(1L);
+
+        assertFalse(result);
+        verify(candidatura, never())
+                .setStato(Candidatura.CandidaturaStato.RIFIUTATA);
+    }
+
+
 }
