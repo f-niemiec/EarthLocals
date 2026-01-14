@@ -64,6 +64,7 @@ public class UtenteDTO implements PasswordMatchingVerifiable {
     private String matchingPassword;
 
     @NotNull
+    @PositiveOrZero
     private Integer nazionalita;
 
     @NotNull
