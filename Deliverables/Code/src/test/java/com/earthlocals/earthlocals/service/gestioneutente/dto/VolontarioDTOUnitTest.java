@@ -52,4 +52,23 @@ public class VolontarioDTOUnitTest {
         assertTrue(constraintValidations.isEmpty());
     }
 
+    void VolontarioDTOnullNomeFails() {
+        var volontarioDTO = new VolontarioDTO(
+                "nome",
+                "cognome",
+                "utente@email.com",
+                "abcYZ17!?",
+                "abcYZ17!?",
+                1,
+                LocalDate.ofEpochDay(-1),
+                'F',
+                "AA000000",
+                LocalDate.ofEpochDay(1),
+                LocalDate.ofEpochDay(-1),
+                passport
+        );
+        var constraintValidations = validator.validate(volontarioDTO);
+        assertTrue(constraintValidations.isEmpty());
+    }
+
 }

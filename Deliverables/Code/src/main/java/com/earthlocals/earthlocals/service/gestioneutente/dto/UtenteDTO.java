@@ -1,6 +1,7 @@
 package com.earthlocals.earthlocals.service.gestioneutente.dto;
 
 import com.earthlocals.earthlocals.utility.constraints.PasswordMatches;
+import com.earthlocals.earthlocals.utility.constraints.Sex;
 import com.earthlocals.earthlocals.utility.interfaces.PasswordMatchingVerifiable;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -17,7 +18,8 @@ import java.util.Objects;
 @AllArgsConstructor
 @PasswordMatches(
         message = "Le password non coincidono",
-        connectedField = "matchingPassword"
+        connectedField = "matchingPassword",
+        groups = {UtenteDTO.UtenteDTOPasswordsMatchGroup.class}
 )
 public class UtenteDTO implements PasswordMatchingVerifiable {
 
@@ -63,6 +65,7 @@ public class UtenteDTO implements PasswordMatchingVerifiable {
     private String matchingPassword;
 
     @NotNull
+    @PositiveOrZero
     private Integer nazionalita;
 
     @NotNull
@@ -72,10 +75,14 @@ public class UtenteDTO implements PasswordMatchingVerifiable {
 
 
     @NotNull
+    @Sex
     private Character sesso;
 
     @Override
     public boolean isPasswordMatching() {
         return Objects.equals(password, matchingPassword);
+    }
+
+    public interface UtenteDTOPasswordsMatchGroup {
     }
 }
