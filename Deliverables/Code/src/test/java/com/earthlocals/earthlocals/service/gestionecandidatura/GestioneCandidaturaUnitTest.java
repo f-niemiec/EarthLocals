@@ -453,4 +453,73 @@ public class GestioneCandidaturaUnitTest {
                 .setStato(Candidatura.CandidaturaStato.ACCETTATA);
     }
 
+    @Test
+    void rejectCandidatura() {
+        var candidaturaId = 1L;
+
+        var candidatura = mock(Candidatura.class);
+        var missione = mock(Missione.class);
+        var creatore = mock(Utente.class);
+
+        when(creatore.getId()).thenReturn(1L);
+        when(missione.getCreatore()).thenReturn(creatore);
+        when(candidatura.getMissione()).thenReturn(missione);
+
+        when(candidaturaRepository.findById(candidaturaId))
+                .thenReturn(Optional.of(candidatura));
+
+        var authentication = mock(Authentication.class);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        when(authentication.getPrincipal()).thenReturn(creatore);
+
+        var result = gestioneCandidatura.rejectCandidatura(candidaturaId);
+
+        assertTrue(result);
+
+        verify(candidatura)
+                .setStato(Candidatura.CandidaturaStato.RIFIUTATA);
+    }
+
+    @Test
+    void rejectCandidaturaDoesntExists() throws Exception{
+        Long candidaturaId = 1L;
+        when(candidaturaRepository.findById(candidaturaId))
+                .thenReturn(Optional.empty());
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> gestioneCandidatura.rejectCandidatura(candidaturaId)
+        );
+    }
+
+    @Test
+    void rejectCandidaturaIsNotOrganizer() throws Exception{
+        var candidatura = mock(Candidatura.class);
+        var missione = mock(Missione.class);
+        var creatore = mock(Utente.class);
+        var utenteLoggato = mock(Utente.class);
+        Long creatoreId = 1L;
+        Long utenteLoggatoId = 2L;
+
+        when(creatore.getId()).thenReturn(creatoreId);
+        when(utenteLoggato.getId()).thenReturn(utenteLoggatoId);
+
+        when(missione.getCreatore()).thenReturn(creatore);
+        when(candidatura.getMissione()).thenReturn(missione);
+
+        when(candidaturaRepository.findById(1L))
+                .thenReturn(Optional.of(candidatura));
+
+        var auth = mock(Authentication.class);
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        when(auth.getPrincipal()).thenReturn(utenteLoggato);
+
+        var result = gestioneCandidatura.rejectCandidatura(1L);
+
+        assertFalse(result);
+        verify(candidatura, never())
+                .setStato(Candidatura.CandidaturaStato.RIFIUTATA);
+    }
+
+
 }
