@@ -10,6 +10,8 @@ import jakarta.validation.Validator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -521,5 +523,23 @@ public class GestioneCandidaturaUnitTest {
                 .setStato(Candidatura.CandidaturaStato.RIFIUTATA);
     }
 
+    @Test
+    void getCandidatureVolontario() throws Exception{
+        var auth = mock(Authentication.class);
+        var volontario = mock(Volontario.class);
+        var pageable = mock(Pageable.class);
+        var page =  mock(Page.class);
+        int pageNumber = 1;
+        int pageSize = 6;
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        when(auth.getPrincipal()).thenReturn(volontario);
+        when(candidaturaRepository.findByCandidato(eq(volontario), any(Pageable.class)))
+                .thenReturn(page);
+
+        var result = gestioneCandidatura.getCandidatureVolontario(pageNumber, pageSize);
+        assertEquals(page, result);
+        verify(candidaturaRepository)
+                .findByCandidato(eq(volontario), any(Pageable.class));
+    }
 
 }

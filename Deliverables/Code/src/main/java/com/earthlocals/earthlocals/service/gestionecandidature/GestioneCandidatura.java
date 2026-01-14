@@ -121,14 +121,14 @@ public class GestioneCandidatura {
     }
 
     @PreAuthorize("hasRole('VOLUNTEER')")
-    public Page<Candidatura> getCandidatureVolontario(Integer page, Integer pageSize) {
+    public Page<Candidatura> getCandidatureVolontario(int page, int pageSize) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Volontario volontario = (Volontario) auth.getPrincipal();
         var pageable = Pageable.ofSize(pageSize).withPage(page);
         return candidaturaRepository.findByCandidato(volontario, pageable);
     }
 
-    public Page<Candidatura> getEsperienzeVolontario(Integer page, Integer pageSize) {
+    public Page<Candidatura> getEsperienzeVolontario(int page, int pageSize) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Utente utente = (Utente) auth.getPrincipal();
         var pageable = Pageable.ofSize(pageSize).withPage(page);
@@ -141,7 +141,7 @@ public class GestioneCandidatura {
 
     }
 
-    public Page<Candidatura> getRichiesteCandidatura(Integer page, Integer pageSize) {
+    public Page<Candidatura> getRichiesteCandidatura(int page, int pageSize) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Utente utente = (Utente) auth.getPrincipal();
         var pageable = Pageable.ofSize(pageSize).withPage(page);
