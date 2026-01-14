@@ -54,6 +54,9 @@ public class MissioneDTO implements DateOverlapVerifier {
 
     @Override
     public boolean isDateOverlapping() {
+        if (dataFine == null || dataInizio == null) {
+            return false;
+        }
         return dataFine.isBefore(dataInizio);
     }
 
