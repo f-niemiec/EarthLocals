@@ -103,7 +103,7 @@ public class EditPassportDTOUnitTest {
     }
 
     @Test
-    void EditPassportDTONull(){
+    void EditPassportDTOPassportNull(){
         var editPassportDTO = new EditPassportDTO(
                 "YA9200000",
                 LocalDate.of(9999, 3, 23),
@@ -113,6 +113,51 @@ public class EditPassportDTOUnitTest {
 
         var constraintValidations = validator.validate(editPassportDTO);
         var constraintValidationsNome = validator.validateProperty(editPassportDTO, "passaporto");
+        assertFalse(constraintValidations.isEmpty());
+        assertEquals(constraintValidations, constraintValidationsNome);
+    }
+
+    @Test
+    void EditPassportDTOBlank(){
+        var editPassportDTO = new EditPassportDTO(
+                "",
+                LocalDate.of(9999, 3, 23),
+                LocalDate.ofEpochDay(-1),
+                passport
+        );
+
+        var constraintValidations = validator.validate(editPassportDTO);
+        var constraintValidationsNome = validator.validateProperty(editPassportDTO, "numeroPassaporto");
+        assertFalse(constraintValidations.isEmpty());
+        assertEquals(constraintValidations, constraintValidationsNome);
+    }
+
+    @Test
+    void EditPassportDTOScadenzaNull(){
+        var editPassportDTO = new EditPassportDTO(
+                "YA9200000",
+                null,
+                LocalDate.ofEpochDay(-1),
+                passport
+        );
+
+        var constraintValidations = validator.validate(editPassportDTO);
+        var constraintValidationsNome = validator.validateProperty(editPassportDTO, "dataScadenzaPassaporto");
+        assertFalse(constraintValidations.isEmpty());
+        assertEquals(constraintValidations, constraintValidationsNome);
+    }
+
+    @Test
+    void EditPassportDTONull(){
+        var editPassportDTO = new EditPassportDTO(
+                "YA9200000",
+                LocalDate.of(9999, 3, 23),
+                null,
+                passport
+        );
+
+        var constraintValidations = validator.validate(editPassportDTO);
+        var constraintValidationsNome = validator.validateProperty(editPassportDTO, "dataEmissionePassaporto");
         assertFalse(constraintValidations.isEmpty());
         assertEquals(constraintValidations, constraintValidationsNome);
     }

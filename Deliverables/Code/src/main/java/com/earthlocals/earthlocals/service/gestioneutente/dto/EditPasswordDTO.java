@@ -3,7 +3,6 @@ package com.earthlocals.earthlocals.service.gestioneutente.dto;
 import com.earthlocals.earthlocals.utility.constraints.PasswordMatches;
 import com.earthlocals.earthlocals.utility.interfaces.PasswordMatchingVerifiable;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,11 +16,13 @@ import java.util.Objects;
 @AllArgsConstructor
 @PasswordMatches(
         message = "Le password non coincidono",
-        connectedField = "matchingPassword"
+        connectedField = "matchingPassword",
+        groups = {EditPasswordDTO.EditPasswordDTOPasswordsMatchGroup.class}
+
 )
 public class EditPasswordDTO implements PasswordMatchingVerifiable {
 
-    @NotNull
+    @NotBlank(message = "La password attuale non può essere vuota")
     private String currentPassword;
 
     // TODO: Centralizzare il controllo delle password
@@ -59,6 +60,9 @@ public class EditPasswordDTO implements PasswordMatchingVerifiable {
     @Override
     public boolean isPasswordMatching() {
         return Objects.equals(newPassword, matchingPassword);
+    }
+
+    public interface EditPasswordDTOPasswordsMatchGroup {
     }
 }
 
