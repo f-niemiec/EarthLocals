@@ -15,6 +15,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
+import java.util.HashSet;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -274,6 +275,98 @@ public class MissioneDTOUnitTest {
 
     @Test
     void missioneDTODataInizioFutureSucceed() {
+        var utente = mock(Utente.class);
+        var foto = new MockMultipartFile("file", "file".getBytes());
+        var missioneDTO = new MissioneDTO(
+                "Help teaching a Pechino",
+                0,
+                "Salerno",
+                "Descrizione di più di 20 caratteri",
+                LocalDate.ofEpochDay(1),
+                LocalDate.ofEpochDay(2),
+                "nessuna",
+                null,
+                foto,
+                utente
+        );
+        var constraintValidation = validator.validate(missioneDTO);
+        assertTrue(constraintValidation.isEmpty());
+    }
+
+
+    @Test
+    void missioneDTODataFineNullFails() {
+        var utente = mock(Utente.class);
+        var foto = new MockMultipartFile("file", "file".getBytes());
+        var missioneDTO = new MissioneDTO(
+                "Help teaching a Pechino",
+                0,
+                "Salerno",
+                "Descrizione di più di 20 caratteri",
+                LocalDate.ofEpochDay(2),
+                null,
+                "nessuna",
+                null,
+                foto,
+                utente
+        );
+        var constraintValidationDataFine = validator.validateProperty(missioneDTO, "dataFine");
+        assertFalse(constraintValidationDataFine.isEmpty());
+        var constraintValidation = validator.validate(missioneDTO);
+        assertEquals(constraintValidation, constraintValidationDataFine);
+    }
+
+    @Test
+    void missioneDTODataFinePastFails() {
+        var utente = mock(Utente.class);
+        var foto = new MockMultipartFile("file", "file".getBytes());
+        var missioneDTO = new MissioneDTO(
+                "Help teaching a Pechino",
+                0,
+                "Salerno",
+                "Descrizione di più di 20 caratteri",
+                LocalDate.ofEpochDay(-2),
+                LocalDate.ofEpochDay(-1),
+                "nessuna",
+                null,
+                foto,
+                utente
+        );
+        var constraintValidationDataFine = validator.validateProperty(missioneDTO, "dataFine");
+        assertFalse(constraintValidationDataFine.isEmpty());
+        var constraintValidationDataInizio = validator.validateProperty(missioneDTO, "dataInizio");
+        assertFalse(constraintValidationDataInizio.isEmpty());
+        var unionSet = new HashSet<>(constraintValidationDataInizio);
+        unionSet.addAll(constraintValidationDataFine);
+
+        var constraintValidation = validator.validate(missioneDTO);
+        assertEquals(constraintValidation, unionSet);
+    }
+
+    @Test
+    void missioneDTODataFinePresentFails() {
+        var utente = mock(Utente.class);
+        var foto = new MockMultipartFile("file", "file".getBytes());
+        var missioneDTO = new MissioneDTO(
+                "Help teaching a Pechino",
+                0,
+                "Salerno",
+                "Descrizione di più di 20 caratteri",
+                LocalDate.ofEpochDay(0),
+                LocalDate.ofEpochDay(0),
+                "nessuna",
+                null,
+                foto,
+                utente
+        );
+        var constraintValidationDataFine = validator.validateProperty(missioneDTO, "dataFine");
+        assertFalse(constraintValidationDataFine.isEmpty());
+        var constraintValidation = validator.validate(missioneDTO);
+        assertEquals(constraintValidation, constraintValidationDataFine);
+    }
+
+    @Test
+    void missioneDTODataFineFutureSucceed() {
         var utente = mock(Utente.class);
         var foto = new MockMultipartFile("file", "file".getBytes());
         var missioneDTO = new MissioneDTO(
