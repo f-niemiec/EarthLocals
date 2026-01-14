@@ -404,5 +404,98 @@ public class UtenteDTOUnitTest {
         assertEquals(constraintValidations, constraintValidationsPassword);
     }
 
+    @Test
+    void UtenteDTODataNascitaNullFails() {
+        var utenteDTO = new UtenteDTO(
+                "nome",
+                "cognome",
+                "utente@email.com",
+                "abcYZ17!?",
+                "abcYZ17!?",
+                1,
+                null,
+                'F'
+        );
+
+        var constraintValidationsPassword = validator.validateProperty(utenteDTO, "dataNascita");
+        var constraintValidations = validator.validate(utenteDTO);
+        assertFalse(constraintValidationsPassword.isEmpty());
+        assertEquals(constraintValidations, constraintValidationsPassword);
+    }
+
+    @Test
+    void UtenteDTODataNascitaTodayFails() {
+        var utenteDTO = new UtenteDTO(
+                "nome",
+                "cognome",
+                "utente@email.com",
+                "abcYZ17!?",
+                "abcYZ17!?",
+                1,
+                LocalDate.ofEpochDay(0),
+                'F'
+        );
+
+        var constraintValidationsPassword = validator.validateProperty(utenteDTO, "dataNascita");
+        var constraintValidations = validator.validate(utenteDTO);
+        assertFalse(constraintValidationsPassword.isEmpty());
+        assertEquals(constraintValidations, constraintValidationsPassword);
+    }
+
+    @Test
+    void UtenteDTODataNascitaFutureFails() {
+        var utenteDTO = new UtenteDTO(
+                "nome",
+                "cognome",
+                "utente@email.com",
+                "abcYZ17!?",
+                "abcYZ17!?",
+                1,
+                LocalDate.ofEpochDay(1),
+                'F'
+        );
+
+        var constraintValidationsPassword = validator.validateProperty(utenteDTO, "dataNascita");
+        var constraintValidations = validator.validate(utenteDTO);
+        assertFalse(constraintValidationsPassword.isEmpty());
+        assertEquals(constraintValidations, constraintValidationsPassword);
+    }
+
+    @Test
+    void UtenteDTOMSessoSucceeds() {
+        var utenteDTO = new UtenteDTO(
+                "nome",
+                "cognome",
+                "utente@email.com",
+                "abcYZ17!?",
+                "abcYZ17!?",
+                1,
+                LocalDate.ofEpochDay(-1),
+                'M'
+        );
+
+        var constraintValidations = validator.validate(utenteDTO);
+        assertTrue(constraintValidations.isEmpty());
+    }
+
+    @Test
+    void UtenteDTOInvalidSessoFails() {
+        var utenteDTO = new UtenteDTO(
+                "nome",
+                "cognome",
+                "utente@email.com",
+                "abcYZ17!?",
+                "abcYZ17!?",
+                1,
+                LocalDate.ofEpochDay(-1),
+                'G'
+        );
+
+        var constraintValidationsPassword = validator.validateProperty(utenteDTO, "sesso");
+        var constraintValidations = validator.validate(utenteDTO);
+        assertFalse(constraintValidationsPassword.isEmpty());
+        assertEquals(constraintValidations, constraintValidationsPassword);
+    }
+
 
 }

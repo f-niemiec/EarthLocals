@@ -1,6 +1,7 @@
 package com.earthlocals.earthlocals.service.gestioneutente.dto;
 
 import com.earthlocals.earthlocals.utility.constraints.PasswordMatches;
+import com.earthlocals.earthlocals.utility.constraints.Sex;
 import com.earthlocals.earthlocals.utility.interfaces.PasswordMatchingVerifiable;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -73,6 +74,7 @@ public class UtenteDTO implements PasswordMatchingVerifiable {
 
 
     @NotNull
+    @Sex
     private Character sesso;
 
     @Override

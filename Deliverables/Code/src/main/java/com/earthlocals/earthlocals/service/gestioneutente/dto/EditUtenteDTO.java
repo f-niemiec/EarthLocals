@@ -1,6 +1,7 @@
 package com.earthlocals.earthlocals.service.gestioneutente.dto;
 
 import com.earthlocals.earthlocals.model.Utente;
+import com.earthlocals.earthlocals.utility.constraints.Sex;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -34,6 +35,7 @@ public class EditUtenteDTO {
     @Past(message = "La data di nascita inserita non è valida")
     private LocalDate dataNascita;
     @NotNull
+    @Sex
     private Character sesso;
 
 
