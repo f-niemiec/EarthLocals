@@ -221,11 +221,18 @@ public class GestioneUtenteUnitTest {
         when(utenteRepository.findByEmail(any())).thenReturn(volontario);
         when(volontario.getPending()).thenReturn(true);
 
+        var verToken = mock(VerificationToken.class);
+        when(verificationTokenRepository.findByUtente(volontario)).thenReturn(verToken);
 
         var res = assertDoesNotThrow(() -> gestioneUtente.registerVolunteer(volontarioDTO));
 
         var utenteCaptor = ArgumentCaptor.forClass(Volontario.class);
-        verify(volontarioRepository, times(1)).save(utenteCaptor.capture());
+        InOrder inOrder = inOrder(utenteRepository, verificationTokenRepository, volontarioRepository);
+
+        inOrder.verify(utenteRepository, times(1)).findByEmail(any());
+        inOrder.verify(verificationTokenRepository, times(1)).delete(verToken);
+        inOrder.verify(utenteRepository, times(1)).delete(volontario);
+        inOrder.verify(volontarioRepository, times(1)).save(utenteCaptor.capture());
         var savedUtente = utenteCaptor.getValue();
 
         assertSame(savedUtente, res);
@@ -337,11 +344,18 @@ public class GestioneUtenteUnitTest {
         when(utenteRepository.findByEmail(any())).thenReturn(utente);
         when(utente.getPending()).thenReturn(true);
 
+        var verToken = mock(VerificationToken.class);
+        when(verificationTokenRepository.findByUtente(utente)).thenReturn(verToken);
 
         var res = assertDoesNotThrow(() -> gestioneUtente.registerOrganizer(utenteDTO));
 
         var utenteCaptor = ArgumentCaptor.forClass(Utente.class);
-        verify(utenteRepository, times(1)).save(utenteCaptor.capture());
+        InOrder inOrder = inOrder(utenteRepository, verificationTokenRepository);
+
+        inOrder.verify(utenteRepository, times(1)).findByEmail(any());
+        inOrder.verify(verificationTokenRepository, times(1)).delete(verToken);
+        inOrder.verify(utenteRepository, times(1)).delete(utente);
+        inOrder.verify(utenteRepository, times(1)).save(utenteCaptor.capture());
         var savedUtente = utenteCaptor.getValue();
 
         assertSame(savedUtente, res);
