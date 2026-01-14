@@ -54,7 +54,7 @@ public class MissioneDTOUnitTest {
     }
 
     @Test
-    public void missioneDTONomeNullFails() {
+    void missioneDTONomeNullFails() {
         var utente = mock(Utente.class);
         var foto = new MockMultipartFile("file", "file".getBytes());
 
@@ -78,7 +78,7 @@ public class MissioneDTOUnitTest {
     }
 
     @Test
-    public void missioneDTONomeTooShortFails() {
+    void missioneDTONomeTooShortFails() {
         var utente = mock(Utente.class);
         var foto = new MockMultipartFile("file", "file".getBytes());
 
@@ -101,7 +101,7 @@ public class MissioneDTOUnitTest {
     }
 
     @Test
-    public void missioneDTONomeLongEnoughSucceeds() {
+    void missioneDTONomeLongEnoughSucceeds() {
         var utente = mock(Utente.class);
         var foto = new MockMultipartFile("file", "file".getBytes());
 
@@ -122,7 +122,7 @@ public class MissioneDTOUnitTest {
     }
 
     @Test
-    public void missioneDTONomeTooLongFails() {
+    void missioneDTONomeTooLongFails() {
         var utente = mock(Utente.class);
         var foto = new MockMultipartFile("file", "file".getBytes());
 
@@ -145,7 +145,7 @@ public class MissioneDTOUnitTest {
     }
 
     @Test
-    public void missioneDTONomeShortEnoughSucceeds() {
+    void missioneDTONomeShortEnoughSucceeds() {
         var utente = mock(Utente.class);
         var foto = new MockMultipartFile("file", "file".getBytes());
 
