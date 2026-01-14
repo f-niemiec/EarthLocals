@@ -2,6 +2,7 @@ package com.earthlocals.earthlocals.service.gestionemissioni.dto;
 
 import com.earthlocals.earthlocals.model.Utente;
 import com.earthlocals.earthlocals.utility.constraints.DateOverlap;
+import com.earthlocals.earthlocals.utility.constraints.FileType;
 import com.earthlocals.earthlocals.utility.interfaces.DateOverlapVerifier;
 import jakarta.validation.constraints.*;
 import jakarta.validation.groups.Default;
@@ -50,6 +51,7 @@ public class MissioneDTO implements DateOverlapVerifier {
     private String requisitiExtra;
 
     @NotNull
+    @FileType(allowedExtensions = {"image/png", "image/jpeg", "image/jpg", "image/webp"}, groups = {MissioneFoto.class})
     private MultipartFile foto;
 
     private Utente creatore;
@@ -63,6 +65,9 @@ public class MissioneDTO implements DateOverlapVerifier {
     }
 
     public interface MissioneDatesOverlap {
+    }
+
+    public interface MissioneFoto {
     }
 
 }

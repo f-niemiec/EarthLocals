@@ -5,11 +5,12 @@ import com.earthlocals.earthlocals.service.gestionemissioni.dto.MissioneDTO;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -21,10 +22,11 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
 // TODO: Change DataJpaTest
-@DataJpaTest
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(SpringExtension.class)
 public class MissioneDTOUnitTest {
     private static Validator validator;
+
+    private MultipartFile foto;
 
     @BeforeAll
     public static void setUpValidator() {
@@ -33,10 +35,14 @@ public class MissioneDTOUnitTest {
         validator = factory.getValidator();
     }
 
+    @BeforeEach
+    void setup() {
+        foto = new MockMultipartFile("file.png", "file.png".getBytes());
+    }
+
     @Test
     void missioneDTOValid() {
         var utente = mock(Utente.class);
-        var foto = new MockMultipartFile("file", "file".getBytes());
         var missioneDTO = new MissioneDTO(
                 "Help teaching a Pechino",
                 0,
@@ -56,7 +62,6 @@ public class MissioneDTOUnitTest {
     @Test
     void missioneDTONomeNullFails() {
         var utente = mock(Utente.class);
-        var foto = new MockMultipartFile("file", "file".getBytes());
 
         var missioneDTO = new MissioneDTO(
                 null,
@@ -80,7 +85,6 @@ public class MissioneDTOUnitTest {
     @Test
     void missioneDTONomeTooShortFails() {
         var utente = mock(Utente.class);
-        var foto = new MockMultipartFile("file", "file".getBytes());
 
         var missioneDTO = new MissioneDTO(
                 "abc",
@@ -103,7 +107,6 @@ public class MissioneDTOUnitTest {
     @Test
     void missioneDTONomeLongEnoughSucceeds() {
         var utente = mock(Utente.class);
-        var foto = new MockMultipartFile("file", "file".getBytes());
 
         var missioneDTO = new MissioneDTO(
                 "abcde",
@@ -124,7 +127,6 @@ public class MissioneDTOUnitTest {
     @Test
     void missioneDTONomeTooLongFails() {
         var utente = mock(Utente.class);
-        var foto = new MockMultipartFile("file", "file".getBytes());
 
         var missioneDTO = new MissioneDTO(
                 "ggdafgxcrufdxerjiuecyxkoiwwuamovrzcdadrsrlupseqluvzweugrqasoerspcikevdjkjfrlsttkaszonjaqsxexhalceanty",
@@ -147,7 +149,6 @@ public class MissioneDTOUnitTest {
     @Test
     void missioneDTONomeShortEnoughSucceeds() {
         var utente = mock(Utente.class);
-        var foto = new MockMultipartFile("file", "file".getBytes());
 
         var missioneDTO = new MissioneDTO(
                 "ggdafgxcrufdxerjiuecyxkoiwwuamovrzcdadrsrlupseqluvzweugrqasoerspcikevdjkjfrlsttkaszonjaqsxexhalceant",
@@ -168,7 +169,6 @@ public class MissioneDTOUnitTest {
     @Test
     void missioneDTONegativePaeseFails() {
         var utente = mock(Utente.class);
-        var foto = new MockMultipartFile("file", "file".getBytes());
         var missioneDTO = new MissioneDTO(
                 "Help teaching a Pechino",
                 -1,
@@ -190,7 +190,6 @@ public class MissioneDTOUnitTest {
     @Test
     void missioneDTONullPaeseFails() {
         var utente = mock(Utente.class);
-        var foto = new MockMultipartFile("file", "file".getBytes());
         var missioneDTO = new MissioneDTO(
                 "Help teaching a Pechino",
                 null,
@@ -212,7 +211,6 @@ public class MissioneDTOUnitTest {
     @Test
     void missioneDTOPositivePaeseSucceeds() {
         var utente = mock(Utente.class);
-        var foto = new MockMultipartFile("file", "file".getBytes());
         var missioneDTO = new MissioneDTO(
                 "Help teaching a Pechino",
                 1,
@@ -232,7 +230,6 @@ public class MissioneDTOUnitTest {
     @Test
     void missioneDTONullCittaFails() {
         var utente = mock(Utente.class);
-        var foto = new MockMultipartFile("file", "file".getBytes());
         var missioneDTO = new MissioneDTO(
                 "Help teaching a Pechino",
                 0,
@@ -254,7 +251,6 @@ public class MissioneDTOUnitTest {
     @Test
     void missioneDTOEmptyCittaFails() {
         var utente = mock(Utente.class);
-        var foto = new MockMultipartFile("file", "file".getBytes());
         var missioneDTO = new MissioneDTO(
                 "Help teaching a Pechino",
                 0,
@@ -276,7 +272,6 @@ public class MissioneDTOUnitTest {
     @Test
     void missioneDTONotBlankCittaSucceeds() {
         var utente = mock(Utente.class);
-        var foto = new MockMultipartFile("file", "file".getBytes());
         var missioneDTO = new MissioneDTO(
                 "Help teaching a Pechino",
                 0,
@@ -296,7 +291,6 @@ public class MissioneDTOUnitTest {
     @Test
     void missioneDTONullDescrizioneFails() {
         var utente = mock(Utente.class);
-        var foto = new MockMultipartFile("file", "file".getBytes());
         var missioneDTO = new MissioneDTO(
                 "Help teaching a Pechino",
                 0,
@@ -318,7 +312,6 @@ public class MissioneDTOUnitTest {
     @Test
     void missioneDTOEmptyDescrizioneFails() {
         var utente = mock(Utente.class);
-        var foto = new MockMultipartFile("file", "file".getBytes());
         var missioneDTO = new MissioneDTO(
                 "Help teaching a Pechino",
                 0,
@@ -340,7 +333,6 @@ public class MissioneDTOUnitTest {
     @Test
     void missioneDTODescrizioneTooShortFails() {
         var utente = mock(Utente.class);
-        var foto = new MockMultipartFile("file", "file".getBytes());
         var missioneDTO = new MissioneDTO(
                 "Help teaching a Pechino",
                 0,
@@ -362,7 +354,6 @@ public class MissioneDTOUnitTest {
     @Test
     void missioneDTODescrizioneLongEnoughSucceeds() {
         var utente = mock(Utente.class);
-        var foto = new MockMultipartFile("file", "file".getBytes());
         var missioneDTO = new MissioneDTO(
                 "Help teaching a Pechino",
                 0,
@@ -382,7 +373,6 @@ public class MissioneDTOUnitTest {
     @Test
     void missioneDTODataInizioNullFails() {
         var utente = mock(Utente.class);
-        var foto = new MockMultipartFile("file", "file".getBytes());
         var missioneDTO = new MissioneDTO(
                 "Help teaching a Pechino",
                 0,
@@ -404,7 +394,6 @@ public class MissioneDTOUnitTest {
     @Test
     void missioneDTODataInizioPastFails() {
         var utente = mock(Utente.class);
-        var foto = new MockMultipartFile("file", "file".getBytes());
         var missioneDTO = new MissioneDTO(
                 "Help teaching a Pechino",
                 0,
@@ -426,7 +415,6 @@ public class MissioneDTOUnitTest {
     @Test
     void missioneDTODataInizioPresentSucceed() {
         var utente = mock(Utente.class);
-        var foto = new MockMultipartFile("file", "file".getBytes());
         var missioneDTO = new MissioneDTO(
                 "Help teaching a Pechino",
                 0,
@@ -446,7 +434,6 @@ public class MissioneDTOUnitTest {
     @Test
     void missioneDTODataInizioFutureSucceed() {
         var utente = mock(Utente.class);
-        var foto = new MockMultipartFile("file", "file".getBytes());
         var missioneDTO = new MissioneDTO(
                 "Help teaching a Pechino",
                 0,
@@ -463,11 +450,9 @@ public class MissioneDTOUnitTest {
         assertTrue(constraintValidation.isEmpty());
     }
 
-
     @Test
     void missioneDTODataFineNullFails() {
         var utente = mock(Utente.class);
-        var foto = new MockMultipartFile("file", "file".getBytes());
         var missioneDTO = new MissioneDTO(
                 "Help teaching a Pechino",
                 0,
@@ -489,7 +474,6 @@ public class MissioneDTOUnitTest {
     @Test
     void missioneDTODataFinePastFails() {
         var utente = mock(Utente.class);
-        var foto = new MockMultipartFile("file", "file".getBytes());
         var missioneDTO = new MissioneDTO(
                 "Help teaching a Pechino",
                 0,
@@ -516,7 +500,6 @@ public class MissioneDTOUnitTest {
     @Test
     void missioneDTODataFinePresentFails() {
         var utente = mock(Utente.class);
-        var foto = new MockMultipartFile("file", "file".getBytes());
         var missioneDTO = new MissioneDTO(
                 "Help teaching a Pechino",
                 0,
@@ -538,7 +521,6 @@ public class MissioneDTOUnitTest {
     @Test
     void missioneDTODataFineFutureSucceed() {
         var utente = mock(Utente.class);
-        var foto = new MockMultipartFile("file", "file".getBytes());
         var missioneDTO = new MissioneDTO(
                 "Help teaching a Pechino",
                 0,
@@ -558,7 +540,6 @@ public class MissioneDTOUnitTest {
     @Test
     void missioneDTODateOverlapFails() {
         var utente = mock(Utente.class);
-        var foto = new MockMultipartFile("file", "file".getBytes());
         var missioneDTO = new MissioneDTO(
                 "Help teaching a Pechino",
                 0,
@@ -580,7 +561,6 @@ public class MissioneDTOUnitTest {
     @Test
     void missioneDTODateSameDaySucceed() {
         var utente = mock(Utente.class);
-        var foto = new MockMultipartFile("file", "file".getBytes());
         var missioneDTO = new MissioneDTO(
                 "Help teaching a Pechino",
                 0,
@@ -600,7 +580,6 @@ public class MissioneDTOUnitTest {
     @Test
     void missioneDTONullCompetenzeRichiesteFails() {
         var utente = mock(Utente.class);
-        var foto = new MockMultipartFile("file", "file".getBytes());
         var missioneDTO = new MissioneDTO(
                 "Help teaching a Pechino",
                 0,
@@ -622,7 +601,6 @@ public class MissioneDTOUnitTest {
     @Test
     void missioneDTOEmptyCompetenzeRichiesteFails() {
         var utente = mock(Utente.class);
-        var foto = new MockMultipartFile("file", "file".getBytes());
         var missioneDTO = new MissioneDTO(
                 "Help teaching a Pechino",
                 0,
@@ -644,7 +622,6 @@ public class MissioneDTOUnitTest {
     @Test
     void missioneDTONotBlankCompetenzeRichiesteSucceeds() {
         var utente = mock(Utente.class);
-        var foto = new MockMultipartFile("file", "file".getBytes());
         var missioneDTO = new MissioneDTO(
                 "Help teaching a Pechino",
                 0,
@@ -664,7 +641,6 @@ public class MissioneDTOUnitTest {
     @Test
     void missioneDTONullRequisitiExtraSucceeds() {
         var utente = mock(Utente.class);
-        var foto = new MockMultipartFile("file", "file".getBytes());
         var missioneDTO = new MissioneDTO(
                 "Help teaching a Pechino",
                 0,
@@ -674,6 +650,44 @@ public class MissioneDTOUnitTest {
                 LocalDate.ofEpochDay(2),
                 "nessuna",
                 null,
+                foto,
+                utente
+        );
+        var constraintValidation = validator.validate(missioneDTO);
+        assertTrue(constraintValidation.isEmpty());
+    }
+
+    @Test
+    void missioneDTOEmptyRequisitiExtraSucceeds() {
+        var utente = mock(Utente.class);
+        var missioneDTO = new MissioneDTO(
+                "Help teaching a Pechino",
+                0,
+                "Salerno",
+                "Descrizione di più di 20 caratteri",
+                LocalDate.ofEpochDay(1),
+                LocalDate.ofEpochDay(2),
+                "nessuna",
+                "",
+                foto,
+                utente
+        );
+        var constraintValidation = validator.validate(missioneDTO);
+        assertTrue(constraintValidation.isEmpty());
+    }
+
+    @Test
+    void missioneDTONotBlankRequisitiExtraSucceeds() {
+        var utente = mock(Utente.class);
+        var missioneDTO = new MissioneDTO(
+                "Help teaching a Pechino",
+                0,
+                "Salerno",
+                "Descrizione di più di 20 caratteri",
+                LocalDate.ofEpochDay(1),
+                LocalDate.ofEpochDay(2),
+                "nessuna",
+                "requisitiExtra",
                 foto,
                 utente
         );
@@ -704,7 +718,6 @@ public class MissioneDTOUnitTest {
 
     @Test
     void missioneDTONullCreatoreSucceeds() {
-        var foto = new MockMultipartFile("file", "file".getBytes());
         var missioneDTO = new MissioneDTO(
                 "Help teaching a Pechino",
                 0,
