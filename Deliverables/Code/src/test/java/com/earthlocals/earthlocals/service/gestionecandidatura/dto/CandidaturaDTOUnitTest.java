@@ -1,28 +1,24 @@
 package com.earthlocals.earthlocals.service.gestionecandidatura.dto;
 
+import com.earthlocals.earthlocals.config.TestAppConfig;
 import com.earthlocals.earthlocals.service.gestionecandidature.dto.CandidaturaDTO;
-import jakarta.validation.Validation;
 import jakarta.validation.Validator;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
-// TODO: Change DataJpaTest
-@DataJpaTest
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {CandidaturaDTO.class, TestAppConfig.class})
 public class CandidaturaDTOUnitTest {
 
-    private static Validator validator;
-
-    @BeforeAll
-    public static void setUpValidator() {
-        var factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
-    }
-
+    @Autowired
+    private Validator validator;
 
     @Test
     public void candidaturaDTOValid() {

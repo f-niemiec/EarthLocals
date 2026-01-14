@@ -1,39 +1,40 @@
 package com.earthlocals.earthlocals.service.gestionemissione.dto;
 
+import com.earthlocals.earthlocals.config.TestAppConfig;
 import com.earthlocals.earthlocals.model.Utente;
 import com.earthlocals.earthlocals.service.gestionemissioni.dto.MissioneDTO;
-import jakarta.validation.Validation;
+import com.earthlocals.earthlocals.utility.constraints.FileTypeValidator;
 import jakarta.validation.Validator;
-import org.junit.jupiter.api.BeforeAll;
+import jakarta.validation.groups.Default;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.Clock;
-import java.time.Instant;
+import java.io.IOException;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.util.HashSet;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
-// TODO: Change DataJpaTest
 @ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {
+        TestAppConfig.class,
+        MissioneDTO.class,
+        FileTypeValidator.class
+})
 public class MissioneDTOUnitTest {
-    private static Validator validator;
+    @Autowired
+    private Validator validator;
 
     private MultipartFile foto;
 
-    @BeforeAll
-    public static void setUpValidator() {
-        var clock = Clock.fixed(Instant.EPOCH, ZoneOffset.UTC);
-        var factory = Validation.byDefaultProvider().configure().clockProvider(() -> clock).buildValidatorFactory();
-        validator = factory.getValidator();
-    }
 
     @BeforeEach
     void setup() {
@@ -818,5 +819,90 @@ public class MissioneDTOUnitTest {
         );
         var constraintValidation = validator.validate(missioneDTO);
         assertTrue(constraintValidation.isEmpty());
+    }
+
+
+    @Test
+    void missioneDTOPngSucceeds() throws IOException {
+        var fileResource = new ClassPathResource("static/resources/files/sample.png");
+        var fotoPng = new MockMultipartFile("sample", fileResource.getInputStream());
+        var utente = mock(Utente.class);
+        var missioneDTO = new MissioneDTO(
+                "Help teaching a Pechino",
+                0,
+                "Salerno",
+                "Descrizione di più di 20 caratteri",
+                LocalDate.ofEpochDay(1),
+                LocalDate.ofEpochDay(2),
+                "nessuna",
+                "nessuno",
+                fotoPng,
+                utente
+        );
+        var constraintValidation = validator.validate(missioneDTO, Default.class, MissioneDTO.MissioneFoto.class);
+        assertTrue(constraintValidation.isEmpty());
+    }
+
+    @Test
+    void missioneDTOJpgSucceeds() throws IOException {
+        var fileResource = new ClassPathResource("static/resources/files/sample.jpg");
+        var fotoPng = new MockMultipartFile("sample", fileResource.getInputStream());
+        var utente = mock(Utente.class);
+        var missioneDTO = new MissioneDTO(
+                "Help teaching a Pechino",
+                0,
+                "Salerno",
+                "Descrizione di più di 20 caratteri",
+                LocalDate.ofEpochDay(1),
+                LocalDate.ofEpochDay(2),
+                "nessuna",
+                "nessuno",
+                fotoPng,
+                utente
+        );
+        var constraintValidation = validator.validate(missioneDTO, Default.class, MissioneDTO.MissioneFoto.class);
+        assertTrue(constraintValidation.isEmpty());
+    }
+
+    @Test
+    void missioneDTOWebpSucceeds() throws IOException {
+        var fileResource = new ClassPathResource("static/resources/files/sample.webp");
+        var fotoPng = new MockMultipartFile("sample", fileResource.getInputStream());
+        var utente = mock(Utente.class);
+        var missioneDTO = new MissioneDTO(
+                "Help teaching a Pechino",
+                0,
+                "Salerno",
+                "Descrizione di più di 20 caratteri",
+                LocalDate.ofEpochDay(1),
+                LocalDate.ofEpochDay(2),
+                "nessuna",
+                "nessuno",
+                fotoPng,
+                utente
+        );
+        var constraintValidation = validator.validate(missioneDTO, Default.class, MissioneDTO.MissioneFoto.class);
+        assertTrue(constraintValidation.isEmpty());
+    }
+
+    @Test
+    void missioneDTONonImageFails() throws IOException {
+        var fileResource = new ClassPathResource("static/resources/files/sample.pdf");
+        var fotoPng = new MockMultipartFile("sample", fileResource.getInputStream());
+        var utente = mock(Utente.class);
+        var missioneDTO = new MissioneDTO(
+                "Help teaching a Pechino",
+                0,
+                "Salerno",
+                "Descrizione di più di 20 caratteri",
+                LocalDate.ofEpochDay(1),
+                LocalDate.ofEpochDay(2),
+                "nessuna",
+                "nessuno",
+                fotoPng,
+                utente
+        );
+        var constraintValidation = validator.validate(missioneDTO, MissioneDTO.MissioneFoto.class);
+        assertFalse(constraintValidation.isEmpty());
     }
 }

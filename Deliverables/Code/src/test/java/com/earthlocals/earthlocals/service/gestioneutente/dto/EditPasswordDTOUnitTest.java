@@ -1,30 +1,21 @@
 package com.earthlocals.earthlocals.service.gestioneutente.dto;
 
-import jakarta.validation.Validation;
+import com.earthlocals.earthlocals.config.TestAppConfig;
 import jakarta.validation.Validator;
 import jakarta.validation.groups.Default;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
-import java.time.Clock;
-import java.time.Instant;
-import java.time.ZoneOffset;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-// TODO: Change DataJpaTest
 @ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {EditPasswordDTO.class, TestAppConfig.class})
 public class EditPasswordDTOUnitTest {
-    private static Validator validator;
-
-    @BeforeAll
-    public static void setUpValidator() {
-        var clock = Clock.fixed(Instant.EPOCH, ZoneOffset.UTC);
-        var factory = Validation.byDefaultProvider().configure().clockProvider(() -> clock).buildValidatorFactory();
-        validator = factory.getValidator();
-    }
+    @Autowired
+    private Validator validator;
 
     @Test
     void EditPasswordDTOValid() {

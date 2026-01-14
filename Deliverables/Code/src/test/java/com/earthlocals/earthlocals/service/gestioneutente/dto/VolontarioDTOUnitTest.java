@@ -1,36 +1,28 @@
 package com.earthlocals.earthlocals.service.gestioneutente.dto;
 
 
-import jakarta.validation.Validation;
+import com.earthlocals.earthlocals.config.TestAppConfig;
 import jakarta.validation.Validator;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.Clock;
-import java.time.Instant;
+import java.io.IOException;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-// TODO: Change DataJpaTest
-@DataJpaTest
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {VolontarioDTO.class, TestAppConfig.class})
 public class VolontarioDTOUnitTest {
-    private static Validator validator;
     MultipartFile passport = new MockMultipartFile("passport", "passport".getBytes());
-
-    @BeforeAll
-    public static void setUpValidator() {
-        var clock = Clock.fixed(Instant.EPOCH, ZoneOffset.UTC);
-        var factory = Validation.byDefaultProvider().configure().clockProvider(() -> clock).buildValidatorFactory();
-        validator = factory.getValidator();
-    }
+    @Autowired
+    private Validator validator;
 
     @Test
     void VolontarioDTOValid() {
@@ -330,6 +322,52 @@ public class VolontarioDTOUnitTest {
         var constraintValidationsPassaporto = validator.validateProperty(volontarioDTO, "passaporto");
         assertFalse(constraintValidationsPassaporto.isEmpty());
         assertEquals(constraintValidations, constraintValidationsPassaporto);
+    }
+
+    @Test
+    void VolontarioDTOPdfPassaportoSucceeds() throws IOException {
+        var fileResource = new ClassPathResource("static/resources/files/sample.pdf");
+        var passaporto = new MockMultipartFile("sample", fileResource.getInputStream());
+        var volontarioDTO = new VolontarioDTO(
+                "nome",
+                "cognome",
+                "utente@email.com",
+                "abcYZ17!?",
+                "abcYZ17!?",
+                1,
+                LocalDate.ofEpochDay(-1),
+                'F',
+                "AA000000",
+                LocalDate.ofEpochDay(1),
+                LocalDate.ofEpochDay(-1),
+                passaporto
+        );
+        var constraintValidations = validator.validate(volontarioDTO, VolontarioDTO.PassaportoGroup.class);
+        assertTrue(constraintValidations.isEmpty());
+
+    }
+
+    @Test
+    void VolontarioDTONonPdfPassaportoFails() throws IOException {
+        var fileResource = new ClassPathResource("static/resources/files/sample.png");
+        var passaporto = new MockMultipartFile("sample", fileResource.getInputStream());
+        var volontarioDTO = new VolontarioDTO(
+                "nome",
+                "cognome",
+                "utente@email.com",
+                "abcYZ17!?",
+                "abcYZ17!?",
+                1,
+                LocalDate.ofEpochDay(-1),
+                'F',
+                "AA000000",
+                LocalDate.ofEpochDay(1),
+                LocalDate.ofEpochDay(-1),
+                passaporto
+        );
+        var constraintValidations = validator.validate(volontarioDTO, VolontarioDTO.PassaportoGroup.class);
+        assertFalse(constraintValidations.isEmpty());
+
     }
 
 

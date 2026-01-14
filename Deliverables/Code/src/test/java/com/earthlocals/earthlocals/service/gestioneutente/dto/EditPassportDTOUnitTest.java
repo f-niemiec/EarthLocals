@@ -1,43 +1,30 @@
 package com.earthlocals.earthlocals.service.gestioneutente.dto;
 
 
-import jakarta.validation.Validation;
+import com.earthlocals.earthlocals.config.TestAppConfig;
 import jakarta.validation.Validator;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
-import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.Clock;
-import java.time.Instant;
+import java.io.IOException;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-// TODO: Change DataJpaTest
-@DataJpaTest
-@ContextConfiguration(classes = EditPassportDTOUnitTest.TestConfig.class)
+@ContextConfiguration(classes = {TestAppConfig.class, EditPassportDTO.class})
 @ExtendWith(SpringExtension.class)
-@ExtendWith(MockitoExtension.class)
 public class EditPassportDTOUnitTest {
-    private static Validator validator;
     private MultipartFile passport;
 
-    @BeforeAll
-    public static void setUpValidator() {
-        var clock = Clock.fixed(Instant.EPOCH, ZoneOffset.UTC);
-        var factory = Validation.byDefaultProvider().configure().clockProvider(() -> clock).buildValidatorFactory();
-        validator = factory.getValidator();
-    }
+    @Autowired
+    private Validator validator;
 
     @BeforeEach
     void setup() {
@@ -45,7 +32,7 @@ public class EditPassportDTOUnitTest {
     }
 
     @Test
-    void EditPassportDTOValid(){
+    void EditPassportDTOValid() {
         var editPassportDTO = new EditPassportDTO(
                 "YA9200000",
                 LocalDate.of(9999, 3, 23),
@@ -58,7 +45,7 @@ public class EditPassportDTOUnitTest {
     }
 
     @Test
-    void EditPassportDTOPassportFails(){
+    void EditPassportDTOPassportFails() {
         var editPassportDTO = new EditPassportDTO(
                 "YA9200000000",
                 LocalDate.of(9999, 3, 23),
@@ -73,7 +60,7 @@ public class EditPassportDTOUnitTest {
     }
 
     @Test
-    void EditPassportDTOFinalFails(){
+    void EditPassportDTOFinalFails() {
         var editPassportDTO = new EditPassportDTO(
                 "YA9200000",
                 LocalDate.ofEpochDay(-3),
@@ -88,7 +75,7 @@ public class EditPassportDTOUnitTest {
     }
 
     @Test
-    void EditPassportDTOFutureFails(){
+    void EditPassportDTOFutureFails() {
         var editPassportDTO = new EditPassportDTO(
                 "YA9200000",
                 LocalDate.of(9999, 3, 23),
@@ -103,7 +90,7 @@ public class EditPassportDTOUnitTest {
     }
 
     @Test
-    void EditPassportDTOPassportNull(){
+    void EditPassportDTOPassportNull() {
         var editPassportDTO = new EditPassportDTO(
                 "YA9200000",
                 LocalDate.of(9999, 3, 23),
@@ -118,7 +105,7 @@ public class EditPassportDTOUnitTest {
     }
 
     @Test
-    void EditPassportDTOBlank(){
+    void EditPassportDTOBlank() {
         var editPassportDTO = new EditPassportDTO(
                 "",
                 LocalDate.of(9999, 3, 23),
@@ -133,7 +120,7 @@ public class EditPassportDTOUnitTest {
     }
 
     @Test
-    void EditPassportDTOScadenzaNull(){
+    void EditPassportDTOScadenzaNull() {
         var editPassportDTO = new EditPassportDTO(
                 "YA9200000",
                 null,
@@ -148,7 +135,7 @@ public class EditPassportDTOUnitTest {
     }
 
     @Test
-    void EditPassportDTONull(){
+    void EditPassportDTONull() {
         var editPassportDTO = new EditPassportDTO(
                 "YA9200000",
                 LocalDate.of(9999, 3, 23),
@@ -162,10 +149,35 @@ public class EditPassportDTOUnitTest {
         assertEquals(constraintValidations, constraintValidationsNome);
     }
 
+    @Test
+    void EditPassportDTOPdfPassaportoSucceeds() throws IOException {
+        var fileResource = new ClassPathResource("static/resources/files/sample.pdf");
+        var passaporto = new MockMultipartFile("sample", fileResource.getInputStream());
+        var editPassportDTO = new EditPassportDTO(
+                "YA9200000",
+                LocalDate.of(9999, 3, 23),
+                LocalDate.ofEpochDay(-1),
+                passaporto
+        );
 
-    @TestConfiguration
-    @EnableMethodSecurity(prePostEnabled = true)
-    static class TestConfig {
-
+        var constraintValidations = validator.validate(editPassportDTO, EditPassportDTO.VolontarioPassport.class);
+        assertTrue(constraintValidations.isEmpty());
     }
+
+    @Test
+    void EditPassportDTONonPdfPassaportoFails() throws IOException {
+        var fileResource = new ClassPathResource("static/resources/files/sample.png");
+        var passaporto = new MockMultipartFile("sample", fileResource.getInputStream());
+        var editPassportDTO = new EditPassportDTO(
+                "YA9200000",
+                LocalDate.of(9999, 3, 23),
+                LocalDate.ofEpochDay(-1),
+                passaporto
+        );
+
+        var constraintValidations = validator.validate(editPassportDTO, EditPassportDTO.VolontarioPassport.class);
+        assertFalse(constraintValidations.isEmpty());
+    }
+
+
 }
