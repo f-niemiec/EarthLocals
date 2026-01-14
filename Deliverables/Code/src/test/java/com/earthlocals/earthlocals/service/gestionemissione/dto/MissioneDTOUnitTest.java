@@ -701,4 +701,23 @@ public class MissioneDTOUnitTest {
         assertFalse(constraintValidationFoto.isEmpty());
         assertEquals(constraintValidation, constraintValidationFoto);
     }
+
+    @Test
+    void missioneDTONullCreatoreSucceeds() {
+        var foto = new MockMultipartFile("file", "file".getBytes());
+        var missioneDTO = new MissioneDTO(
+                "Help teaching a Pechino",
+                0,
+                "Salerno",
+                "Descrizione di più di 20 caratteri",
+                LocalDate.ofEpochDay(1),
+                LocalDate.ofEpochDay(2),
+                "nessuna",
+                "nessuno",
+                foto,
+                null
+        );
+        var constraintValidation = validator.validate(missioneDTO);
+        assertTrue(constraintValidation.isEmpty());
+    }
 }
