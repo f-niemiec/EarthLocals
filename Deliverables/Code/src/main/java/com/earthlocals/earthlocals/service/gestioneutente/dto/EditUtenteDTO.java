@@ -1,10 +1,8 @@
 package com.earthlocals.earthlocals.service.gestioneutente.dto;
 
 import com.earthlocals.earthlocals.model.Utente;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Past;
+import com.earthlocals.earthlocals.utility.constraints.Sex;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,12 +26,15 @@ public class EditUtenteDTO {
     @Email(message = "L'email inserita non è valida")
     private String email;
     @NotNull
+    @PositiveOrZero
     private Integer nazionalita;
     @NotNull
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Past(message = "La data di nascita inserita non è valida")
     private LocalDate dataNascita;
+
     @NotNull
+    @Sex
     private Character sesso;
 
 
