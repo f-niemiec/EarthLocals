@@ -4,6 +4,7 @@ import com.earthlocals.earthlocals.model.Utente;
 import com.earthlocals.earthlocals.utility.constraints.DateOverlap;
 import com.earthlocals.earthlocals.utility.interfaces.DateOverlapVerifier;
 import jakarta.validation.constraints.*;
+import jakarta.validation.groups.Default;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,7 +16,7 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@DateOverlap
+@DateOverlap(connectedField = "dataFine", groups = {Default.class, MissioneDTO.MissioneDatesOverlap.class})
 public class MissioneDTO implements DateOverlapVerifier {
 
     @NotBlank(message = "Il nome della missione è obbligatorio")
@@ -59,6 +60,9 @@ public class MissioneDTO implements DateOverlapVerifier {
             return false;
         }
         return dataFine.isBefore(dataInizio);
+    }
+
+    public interface MissioneDatesOverlap {
     }
 
 }
