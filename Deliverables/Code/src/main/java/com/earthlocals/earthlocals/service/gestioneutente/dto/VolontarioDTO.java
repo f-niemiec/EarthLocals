@@ -31,7 +31,7 @@ public class VolontarioDTO extends UtenteDTO {
     @PastOrPresent(message = "La data di emissione del passaporto inserita non è valida")
     private LocalDate dataEmissionePassaporto;
     @NotNull
-    @FileType(allowedExtensions = {"application/pdf"})
+    @FileType(allowedExtensions = {"application/pdf"}, groups = {PassaportoGroup.class})
     private MultipartFile passaporto;
 
     public VolontarioDTO(String nome, String cognome, String email, String password, String matchingPassword, Integer nazionalita, LocalDate dataNascita, Character sesso, String numeroPassaporto, LocalDate dataScadenzaPassaporto, LocalDate dataEmissionePassaporto, MultipartFile passaporto) {
@@ -40,5 +40,8 @@ public class VolontarioDTO extends UtenteDTO {
         this.dataScadenzaPassaporto = dataScadenzaPassaporto;
         this.dataEmissionePassaporto = dataEmissionePassaporto;
         this.passaporto = passaporto;
+    }
+
+    public interface PassaportoGroup {
     }
 }
