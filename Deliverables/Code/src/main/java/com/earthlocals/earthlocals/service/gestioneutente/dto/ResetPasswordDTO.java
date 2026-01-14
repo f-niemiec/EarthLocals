@@ -16,7 +16,8 @@ import java.util.Objects;
 @AllArgsConstructor
 @PasswordMatches(
         message = "Le password non coincidono",
-        connectedField = "matchingPassword"
+        connectedField = "matchingPassword",
+        groups = {ResetPasswordDTO.ResetPasswordDTOPasswordsMatchGroup.class}
 )
 public class ResetPasswordDTO implements PasswordMatchingVerifiable {
 
@@ -58,4 +59,8 @@ public class ResetPasswordDTO implements PasswordMatchingVerifiable {
     public boolean isPasswordMatching() {
         return Objects.equals(newPassword, matchingPassword);
     }
+
+    public interface ResetPasswordDTOPasswordsMatchGroup {
+    }
+
 }
