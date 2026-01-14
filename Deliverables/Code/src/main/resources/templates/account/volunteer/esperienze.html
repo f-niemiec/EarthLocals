@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{account/fragments/account_layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="https://www.thymeleaf.org"
+>
+<head>
+    <link rel="stylesheet" th:href="@{/resources/css/card.css}"/>
+</head>
+<body>
+<th:block layout:fragment="account_content">
+
+
+    <h1 class="mb-4">Le mie esperienze</h1>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4">
+        <th:block th:each="esperienza : ${esperienze}">
+            <th:block
+                    th:replace="fragments/card_missione :: card_missione(${esperienza.missione}, ~{ :: #missionButton}, ~{:: badge})">
+                <a class="btn btn-primary w-100 rounded-pill" id="missionButton"
+                   th:href="@{/mission(id = ${esperienza.missione.id})}">
+                    Visualizza Dettagli <i class="fa-solid fa-arrow-right ms-1"></i>
+                </a>
+                <div th:fragment="badge">
+                </div>
+            </th:block>
+        </th:block>
+    </div>
+    <th:block th:replace="fragments/pagination :: pagination(${esperienze})"></th:block>
+
+
+</th:block>
+</body>
+</html>

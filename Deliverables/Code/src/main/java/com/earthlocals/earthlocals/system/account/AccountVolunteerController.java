@@ -53,7 +53,7 @@ public class AccountVolunteerController {
         return ResponseEntity.ok().body(gestioneUtente.getPassportVolontarioFileResource());
 
     }
-    
+
     @GetMapping({"/candidature"})
     @Transactional
     public String volunteerCandidature(
@@ -64,6 +64,17 @@ public class AccountVolunteerController {
         var candidature = gestioneCandidatura.getCandidatureVolontario(page, size);
         model.addAttribute("candidature", candidature);
         return "account/volunteer/candidature";
+    }
+
+    @GetMapping({"/esperienze"})
+    public String volunteerEsperienze(
+            Model model,
+            @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
+            @RequestParam(value = "size", required = false, defaultValue = "6") Integer size) {
+        model.addAttribute("currentPage", "volunteer-esperienze");
+        var esperienze = gestioneCandidatura.getEsperienzeVolontario(page, size);
+        model.addAttribute("esperienze", esperienze);
+        return "account/volunteer/esperienze";
     }
 
 }
