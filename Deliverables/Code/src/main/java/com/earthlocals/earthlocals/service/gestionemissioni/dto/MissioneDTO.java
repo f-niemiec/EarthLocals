@@ -1,6 +1,7 @@
 package com.earthlocals.earthlocals.service.gestionemissioni.dto;
 
 import com.earthlocals.earthlocals.model.Utente;
+import com.earthlocals.earthlocals.utility.constraints.DateOverlap;
 import com.earthlocals.earthlocals.utility.interfaces.DateOverlapVerifier;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -14,6 +15,7 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@DateOverlap
 public class MissioneDTO implements DateOverlapVerifier {
 
     @NotBlank(message = "Il nome della missione è obbligatorio")
