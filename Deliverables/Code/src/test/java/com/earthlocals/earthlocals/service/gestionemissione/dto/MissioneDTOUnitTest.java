@@ -83,6 +83,28 @@ public class MissioneDTOUnitTest {
     }
 
     @Test
+    void missioneDTONomeBlankFails() {
+        var utente = mock(Utente.class);
+
+        var missioneDTO = new MissioneDTO(
+                "     ",
+                0,
+                "città",
+                "la descrizione deve essere di almeno venti caratteri",
+                LocalDate.ofEpochDay(1),
+                LocalDate.ofEpochDay(2),
+                "competenze richieste",
+                "requisiti extra",
+                foto,
+                utente
+        );
+        var constraintValidations = validator.validate(missioneDTO);
+        var constraintValidationsName = validator.validateProperty(missioneDTO, "nome");
+        assertFalse(constraintValidationsName.isEmpty());
+        assertEquals(constraintValidationsName, constraintValidations);
+    }
+
+    @Test
     void missioneDTONomeTooShortFails() {
         var utente = mock(Utente.class);
 
@@ -247,6 +269,28 @@ public class MissioneDTOUnitTest {
         assertFalse(constraintValidationsCitta.isEmpty());
         assertEquals(constraintValidationsCitta, constraintValidations);
     }
+
+    @Test
+    void missioneDTOBlankCittaFails() {
+        var utente = mock(Utente.class);
+        var missioneDTO = new MissioneDTO(
+                "Help teaching a Pechino",
+                0,
+                "    ",
+                "Descrizione di più di 20 caratteri",
+                LocalDate.ofEpochDay(1),
+                LocalDate.ofEpochDay(2),
+                "nessuna",
+                "nessuno",
+                foto,
+                utente
+        );
+        var constraintValidations = validator.validate(missioneDTO);
+        var constraintValidationsCitta = validator.validateProperty(missioneDTO, "citta");
+        assertFalse(constraintValidationsCitta.isEmpty());
+        assertEquals(constraintValidationsCitta, constraintValidations);
+    }
+
 
     @Test
     void missioneDTOEmptyCittaFails() {
