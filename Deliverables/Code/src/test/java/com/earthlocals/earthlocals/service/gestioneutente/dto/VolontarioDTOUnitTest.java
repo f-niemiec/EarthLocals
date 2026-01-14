@@ -163,6 +163,26 @@ public class VolontarioDTOUnitTest {
     }
 
     @Test
+    void VolontarioDTOOneCharPassportNumberSucceeds() {
+        var volontarioDTO = new VolontarioDTO(
+                "nome",
+                "cognome",
+                "utente@email.com",
+                "abcYZ17!?",
+                "abcYZ17!?",
+                1,
+                LocalDate.ofEpochDay(-1),
+                'F',
+                "A",
+                LocalDate.ofEpochDay(1),
+                LocalDate.ofEpochDay(-1),
+                passport
+        );
+        var constraintValidations = validator.validate(volontarioDTO);
+        assertTrue(constraintValidations.isEmpty());
+    }
+
+    @Test
     void VolontarioDTONullDataScadenzaFails() {
         var volontarioDTO = new VolontarioDTO(
                 "nome",
