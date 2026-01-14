@@ -527,7 +527,6 @@ public class GestioneCandidaturaUnitTest {
     void getCandidatureVolontario() throws Exception{
         var auth = mock(Authentication.class);
         var volontario = mock(Volontario.class);
-        var pageable = mock(Pageable.class);
         var page =  mock(Page.class);
         int pageNumber = 1;
         int pageSize = 6;
@@ -540,6 +539,21 @@ public class GestioneCandidaturaUnitTest {
         assertEquals(page, result);
         verify(candidaturaRepository)
                 .findByCandidato(eq(volontario), any(Pageable.class));
+    }
+
+    @Test
+    void getCandidatureVolontarioNotVolunteer() {
+        var utenteGenerico = mock(Utente.class);
+        var auth = mock(Authentication.class);
+        int pageNumber = 1;
+        int pageSize = 6;
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        when(auth.getPrincipal()).thenReturn(utenteGenerico);
+
+        assertThrows(ClassCastException.class, () ->
+                gestioneCandidatura.getCandidatureVolontario(pageNumber, pageSize)
+        );
     }
 
 }
