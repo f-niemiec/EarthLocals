@@ -140,6 +140,27 @@ public class VolontarioDTOUnitTest {
         assertEquals(constraintValidations, constraintValidationsPassportNumber);
     }
 
+    @Test
+    void VolontarioDTOWrongPatternPassportNumberFails() {
+        var volontarioDTO = new VolontarioDTO(
+                "nome",
+                "cognome",
+                "utente@email.com",
+                "abcYZ17!?",
+                "abcYZ17!?",
+                1,
+                LocalDate.ofEpochDay(-1),
+                'F',
+                "a@!!",
+                LocalDate.ofEpochDay(1),
+                LocalDate.ofEpochDay(-1),
+                passport
+        );
+        var constraintValidations = validator.validate(volontarioDTO);
+        var constraintValidationsPassportNumber = validator.validateProperty(volontarioDTO, "numeroPassaporto");
+        assertFalse(constraintValidations.isEmpty());
+        assertEquals(constraintValidations, constraintValidationsPassportNumber);
+    }
 
     @Test
     void VolontarioDTONullDataScadenzaFails() {
