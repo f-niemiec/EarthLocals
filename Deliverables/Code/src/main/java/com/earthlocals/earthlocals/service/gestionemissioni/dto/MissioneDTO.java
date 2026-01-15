@@ -51,7 +51,7 @@ public class MissioneDTO implements DateOverlapVerifier {
     private String requisitiExtra;
 
     @NotNull
-    @FileType(allowedExtensions = {"image/png", "image/jpeg", "image/jpg", "image/webp"}, groups = {MissioneFoto.class})
+    @FileType(allowedExtensions = {"image/png", "image/jpeg", "image/jpg", "image/webp"}, groups = {Default.class, MissioneFoto.class})
     private MultipartFile foto;
 
     private Utente creatore;

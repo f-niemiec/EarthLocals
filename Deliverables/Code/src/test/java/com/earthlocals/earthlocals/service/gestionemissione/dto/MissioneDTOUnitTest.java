@@ -37,8 +37,9 @@ public class MissioneDTOUnitTest {
 
 
     @BeforeEach
-    void setup() {
-        foto = new MockMultipartFile("file.png", "file.png".getBytes());
+    void setup() throws IOException {
+        var fotoResource = new ClassPathResource("static/resources/files/sample.png");
+        foto = new MockMultipartFile("file", fotoResource.getInputStream());
     }
 
     @Test

@@ -26,6 +26,9 @@ public class FileTypeValidator
     @Override
     public boolean isValid(Object obj, ConstraintValidatorContext context) {
         var file = (MultipartFile) obj;
+        if (file == null) {
+            return true;
+        }
         if (file.isEmpty()) {
             return false;
         }

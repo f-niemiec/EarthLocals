@@ -1,9 +1,9 @@
 package com.earthlocals.earthlocals.service.gestioneutente.dto;
 
 import com.earthlocals.earthlocals.model.Volontario;
-import com.earthlocals.earthlocals.service.gestionemissioni.dto.MissioneDTO;
 import com.earthlocals.earthlocals.utility.constraints.FileType;
 import jakarta.validation.constraints.*;
+import jakarta.validation.groups.Default;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -32,7 +32,7 @@ public class EditPassportDTO {
     @PastOrPresent(message = "La data di emissione del passaporto inserita non è valida")
     private LocalDate dataEmissionePassaporto;
     @NotNull
-    @FileType(allowedExtensions = {"application/pdf"}, groups = {EditPassportDTO.VolontarioPassport.class})
+    @FileType(allowedExtensions = {"application/pdf"}, groups = {Default.class, EditPassportDTO.VolontarioPassport.class})
     private MultipartFile passaporto;
 
     public EditPassportDTO(Volontario volontario) {

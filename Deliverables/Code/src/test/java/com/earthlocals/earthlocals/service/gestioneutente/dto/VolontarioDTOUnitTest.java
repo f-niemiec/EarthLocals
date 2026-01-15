@@ -3,6 +3,7 @@ package com.earthlocals.earthlocals.service.gestioneutente.dto;
 
 import com.earthlocals.earthlocals.config.TestAppConfig;
 import jakarta.validation.Validator;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +21,16 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {VolontarioDTO.class, TestAppConfig.class})
 public class VolontarioDTOUnitTest {
-    MultipartFile passport = new MockMultipartFile("passport", "passport".getBytes());
+    MultipartFile passport;
     @Autowired
     private Validator validator;
+
+    @BeforeEach
+    void setup() throws IOException {
+        var passportResource = new ClassPathResource("static/resources/files/sample.pdf");
+        passport = new MockMultipartFile("passport", passportResource.getInputStream());
+
+    }
 
     @Test
     void VolontarioDTOValid() {

@@ -26,9 +26,11 @@ public class EditPassportDTOUnitTest {
     @Autowired
     private Validator validator;
 
+
     @BeforeEach
-    void setup() {
-        passport = new MockMultipartFile("file.pdf", "file.pdf".getBytes());
+    void setup() throws IOException {
+        var passportResource = new ClassPathResource("static/resources/files/sample.pdf");
+        passport = new MockMultipartFile("file", passportResource.getInputStream());
     }
 
     @Test

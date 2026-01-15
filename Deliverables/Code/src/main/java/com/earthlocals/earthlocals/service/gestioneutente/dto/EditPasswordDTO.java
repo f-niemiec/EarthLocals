@@ -4,6 +4,7 @@ import com.earthlocals.earthlocals.utility.constraints.PasswordMatches;
 import com.earthlocals.earthlocals.utility.interfaces.PasswordMatchingVerifiable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.groups.Default;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,7 +18,7 @@ import java.util.Objects;
 @PasswordMatches(
         message = "Le password non coincidono",
         connectedField = "matchingPassword",
-        groups = {EditPasswordDTO.EditPasswordDTOPasswordsMatchGroup.class}
+        groups = {Default.class, EditPasswordDTO.EditPasswordDTOPasswordsMatchGroup.class}
 
 )
 public class EditPasswordDTO implements PasswordMatchingVerifiable {
