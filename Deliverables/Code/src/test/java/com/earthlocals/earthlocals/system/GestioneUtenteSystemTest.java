@@ -4,42 +4,46 @@ import com.earthlocals.earthlocals.config.SystemTestAppConfig;
 import com.earthlocals.earthlocals.config.TestcontainerConfig;
 import com.earthlocals.earthlocals.model.Utente;
 import com.earthlocals.earthlocals.model.UtenteRepository;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.*;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.interactions.Actions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Transactional
 @ActiveProfiles("test") // Ensures application-test.yml is used
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @Import({SystemTestAppConfig.class, TestcontainerConfig.class})
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class GestioneUtenteSystemTest {
     private final ClassPathResource file = new ClassPathResource("static/resources/files/sample.pdf");
     JavascriptExecutor js;
     private WebDriver driver;
     private Map<String, Object> vars;
-
     @Autowired
     private UtenteRepository utenteRepository;
 
     @BeforeEach
-    public void setUp() {
-        driver = new FirefoxDriver();
+    public void setUp(WebApplicationContext context) {
+        FirefoxOptions options = new FirefoxOptions();
+        options.addArguments("-headless");
+        driver = new FirefoxDriver(options);
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(30));
         js = (JavascriptExecutor) driver;
         vars = new HashMap<String, Object>();
@@ -56,7 +60,6 @@ public class GestioneUtenteSystemTest {
     }
 
     @Test
-    @Transactional
     public void TC1_1RegistrazioneVolontarioConSuccesso() throws IOException {
         driver.get("http://localhost:8080/");
         driver.manage().window().setSize(new Dimension(1908, 1023));
@@ -93,10 +96,16 @@ public class GestioneUtenteSystemTest {
     }
 
     @Test
-    @Transactional
     public void TC1_2Registrazionevolontarioconemailpresente() throws IOException {
-        var utente = new Utente();
-        utente.setEmail("andrea.squitieri@mail.com");
+        var utente = Utente.utenteBuilder()
+                .nome("Mario")
+                .cognome("Rossi")
+                .email("andrea.squitieri@mail.com")
+                .password("PasswordMoltoSicura1234!")
+                .dataNascita(LocalDate.of(2004, 4, 1))
+                .sesso('M')
+                .pending(false)
+                .build();
         utenteRepository.save(utente);
         driver.get("http://localhost:8080/");
         driver.manage().window().setSize(new Dimension(1908, 1023));

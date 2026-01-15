@@ -49,7 +49,6 @@ public class RegistrationController {
 
     @PostMapping("/volunteer")
     public String volunteerRegistration(@ModelAttribute("user") @Valid VolontarioDTO userDTO, BindingResult result, Model model, HttpServletRequest request) {
-        System.out.println(userDTO);
         List<Paese> paeseList = gestionePaese.getPaesiSortedByName(Sort.Direction.ASC);
         model.addAttribute("paesi", paeseList);
         if (result.hasErrors()) {
