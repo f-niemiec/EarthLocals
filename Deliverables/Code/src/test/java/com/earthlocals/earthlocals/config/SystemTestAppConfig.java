@@ -17,12 +17,13 @@ import java.time.ZoneOffset;
 
 @TestConfiguration
 @EnableMethodSecurity(prePostEnabled = true)
-public class TestAppConfig {
+public class SystemTestAppConfig {
 
     @Bean
     public Validator validator(final AutowireCapableBeanFactory autowireCapableBeanFactory) {
 
-        var clock = Clock.fixed(Instant.EPOCH, ZoneOffset.UTC);
+        Instant instant = Instant.parse("2026-01-15T00:00:00.00Z");
+        var clock = Clock.fixed(instant, ZoneOffset.UTC);
 
         ValidatorFactory validatorFactory = Validation.byProvider(HibernateValidator.class)
                 .configure()
