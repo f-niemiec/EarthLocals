@@ -3,10 +3,7 @@ package com.earthlocals.earthlocals.service.gestioneutente;
 import com.earthlocals.earthlocals.config.TestAppConfig;
 import com.earthlocals.earthlocals.model.*;
 import com.earthlocals.earthlocals.service.gestioneutente.dto.*;
-import com.earthlocals.earthlocals.service.gestioneutente.exceptions.ExpiredVerificationTokenException;
-import com.earthlocals.earthlocals.service.gestioneutente.exceptions.PasswordResetTokenNotFoundException;
-import com.earthlocals.earthlocals.service.gestioneutente.exceptions.UserAlreadyExistsException;
-import com.earthlocals.earthlocals.service.gestioneutente.exceptions.WrongPasswordException;
+import com.earthlocals.earthlocals.service.gestioneutente.exceptions.*;
 import com.earthlocals.earthlocals.service.gestioneutente.passport.PassportStorageService;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -893,7 +890,7 @@ public class GestioneUtenteUnitTest {
         when(passwordResetTokenRepository.findByToken(dto.getToken())).thenReturn(Optional.of(passToken));
         when(passToken.isExpired()).thenReturn(true);
 
-        assertThrows(ExpiredVerificationTokenException.class, () -> gestioneUtente.resetPassword(dto));
+        assertThrows(ExpiredResetTokenException.class, () -> gestioneUtente.resetPassword(dto));
     }
 
 }
