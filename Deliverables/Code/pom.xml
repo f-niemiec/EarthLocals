@@ -156,6 +156,56 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
+                <version>2.0.0</version>
+                <executions>
+                    <execution>
+                        <id>install bun</id>
+                        <goals>
+                            <goal>install-bun</goal>
+                        </goals>
+                        <phase>generate-resources</phase>
+                    </execution>
+                    <execution>
+                        <id>bun-install</id>
+                        <goals>
+                            <goal>bun</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>install</arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>scss-compile</id>
+                        <goals>
+                            <goal>bun</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>run scss</arguments>
+                        </configuration>
+                        <phase>
+                            compile
+                        </phase>
+                    </execution>
+                    <execution>
+                        <id>scss-watch</id>
+                        <goals>
+                            <goal>bun</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>run scss-watch</arguments>
+                        </configuration>
+                        <phase>
+                            none
+                        </phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <bunVersion>v1.3.5</bunVersion>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>

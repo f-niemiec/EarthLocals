@@ -1,0 +1,51 @@
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&display=swap');
+
+//$white: #fff;
+//$gray-100: #eceff4;
+//$gray-200: #e5e9f0;
+//$gray-300: #e5e9f0;
+//$gray-400: #d8dee9;
+//$gray-500: #d8dee9;
+//$gray-600: #4c566a;
+//$gray-700: #434c5e;
+//$gray-800: #3b4252;
+//$gray-900: #2e3440;
+//
+
+$blue: #3d689b;
+//$indigo: #81a1c1;
+//$purple: #5e81ac;
+//$pink: #bf616a;
+$red: #ab4a4e;
+//$orange: #d08770;
+$yellow: #eec993;
+$green: #4f7237;
+//$teal: #88c0d0;
+//$cyan: #88c0d0;
+//
+//$secondary: $gray-600;
+//
+//$text-muted: $gray-400;
+
+$font-family-sans-serif: "Google Sans Flex",
+  // Cross-platform generic font family (default user interface font)
+system-ui,
+  // Safari for macOS and iOS (San Francisco)
+-apple-system,
+  // Windows
+"Segoe UI",
+  // Android
+Roboto,
+  // older macOS and iOS
+"Helvetica Neue",
+  // Linux
+"Noto Sans",
+"Liberation Sans",
+  // Basic web fallback
+Arial,
+  // Sans serif fallback
+sans-serif,
+  // Emoji fonts
+"Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !default;
+
+@import "../../../node_modules/bootstrap/scss/bootstrap.scss";

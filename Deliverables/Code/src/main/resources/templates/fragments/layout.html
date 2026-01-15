@@ -2,7 +2,8 @@
 
 <html class="h-100"
       lang="it"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" xmlns:th="https://www.thymeleaf.org">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="https://www.thymeleaf.org">
 
 <head>
     <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
@@ -12,8 +13,8 @@
     <link rel="shortcut icon" th:href="@{/resources/images/favicon.png}" type="image/x-icon">
     <title th:text="#{layoutTitle}">EarthLocals</title>
     <link rel="stylesheet" th:href="@{/webjars/font-awesome/css/all.min.css}">
+    <link rel="stylesheet" th:href="@{/resources/css/site.css}"/>
     <link rel="stylesheet" th:href="@{/resources/css/earthlocals.css}"/>
-    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
     <script>
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
             document.documentElement.setAttribute('data-bs-theme', 'dark');
@@ -41,9 +42,8 @@
 <div th:replace="fragments/footer :: footer"></div>
 
 <script th:src="@{/webjars/popper.js/umd/popper.min.js}"></script>
-<script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/bootstrap/bootstrap.bundle.min.js}"></script>
 <script th:src="@{/webjars/font-awesome/js/all.min.js}"></script>
-
 
 </body>
 

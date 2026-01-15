@@ -33,3 +33,9 @@ build/
 .vscode/
 
 /src/main/resources/secrets.properties
+
+bun
+node
+node_modules
+/src/main/resources/static/resources/css/site.css
+/src/main/resources/static/resources/css/site.css.map
