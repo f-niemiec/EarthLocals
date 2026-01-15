@@ -117,7 +117,7 @@ public class GestioneEmail {
         SimpleMailMessage mail = new SimpleMailMessage();
 
         mail.setTo(utente.getEmail());
-        mail.setSubject("[Conferma registrazione] Account EarthLocals");
+        mail.setSubject("[Richiesta recupero password] Account EarthLocals");
         mail.setText("Gentile, " + utente.getNome() + ", di seguito le inviamo" +
                 " un link per effettuare il cambio password: " + linkBase +
                 "resetPasswordConfirm?token=" + token + "\n" + warning);

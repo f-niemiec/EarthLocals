@@ -1,0 +1,19 @@
+#editPassportForm {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-gap: 1rem;
+}
+
+
+@media (min-width: 992px) {
+
+    #editPassportForm {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-gap: 1rem;
+    }
+
+    #submitContainerEditPassportForm {
+        grid-column-start: span 2;
+    }
+}

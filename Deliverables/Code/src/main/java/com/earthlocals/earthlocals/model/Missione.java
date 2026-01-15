@@ -46,9 +46,6 @@ public class Missione implements Serializable {
     @Column(nullable = false)
     private String immagine;
 
-    @Column(nullable = false)
-    private MissioneStato stato;
-
     @OneToMany(mappedBy = "missione")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude

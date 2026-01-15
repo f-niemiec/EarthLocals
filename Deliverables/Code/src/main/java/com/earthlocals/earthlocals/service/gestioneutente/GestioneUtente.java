@@ -207,14 +207,14 @@ public class GestioneUtente {
         return Optional.of(resetToken.getToken());
     }
 
-    public void resetPassword(ResetPasswordDTO dto) throws PasswordResetTokenNotFoundException, ExpiredVerificationTokenException {
+    public void resetPassword(ResetPasswordDTO dto) throws PasswordResetTokenNotFoundException, ExpiredResetTokenException {
         var constraintViolation = validator.validate(dto);
         if (!constraintViolation.isEmpty()) {
             throw new ConstraintViolationException(constraintViolation);
         }
         var passToken = passwordResetTokenRepository.findByToken(dto.getToken()).orElseThrow(PasswordResetTokenNotFoundException::new);
         if (passToken.isExpired()) {
-            throw new ExpiredVerificationTokenException();
+            throw new ExpiredResetTokenException();
         }
         var utente = passToken.getUtente();
         var hashPassword = passwordEncoder.encode(dto.getNewPassword());

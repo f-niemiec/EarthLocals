@@ -6,6 +6,16 @@
     padding: 0;
 }
 
+.card-img-top-3-2 {
+    aspect-ratio: 3/2;
+}
+
+.card-clamp {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
 
 .mw-400 {
     max-width: 400px;
@@ -19,6 +29,15 @@
     display: grid;
     grid-template-columns: 1fr;
     grid-gap: 1rem;
+}
+
+.hover-effect {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-effect:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15) !important;
 }
 
 #bannerHomePage {
