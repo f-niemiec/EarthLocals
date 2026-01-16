@@ -161,6 +161,40 @@ public class GestioneUtenteSystemTest {
         driver.findElement(By.cssSelector(".invalid-feedback")).click();
         assertEquals(driver.findElement(By.cssSelector(".invalid-feedback")).getText(), "L'email è già registrata");
     }
+
+    @Test
+    public void TC1_3RegistrazioneVolontarioFormatoNomeErrato() throws IOException {
+        driver.get("http://localhost:8080/");
+        driver.manage().window().setSize(new Dimension(1550, 830));
+        driver.findElement(By.linkText("Iscriviti")).click();
+        driver.findElement(By.id("firstNameRegistrationForm")).click();
+        driver.findElement(By.id("firstNameRegistrationForm")).sendKeys(" ");
+        driver.findElement(By.id("lastNameRegistrationForm")).click();
+        driver.findElement(By.id("lastNameRegistrationForm")).sendKeys("Squitieri");
+        driver.findElement(By.id("emailRegistrationForm")).click();
+        driver.findElement(By.id("emailRegistrationForm")).sendKeys("andrea.squitieri@mail.com");
+        driver.findElement(By.id("passwordRegistrationForm")).sendKeys("PasswordMoltoSicura1234!");
+        driver.findElement(By.id("confirmPasswordRegistrationForm")).sendKeys("PasswordMoltoSicura1234!");
+        {
+            WebElement dropdown = driver.findElement(By.id("nazionalitaRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Italia']")).click();
+        }
+        driver.findElement(By.cssSelector("option:nth-child(123)")).click();
+        driver.findElement(By.id("dataNascitaRegistrationForm")).click();
+        driver.findElement(By.id("dataNascitaRegistrationForm")).sendKeys("2004-04-01");
+        driver.findElement(By.id("numeroPassaportoRegistrationForm")).sendKeys("ASPASS");
+        driver.findElement(By.id("dataScadenzaPassaportoRegistrationForm")).sendKeys("2099-04-01");
+        driver.findElement(By.id("dataEmissionePassaportoRegistrationForm")).sendKeys("2010-04-01");
+        driver.findElement(By.id("passaportoRegistrationForm")).sendKeys(getFilePath());
+        {
+            WebElement dropdown = driver.findElement(By.id("sessoRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Maschio']")).click();
+        }
+        driver.findElement(By.cssSelector("#sessoRegistrationForm > option:nth-child(2)")).click();
+        driver.findElement(By.cssSelector(".btn")).click();
+        driver.findElement(By.cssSelector(".p-4:nth-child(1)")).click();
+        assertEquals(driver.findElement(By.cssSelector(".invalid-feedback")).getText(), "Il nome è obbligatorio");
+    }
 }
 
 
