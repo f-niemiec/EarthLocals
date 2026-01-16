@@ -195,6 +195,72 @@ public class GestioneUtenteSystemTest {
         driver.findElement(By.cssSelector(".p-4:nth-child(1)")).click();
         assertEquals(driver.findElement(By.cssSelector(".invalid-feedback")).getText(), "Il nome è obbligatorio");
     }
+
+    @Test
+    public void TC1_5RegistrazioneVolontarioFormatoDataNascitaErrato() throws IOException {
+        driver.get("http://localhost:8080/");
+        driver.manage().window().setSize(new Dimension(1550, 830));
+        driver.findElement(By.linkText("Iscriviti")).click();
+        driver.findElement(By.id("firstNameRegistrationForm")).click();
+        driver.findElement(By.id("firstNameRegistrationForm")).sendKeys("Andrea");
+        driver.findElement(By.id("lastNameRegistrationForm")).click();
+        driver.findElement(By.id("lastNameRegistrationForm")).sendKeys("Squitieri");
+        driver.findElement(By.id("emailRegistrationForm")).click();
+        driver.findElement(By.id("emailRegistrationForm")).sendKeys("andrea.squitieri@mail.com");
+        driver.findElement(By.cssSelector("div:nth-child(6)")).click();
+        driver.findElement(By.id("passwordRegistrationForm")).click();
+        driver.findElement(By.id("passwordRegistrationForm")).sendKeys("PasswordMoltoSicura1234!");
+        driver.findElement(By.id("confirmPasswordRegistrationForm")).click();
+        driver.findElement(By.id("confirmPasswordRegistrationForm")).sendKeys("PasswordMoltoSicura1234!");
+        {
+            WebElement element = driver.findElement(By.id("nazionalitaRegistrationForm"));
+            Actions builder = new Actions(driver);
+            builder.moveToElement(element).clickAndHold().perform();
+        }
+        {
+            WebElement element = driver.findElement(By.id("nazionalitaRegistrationForm"));
+            Actions builder = new Actions(driver);
+            builder.moveToElement(element).perform();
+        }
+        {
+            WebElement element = driver.findElement(By.id("nazionalitaRegistrationForm"));
+            Actions builder = new Actions(driver);
+            builder.moveToElement(element).release().perform();
+        }
+        driver.findElement(By.id("nazionalitaRegistrationForm")).click();
+        {
+            WebElement dropdown = driver.findElement(By.id("nazionalitaRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Iran']")).click();
+        }
+        driver.findElement(By.cssSelector("option:nth-child(97)")).click();
+        driver.findElement(By.id("dataNascitaRegistrationForm")).click();
+        driver.findElement(By.id("dataNascitaRegistrationForm")).click();
+        driver.findElement(By.id("dataNascitaRegistrationForm")).click();
+        {
+            WebElement element = driver.findElement(By.id("dataNascitaRegistrationForm"));
+            Actions builder = new Actions(driver);
+            builder.doubleClick(element).perform();
+        }
+        driver.findElement(By.id("dataNascitaRegistrationForm")).sendKeys("2030-04-01");
+        driver.findElement(By.id("numeroPassaportoRegistrationForm")).click();
+        driver.findElement(By.id("numeroPassaportoRegistrationForm")).sendKeys("ASPASS");
+        driver.findElement(By.id("dataScadenzaPassaportoRegistrationForm")).click();
+        driver.findElement(By.id("dataScadenzaPassaportoRegistrationForm")).click();
+        driver.findElement(By.id("dataScadenzaPassaportoRegistrationForm")).sendKeys("2099-04-01");
+        driver.findElement(By.id("dataEmissionePassaportoRegistrationForm")).click();
+        driver.findElement(By.id("dataEmissionePassaportoRegistrationForm")).sendKeys("2010-04-01");
+        driver.findElement(By.id("passaportoRegistrationForm")).sendKeys(getFilePath());
+        driver.findElement(By.id("sessoRegistrationForm")).click();
+        {
+            WebElement dropdown = driver.findElement(By.id("sessoRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Maschio']")).click();
+        }
+        driver.findElement(By.cssSelector("#sessoRegistrationForm > option:nth-child(2)")).click();
+        driver.findElement(By.cssSelector(".btn")).click();
+        driver.findElement(By.cssSelector(".invalid-feedback")).click();
+        assertEquals(driver.findElement(By.cssSelector(".invalid-feedback")).getText(), "La data di nascita inserita non è valida");
+    }
+
 }
 
 
