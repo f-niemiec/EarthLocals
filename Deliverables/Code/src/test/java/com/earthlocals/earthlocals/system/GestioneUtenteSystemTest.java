@@ -192,6 +192,21 @@ public class GestioneUtenteSystemTest {
         driver.findElement(By.cssSelector(".btn")).click();
         assertEquals(driver.findElement(By.cssSelector(".alert")).getText(), "E-mail o password non valida");
     }
+
+    @Test
+    public void TC3_3PasswordErrata() {
+        driver.get("http://localhost:8080/");
+        driver.manage().window().setSize(new Dimension(1280, 672));
+        driver.findElement(By.linkText("Log in")).click();
+        driver.findElement(By.id("inputEmailLoginForm")).click();
+        driver.findElement(By.id("inputEmailLoginForm")).sendKeys("andrea.squitieri@mail.com");
+        driver.findElement(By.id("inputPasswordLoginForm")).click();
+        driver.findElement(By.id("inputPasswordLoginForm")).sendKeys("pwnnsicura");
+        driver.findElement(By.cssSelector(".btn")).click();
+        assertEquals(driver.findElement(By.cssSelector(".alert")).getText(), "E-mail o password non valida");
+    }
+
+
 }
 
 
