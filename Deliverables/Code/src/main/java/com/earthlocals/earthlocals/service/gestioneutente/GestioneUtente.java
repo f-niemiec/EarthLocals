@@ -8,7 +8,7 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -168,7 +168,7 @@ public class GestioneUtente {
     }
 
     @PreAuthorize("hasRole('VOLUNTEER')")
-    public FileSystemResource getPassportVolontarioFileResource() throws Exception {
+    public Resource getPassportVolontarioFileResource() throws Exception {
 
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

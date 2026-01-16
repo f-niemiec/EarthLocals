@@ -3,14 +3,12 @@ package com.earthlocals.earthlocals.service.gestionemissioni.pictures;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.UUID;
 
-@Service
 @Transactional
 public class PicturesFilesystemStorage implements PicturesStorageService {
     @Value("${earthlocalsfiles.pictures}")
