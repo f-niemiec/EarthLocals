@@ -23,8 +23,10 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ActiveProfiles("test") // Ensures application-test.yml is used
@@ -160,6 +162,35 @@ public class GestioneUtenteSystemTest {
         }
         driver.findElement(By.cssSelector(".invalid-feedback")).click();
         assertEquals(driver.findElement(By.cssSelector(".invalid-feedback")).getText(), "L'email è già registrata");
+    }
+
+    @Test
+    public void TC3_1Loginsuccessfull() {
+         driver.get("http://localhost:8080/");
+         driver.manage().window().setSize(new Dimension(1280, 672));
+         driver.findElement(By.linkText("Log in")).click();
+         driver.findElement(By.id("inputEmailLoginForm")).click();
+         driver.findElement(By.id("inputEmailLoginForm")).sendKeys("francesconiemiec23@gmail.com");
+         driver.findElement(By.id("inputPasswordLoginForm")).click();
+         driver.findElement(By.id("inputPasswordLoginForm")).sendKeys("MiaoMeow24!");
+         driver.findElement(By.cssSelector(".btn")).click();
+         {
+             List<WebElement> elements = driver.findElements(By.id("bannerHomePage"));
+             assert(elements.size() == 0);
+         }
+    }
+
+    @Test
+    public void TC3_2Emailnonpresente() {
+        driver.get("http://localhost:8080/");
+        driver.manage().window().setSize(new Dimension(1280, 672));
+        driver.findElement(By.linkText("Log in")).click();
+        driver.findElement(By.id("inputEmailLoginForm")).click();
+        driver.findElement(By.id("inputEmailLoginForm")).sendKeys("andrea.squitieri@mail.com");
+        driver.findElement(By.id("inputPasswordLoginForm")).click();
+        driver.findElement(By.id("inputPasswordLoginForm")).sendKeys("PasswordMoltoSicura1234!");
+        driver.findElement(By.cssSelector(".btn")).click();
+        assertEquals(driver.findElement(By.cssSelector(".alert")).getText(), "E-mail o password non valida");
     }
 }
 
