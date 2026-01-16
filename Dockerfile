@@ -14,10 +14,6 @@ FROM amazoncorretto:25-alpine
 
 WORKDIR /app
 
-RUN mkdir -p /app/earthlocalsfiles/passports
-
-RUN mkdir -p /app/earthlocalsfiles/pictures
-
 COPY --from=build /app/target/earthlocals-0.0.1-SNAPSHOT.jar app.jar
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
