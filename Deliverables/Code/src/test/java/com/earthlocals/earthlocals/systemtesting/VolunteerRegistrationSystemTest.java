@@ -201,11 +201,9 @@ public class VolunteerRegistrationSystemTest {
         }
         driver.findElement(By.cssSelector("#sessoRegistrationForm > option:nth-child(2)")).click();
         driver.findElement(By.cssSelector(".btn")).click();
-        driver.findElement(By.cssSelector(".p-4:nth-child(1)")).click();
         assertEquals(driver.findElement(By.cssSelector(".invalid-feedback")).getText(), "Il nome è obbligatorio");
     }
 
-    //N.B. Test corretto è la validazione a non esserci
     @Test
     public void TC1_4RegistrazioneFormatoCognomeErrato() throws IOException {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
