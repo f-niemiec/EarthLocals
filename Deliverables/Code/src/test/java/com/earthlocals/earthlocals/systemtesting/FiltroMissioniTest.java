@@ -119,4 +119,15 @@ public class FiltroMissioniTest {
             assert(elements.size() > 0);
         }
     }
+
+    @Test
+    public void TC12_5FiltroNotSelected() {
+        driver.get("http://localhost:8080/");
+        driver.manage().window().setSize(new Dimension(1280, 672));
+        driver.findElement(By.linkText("Opportunità")).click();
+        {
+            List<WebElement> elements = driver.findElements(By.cssSelector(".col:nth-child(3) .card-title"));
+            assert(elements.size() > 0);
+        }
+    }
 }
