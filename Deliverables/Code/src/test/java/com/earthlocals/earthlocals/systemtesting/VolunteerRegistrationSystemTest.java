@@ -532,6 +532,35 @@ public class VolunteerRegistrationSystemTest {
         assertEquals(driver.findElement(By.cssSelector(".invalid-feedback:nth-child(3)")).getText(), "La password deve contenere almeno un carattere maiuscolo");
     }
 
+
+    @Test
+    public void TC1_14RegistrazioneVolontarioPasswordNumeroMancante() throws IOException {
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
+        driver.manage().window().setSize(new Dimension(1550, 830));
+        driver.findElement(By.linkText("Iscriviti")).click();
+        driver.findElement(By.id("firstNameRegistrationForm")).sendKeys("Andrea");
+        driver.findElement(By.id("lastNameRegistrationForm")).sendKeys("Squitieri");
+        driver.findElement(By.id("emailRegistrationForm")).sendKeys("andrea.squitieri@mail.com");
+        driver.findElement(By.id("passwordRegistrationForm")).sendKeys("Pwnns!cura");
+        driver.findElement(By.id("confirmPasswordRegistrationForm")).sendKeys("Pwnns!cura");
+        {
+            WebElement dropdown = driver.findElement(By.id("nazionalitaRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Italia']")).click();
+        }
+        driver.findElement(By.id("dataNascitaRegistrationForm")).sendKeys("2004-04-01");
+        driver.findElement(By.id("numeroPassaportoRegistrationForm")).sendKeys("ASPASS");
+        driver.findElement(By.id("dataScadenzaPassaportoRegistrationForm")).sendKeys("2099-04-01");
+        driver.findElement(By.id("dataEmissionePassaportoRegistrationForm")).sendKeys("2010-04-01");
+        driver.findElement(By.id("passaportoRegistrationForm")).sendKeys(getFilePath());
+        {
+            WebElement dropdown = driver.findElement(By.id("sessoRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Maschio']")).click();
+        }
+        driver.findElement(By.cssSelector(".btn")).click();
+        assertEquals(driver.findElement(By.cssSelector(".invalid-feedback:nth-child(3)")).getText(), "La password deve contenere almeno un numero");
+    }
+
+
 }
 
 
