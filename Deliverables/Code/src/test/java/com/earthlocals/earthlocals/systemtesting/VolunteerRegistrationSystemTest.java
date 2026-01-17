@@ -36,6 +36,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class VolunteerRegistrationSystemTest {
     private final ClassPathResource file = new ClassPathResource("static/resources/files/sample.pdf");
+    private final ClassPathResource webpFile = new ClassPathResource("static/resources/files/sample.webp");
+
     JavascriptExecutor js;
     @LocalServerPort
     private int port;
@@ -60,6 +62,11 @@ public class VolunteerRegistrationSystemTest {
 
     private String getFilePath() throws IOException {
         return file.getFilePath().toAbsolutePath().toString();
+
+    }
+
+    private String getWebpFilePath() throws IOException {
+        return webpFile.getFilePath().toAbsolutePath().toString();
 
     }
 
@@ -201,11 +208,9 @@ public class VolunteerRegistrationSystemTest {
         }
         driver.findElement(By.cssSelector("#sessoRegistrationForm > option:nth-child(2)")).click();
         driver.findElement(By.cssSelector(".btn")).click();
-        driver.findElement(By.cssSelector(".p-4:nth-child(1)")).click();
         assertEquals(driver.findElement(By.cssSelector(".invalid-feedback")).getText(), "Il nome è obbligatorio");
     }
 
-    //N.B. Test corretto è la validazione a non esserci
     @Test
     public void TC1_4RegistrazioneFormatoCognomeErrato() throws IOException {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
@@ -304,6 +309,399 @@ public class VolunteerRegistrationSystemTest {
         driver.findElement(By.cssSelector(".invalid-feedback")).click();
         assertEquals(driver.findElement(By.cssSelector(".invalid-feedback")).getText(), "La data di nascita inserita non è valida");
     }
+
+    @Test
+    public void TC1_6RegistrazioneVolontarioDataScadenzaPassaportoNonValida() throws IOException {
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
+        driver.manage().window().setSize(new Dimension(1550, 830));
+        driver.findElement(By.linkText("Iscriviti")).click();
+        driver.findElement(By.id("firstNameRegistrationForm")).click();
+        driver.findElement(By.id("firstNameRegistrationForm")).sendKeys("Andrea");
+        driver.findElement(By.id("lastNameRegistrationForm")).sendKeys("Squitieri");
+        driver.findElement(By.id("emailRegistrationForm")).sendKeys("andrea.squitieri@mail.com");
+        driver.findElement(By.id("passwordRegistrationForm")).sendKeys("PasswordMoltoSicura1234!");
+        driver.findElement(By.id("confirmPasswordRegistrationForm")).sendKeys("PasswordMoltoSicura1234!");
+        driver.findElement(By.id("nazionalitaRegistrationForm")).click();
+        {
+            WebElement dropdown = driver.findElement(By.id("nazionalitaRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Italia']")).click();
+        }
+        driver.findElement(By.cssSelector("option:nth-child(123)")).click();
+        driver.findElement(By.cssSelector("#registrationForm > div:nth-child(4)")).click();
+        driver.findElement(By.id("dataNascitaRegistrationForm")).click();
+        driver.findElement(By.id("dataNascitaRegistrationForm")).sendKeys("2004-04-01");
+        driver.findElement(By.id("numeroPassaportoRegistrationForm")).click();
+        driver.findElement(By.id("numeroPassaportoRegistrationForm")).sendKeys("ASPASS");
+        driver.findElement(By.id("dataScadenzaPassaportoRegistrationForm")).click();
+        driver.findElement(By.id("dataScadenzaPassaportoRegistrationForm")).sendKeys("2010-04-01");
+        driver.findElement(By.id("dataEmissionePassaportoRegistrationForm")).sendKeys("2010-04-01");
+        driver.findElement(By.id("passaportoRegistrationForm")).sendKeys(getFilePath());
+        driver.findElement(By.id("sessoRegistrationForm")).click();
+        {
+            WebElement dropdown = driver.findElement(By.id("sessoRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Maschio']")).click();
+        }
+        driver.findElement(By.cssSelector("#sessoRegistrationForm > option:nth-child(2)")).click();
+        driver.findElement(By.cssSelector(".btn")).click();
+        driver.findElement(By.id("registrationForm")).click();
+        assertEquals(driver.findElement(By.cssSelector("div:nth-child(11) > .invalid-feedback")).getText(), "La data di scadenza del passaporto inserita non è valida");
+    }
+
+    @Test
+    public void TC1_7RegistrazioneVolontarioDataEmissionePassaportoNonValida() throws IOException {
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
+        driver.manage().window().setSize(new Dimension(1550, 830));
+        driver.findElement(By.linkText("Iscriviti")).click();
+        driver.findElement(By.id("firstNameRegistrationForm")).sendKeys("Andrea");
+        driver.findElement(By.id("lastNameRegistrationForm")).sendKeys("Squitieri");
+        driver.findElement(By.id("emailRegistrationForm")).sendKeys("andrea.squitieri@mail.com");
+        driver.findElement(By.id("passwordRegistrationForm")).sendKeys("PasswordMoltoSicura1234!");
+        driver.findElement(By.id("confirmPasswordRegistrationForm")).sendKeys("PasswordMoltoSicura1234!");
+        {
+            WebElement dropdown = driver.findElement(By.id("nazionalitaRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Italia']")).click();
+        }
+        driver.findElement(By.id("dataNascitaRegistrationForm")).sendKeys("2004-04-01");
+        driver.findElement(By.id("numeroPassaportoRegistrationForm")).sendKeys("ASPASS");
+        driver.findElement(By.id("dataScadenzaPassaportoRegistrationForm")).sendKeys("2099-04-01");
+        driver.findElement(By.id("dataEmissionePassaportoRegistrationForm")).sendKeys("2080-04-01");
+        driver.findElement(By.id("passaportoRegistrationForm")).sendKeys(getFilePath());
+        driver.findElement(By.id("sessoRegistrationForm")).click();
+        {
+            WebElement dropdown = driver.findElement(By.id("sessoRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Maschio']")).click();
+        }
+        driver.findElement(By.cssSelector("#sessoRegistrationForm > option:nth-child(2)")).click();
+        driver.findElement(By.cssSelector(".btn")).click();
+        assertEquals(driver.findElement(By.cssSelector(".invalid-feedback")).getText(), "La data di emissione del passaporto inserita non è valida");
+    }
+
+    @Test
+    public void TC1_8RegistrazioneVolontarioEmailNonValidaUsernameMancante() throws IOException {
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
+        driver.manage().window().setSize(new Dimension(1550, 830));
+        driver.findElement(By.linkText("Iscriviti")).click();
+        driver.findElement(By.id("firstNameRegistrationForm")).sendKeys("Andrea");
+        driver.findElement(By.id("lastNameRegistrationForm")).sendKeys("Squitieri");
+        driver.findElement(By.id("emailRegistrationForm")).sendKeys("@mail.com");
+        driver.findElement(By.id("passwordRegistrationForm")).sendKeys("PasswordMoltoSicura1234!");
+        driver.findElement(By.id("confirmPasswordRegistrationForm")).sendKeys("PasswordMoltoSicura1234!");
+        {
+            WebElement dropdown = driver.findElement(By.id("nazionalitaRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Italia']")).click();
+        }
+        driver.findElement(By.id("dataNascitaRegistrationForm")).sendKeys("2004-04-01");
+        driver.findElement(By.id("numeroPassaportoRegistrationForm")).sendKeys("ASPASS");
+        driver.findElement(By.id("dataScadenzaPassaportoRegistrationForm")).sendKeys("2099-04-01");
+        driver.findElement(By.id("dataEmissionePassaportoRegistrationForm")).sendKeys("2010-04-01");
+        driver.findElement(By.id("passaportoRegistrationForm")).sendKeys(getFilePath());
+        {
+            WebElement dropdown = driver.findElement(By.id("sessoRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Maschio']")).click();
+        }
+        driver.findElement(By.cssSelector(".btn")).click();
+        assertEquals(driver.findElement(By.cssSelector("div:nth-child(4) > .invalid-feedback")).getText(), "L'email inserita non è valida");
+    }
+
+    @Test
+    public void TC1_9RegistrazioneVolontarioEmailNonValidaChiocciolaMancante() throws IOException {
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
+        driver.manage().window().setSize(new Dimension(1550, 830));
+        driver.findElement(By.linkText("Iscriviti")).click();
+        driver.findElement(By.id("firstNameRegistrationForm")).sendKeys("Andrea");
+        driver.findElement(By.id("lastNameRegistrationForm")).sendKeys("Squitieri");
+        driver.findElement(By.id("emailRegistrationForm")).sendKeys("andrea.squitiermail.com");
+        driver.findElement(By.id("passwordRegistrationForm")).sendKeys("PasswordMoltoSicura1234!");
+        driver.findElement(By.id("confirmPasswordRegistrationForm")).sendKeys("PasswordMoltoSicura1234!");
+        {
+            WebElement dropdown = driver.findElement(By.id("nazionalitaRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Italia']")).click();
+        }
+        driver.findElement(By.id("dataNascitaRegistrationForm")).sendKeys("2004-04-01");
+        driver.findElement(By.id("numeroPassaportoRegistrationForm")).sendKeys("ASPASS");
+        driver.findElement(By.id("dataScadenzaPassaportoRegistrationForm")).sendKeys("2099-04-01");
+        driver.findElement(By.id("dataEmissionePassaportoRegistrationForm")).sendKeys("2010-04-01");
+        driver.findElement(By.id("passaportoRegistrationForm")).sendKeys(getFilePath());
+        {
+            WebElement dropdown = driver.findElement(By.id("sessoRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Maschio']")).click();
+        }
+        driver.findElement(By.cssSelector(".btn")).click();
+        assertEquals(driver.findElement(By.cssSelector("div:nth-child(4) > .invalid-feedback")).getText(), "L'email inserita non è valida");
+    }
+
+    @Test
+    public void TC1_10RegistrazioneVolontarioEmailNonValidaDominioMancante() throws IOException {
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
+        driver.manage().window().setSize(new Dimension(1550, 830));
+        driver.findElement(By.linkText("Iscriviti")).click();
+        driver.findElement(By.id("firstNameRegistrationForm")).sendKeys("Andrea");
+        driver.findElement(By.id("lastNameRegistrationForm")).sendKeys("Squitieri");
+        driver.findElement(By.id("emailRegistrationForm")).sendKeys("andrea.squitieri@");
+        driver.findElement(By.id("passwordRegistrationForm")).sendKeys("PasswordMoltoSicura1234!");
+        driver.findElement(By.id("confirmPasswordRegistrationForm")).sendKeys("PasswordMoltoSicura1234!");
+        {
+            WebElement dropdown = driver.findElement(By.id("nazionalitaRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Italia']")).click();
+        }
+        driver.findElement(By.id("dataNascitaRegistrationForm")).sendKeys("2004-04-01");
+        driver.findElement(By.id("numeroPassaportoRegistrationForm")).sendKeys("ASPASS");
+        driver.findElement(By.id("dataScadenzaPassaportoRegistrationForm")).sendKeys("2099-04-01");
+        driver.findElement(By.id("dataEmissionePassaportoRegistrationForm")).sendKeys("2010-04-01");
+        driver.findElement(By.id("passaportoRegistrationForm")).sendKeys(getFilePath());
+        {
+            WebElement dropdown = driver.findElement(By.id("sessoRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Maschio']")).click();
+        }
+        driver.findElement(By.cssSelector(".btn")).click();
+        assertEquals(driver.findElement(By.cssSelector("div:nth-child(4) > .invalid-feedback")).getText(), "L'email inserita non è valida");
+    }
+
+    @Test
+    public void TC1_11RegistrazioneVolontarioPasswordCarattereSpecialeMancante() throws IOException {
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
+        driver.manage().window().setSize(new Dimension(1550, 830));
+        driver.findElement(By.linkText("Iscriviti")).click();
+        driver.findElement(By.id("firstNameRegistrationForm")).sendKeys("Andrea");
+        driver.findElement(By.id("lastNameRegistrationForm")).sendKeys("Squitieri");
+        driver.findElement(By.id("emailRegistrationForm")).sendKeys("andrea.squitieri@mail.com");
+        driver.findElement(By.id("passwordRegistrationForm")).sendKeys("Pwnnsicur4");
+        driver.findElement(By.id("confirmPasswordRegistrationForm")).sendKeys("Pwnnsicur4");
+        {
+            WebElement dropdown = driver.findElement(By.id("nazionalitaRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Italia']")).click();
+        }
+        driver.findElement(By.id("dataNascitaRegistrationForm")).sendKeys("2004-04-01");
+        driver.findElement(By.id("numeroPassaportoRegistrationForm")).sendKeys("ASPASS");
+        driver.findElement(By.id("dataScadenzaPassaportoRegistrationForm")).sendKeys("2099-04-01");
+        driver.findElement(By.id("dataEmissionePassaportoRegistrationForm")).sendKeys("2010-04-01");
+        driver.findElement(By.id("passaportoRegistrationForm")).sendKeys(getFilePath());
+        {
+            WebElement dropdown = driver.findElement(By.id("sessoRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Maschio']")).click();
+        }
+        driver.findElement(By.cssSelector(".btn")).click();
+        assertEquals(driver.findElement(By.cssSelector(".invalid-feedback:nth-child(3)")).getText(), "La password deve contenere almeno un carattere speciale");
+    }
+
+    @Test
+    public void TC1_12RegistrazioneVolontarioPasswordCarattereMinuscoloMancante() throws IOException {
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
+        driver.manage().window().setSize(new Dimension(1550, 830));
+        driver.findElement(By.linkText("Iscriviti")).click();
+        driver.findElement(By.id("firstNameRegistrationForm")).sendKeys("Andrea");
+        driver.findElement(By.id("lastNameRegistrationForm")).sendKeys("Squitieri");
+        driver.findElement(By.id("emailRegistrationForm")).sendKeys("andrea.squitieri@mail.com");
+        driver.findElement(By.id("passwordRegistrationForm")).sendKeys("PWNNS!CUR4");
+        driver.findElement(By.id("confirmPasswordRegistrationForm")).sendKeys("PWNNS!CUR4");
+        {
+            WebElement dropdown = driver.findElement(By.id("nazionalitaRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Italia']")).click();
+        }
+        driver.findElement(By.id("dataNascitaRegistrationForm")).sendKeys("2004-04-01");
+        driver.findElement(By.id("numeroPassaportoRegistrationForm")).sendKeys("ASPASS");
+        driver.findElement(By.id("dataScadenzaPassaportoRegistrationForm")).sendKeys("2099-04-01");
+        driver.findElement(By.id("dataEmissionePassaportoRegistrationForm")).sendKeys("2010-04-01");
+        driver.findElement(By.id("passaportoRegistrationForm")).sendKeys(getFilePath());
+        {
+            WebElement dropdown = driver.findElement(By.id("sessoRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Maschio']")).click();
+        }
+        driver.findElement(By.cssSelector(".btn")).click();
+        assertEquals(driver.findElement(By.cssSelector(".invalid-feedback:nth-child(3)")).getText(), "La password deve contenere almeno un carattere minuscolo");
+    }
+
+
+    @Test
+    public void TC1_13RegistrazioneVolontarioPasswordCarattereMaiuscoloMancante() throws IOException {
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
+        driver.manage().window().setSize(new Dimension(1550, 830));
+        driver.findElement(By.linkText("Iscriviti")).click();
+        driver.findElement(By.id("firstNameRegistrationForm")).sendKeys("Andrea");
+        driver.findElement(By.id("lastNameRegistrationForm")).sendKeys("Squitieri");
+        driver.findElement(By.id("emailRegistrationForm")).sendKeys("andrea.squitieri@mail.com");
+        driver.findElement(By.id("passwordRegistrationForm")).sendKeys("pwnns!cur4");
+        driver.findElement(By.id("confirmPasswordRegistrationForm")).sendKeys("pwnns!cur4");
+        {
+            WebElement dropdown = driver.findElement(By.id("nazionalitaRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Italia']")).click();
+        }
+        driver.findElement(By.id("dataNascitaRegistrationForm")).sendKeys("2004-04-01");
+        driver.findElement(By.id("numeroPassaportoRegistrationForm")).sendKeys("ASPASS");
+        driver.findElement(By.id("dataScadenzaPassaportoRegistrationForm")).sendKeys("2099-04-01");
+        driver.findElement(By.id("dataEmissionePassaportoRegistrationForm")).sendKeys("2010-04-01");
+        driver.findElement(By.id("passaportoRegistrationForm")).sendKeys(getFilePath());
+        {
+            WebElement dropdown = driver.findElement(By.id("sessoRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Maschio']")).click();
+        }
+        driver.findElement(By.cssSelector(".btn")).click();
+        assertEquals(driver.findElement(By.cssSelector(".invalid-feedback:nth-child(3)")).getText(), "La password deve contenere almeno un carattere maiuscolo");
+    }
+
+
+    @Test
+    public void TC1_14RegistrazioneVolontarioPasswordNumeroMancante() throws IOException {
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
+        driver.manage().window().setSize(new Dimension(1550, 830));
+        driver.findElement(By.linkText("Iscriviti")).click();
+        driver.findElement(By.id("firstNameRegistrationForm")).sendKeys("Andrea");
+        driver.findElement(By.id("lastNameRegistrationForm")).sendKeys("Squitieri");
+        driver.findElement(By.id("emailRegistrationForm")).sendKeys("andrea.squitieri@mail.com");
+        driver.findElement(By.id("passwordRegistrationForm")).sendKeys("Pwnns!cura");
+        driver.findElement(By.id("confirmPasswordRegistrationForm")).sendKeys("Pwnns!cura");
+        {
+            WebElement dropdown = driver.findElement(By.id("nazionalitaRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Italia']")).click();
+        }
+        driver.findElement(By.id("dataNascitaRegistrationForm")).sendKeys("2004-04-01");
+        driver.findElement(By.id("numeroPassaportoRegistrationForm")).sendKeys("ASPASS");
+        driver.findElement(By.id("dataScadenzaPassaportoRegistrationForm")).sendKeys("2099-04-01");
+        driver.findElement(By.id("dataEmissionePassaportoRegistrationForm")).sendKeys("2010-04-01");
+        driver.findElement(By.id("passaportoRegistrationForm")).sendKeys(getFilePath());
+        {
+            WebElement dropdown = driver.findElement(By.id("sessoRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Maschio']")).click();
+        }
+        driver.findElement(By.cssSelector(".btn")).click();
+        assertEquals(driver.findElement(By.cssSelector(".invalid-feedback:nth-child(3)")).getText(), "La password deve contenere almeno un numero");
+    }
+
+    @Test
+    public void TC1_15RegistrazioneVolontarioPasswordTroppoCorta() throws IOException {
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
+        driver.manage().window().setSize(new Dimension(1550, 830));
+        driver.findElement(By.linkText("Iscriviti")).click();
+        driver.findElement(By.id("firstNameRegistrationForm")).sendKeys("Andrea");
+        driver.findElement(By.id("lastNameRegistrationForm")).sendKeys("Squitieri");
+        driver.findElement(By.id("emailRegistrationForm")).sendKeys("andrea.squitieri@mail.com");
+        driver.findElement(By.id("passwordRegistrationForm")).sendKeys("aB3!");
+        driver.findElement(By.id("confirmPasswordRegistrationForm")).sendKeys("aB3!");
+        {
+            WebElement dropdown = driver.findElement(By.id("nazionalitaRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Italia']")).click();
+        }
+        driver.findElement(By.id("dataNascitaRegistrationForm")).sendKeys("2004-04-01");
+        driver.findElement(By.id("numeroPassaportoRegistrationForm")).sendKeys("ASPASS");
+        driver.findElement(By.id("dataScadenzaPassaportoRegistrationForm")).sendKeys("2099-04-01");
+        driver.findElement(By.id("dataEmissionePassaportoRegistrationForm")).sendKeys("2010-04-01");
+        driver.findElement(By.id("passaportoRegistrationForm")).sendKeys(getFilePath());
+        {
+            WebElement dropdown = driver.findElement(By.id("sessoRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Maschio']")).click();
+        }
+        driver.findElement(By.cssSelector(".btn")).click();
+        assertEquals(driver.findElement(By.cssSelector(".invalid-feedback:nth-child(3)")).getText(), "La password deve essere lunga almeno 8 caratteri");
+    }
+
+    @Test
+    public void TC1_16RegistrazioneVolontarioNumeroPassaportoTroppoLungo() throws IOException {
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
+        driver.manage().window().setSize(new Dimension(1550, 830));
+        driver.findElement(By.linkText("Iscriviti")).click();
+        driver.findElement(By.id("firstNameRegistrationForm")).sendKeys("Andrea");
+        driver.findElement(By.id("lastNameRegistrationForm")).sendKeys("Squitieri");
+        driver.findElement(By.id("emailRegistrationForm")).sendKeys("andrea.squitieri@mail.com");
+        driver.findElement(By.id("passwordRegistrationForm")).sendKeys("PasswordMoltoSicura1234!");
+        driver.findElement(By.id("confirmPasswordRegistrationForm")).sendKeys("PasswordMoltoSicura1234!");
+        {
+            WebElement dropdown = driver.findElement(By.id("nazionalitaRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Italia']")).click();
+        }
+        driver.findElement(By.id("dataNascitaRegistrationForm")).sendKeys("2004-04-01");
+        driver.findElement(By.id("numeroPassaportoRegistrationForm")).sendKeys("ASPASSAPORTO");
+        driver.findElement(By.id("dataScadenzaPassaportoRegistrationForm")).sendKeys("2099-04-01");
+        driver.findElement(By.id("dataEmissionePassaportoRegistrationForm")).sendKeys("2010-04-01");
+        driver.findElement(By.id("passaportoRegistrationForm")).sendKeys(getFilePath());
+        {
+            WebElement dropdown = driver.findElement(By.id("sessoRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Maschio']")).click();
+        }
+        driver.findElement(By.cssSelector(".btn")).click();
+        assertEquals(driver.findElement(By.cssSelector(".invalid-feedback")).getText(), "Il numero del passaporto deve contenere al massimo 9 caratteri");
+    }
+
+    @Test
+    public void TC1_17RegistrazioneVolontarioNumeroPassaportoCarattereSpecialeNonValido() throws IOException {
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
+        driver.manage().window().setSize(new Dimension(1550, 830));
+        driver.findElement(By.linkText("Iscriviti")).click();
+        driver.findElement(By.id("firstNameRegistrationForm")).sendKeys("Andrea");
+        driver.findElement(By.id("lastNameRegistrationForm")).sendKeys("Squitieri");
+        driver.findElement(By.id("emailRegistrationForm")).sendKeys("andrea.squitieri@mail.com");
+        driver.findElement(By.id("passwordRegistrationForm")).sendKeys("PasswordMoltoSicura1234!");
+        driver.findElement(By.id("confirmPasswordRegistrationForm")).sendKeys("PasswordMoltoSicura1234!");
+        {
+            WebElement dropdown = driver.findElement(By.id("nazionalitaRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Italia']")).click();
+        }
+        driver.findElement(By.id("dataNascitaRegistrationForm")).sendKeys("2004-04-01");
+        driver.findElement(By.id("numeroPassaportoRegistrationForm")).sendKeys("ASPASS!");
+        driver.findElement(By.id("dataScadenzaPassaportoRegistrationForm")).sendKeys("2099-04-01");
+        driver.findElement(By.id("dataEmissionePassaportoRegistrationForm")).sendKeys("2010-04-01");
+        driver.findElement(By.id("passaportoRegistrationForm")).sendKeys(getFilePath());
+        {
+            WebElement dropdown = driver.findElement(By.id("sessoRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Maschio']")).click();
+        }
+        driver.findElement(By.cssSelector(".btn")).click();
+        assertEquals(driver.findElement(By.cssSelector(".invalid-feedback")).getText(), "Il numero del passaporto deve contenere solo caratteri alfanumerici maiuscoli");
+    }
+
+    @Test
+    public void TC1_18RegistrazioneVolontarioNumeroPassaportoCarattereMinuscoloNonValido() throws IOException {
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
+        driver.manage().window().setSize(new Dimension(1550, 830));
+        driver.findElement(By.linkText("Iscriviti")).click();
+        driver.findElement(By.id("firstNameRegistrationForm")).sendKeys("Andrea");
+        driver.findElement(By.id("lastNameRegistrationForm")).sendKeys("Squitieri");
+        driver.findElement(By.id("emailRegistrationForm")).sendKeys("andrea.squitieri@mail.com");
+        driver.findElement(By.id("passwordRegistrationForm")).sendKeys("PasswordMoltoSicura1234!");
+        driver.findElement(By.id("confirmPasswordRegistrationForm")).sendKeys("PasswordMoltoSicura1234!");
+        {
+            WebElement dropdown = driver.findElement(By.id("nazionalitaRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Italia']")).click();
+        }
+        driver.findElement(By.id("dataNascitaRegistrationForm")).sendKeys("2004-04-01");
+        driver.findElement(By.id("numeroPassaportoRegistrationForm")).sendKeys("AsPASS");
+        driver.findElement(By.id("dataScadenzaPassaportoRegistrationForm")).sendKeys("2099-04-01");
+        driver.findElement(By.id("dataEmissionePassaportoRegistrationForm")).sendKeys("2010-04-01");
+        driver.findElement(By.id("passaportoRegistrationForm")).sendKeys(getFilePath());
+        {
+            WebElement dropdown = driver.findElement(By.id("sessoRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Maschio']")).click();
+        }
+        driver.findElement(By.cssSelector(".btn")).click();
+        assertEquals(driver.findElement(By.cssSelector(".invalid-feedback")).getText(), "Il numero del passaporto deve contenere solo caratteri alfanumerici maiuscoli");
+    }
+
+    @Test
+    public void TC1_19RegistrazioneVolontarioFilePassaportoNonValido() throws IOException {
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
+        driver.manage().window().setSize(new Dimension(1550, 830));
+        driver.findElement(By.linkText("Iscriviti")).click();
+        driver.findElement(By.id("firstNameRegistrationForm")).sendKeys("Andrea");
+        driver.findElement(By.id("lastNameRegistrationForm")).sendKeys("Squitieri");
+        driver.findElement(By.id("emailRegistrationForm")).sendKeys("andrea.squitieri@mail.com");
+        driver.findElement(By.id("passwordRegistrationForm")).sendKeys("PasswordMoltoSicura1234!");
+        driver.findElement(By.id("confirmPasswordRegistrationForm")).sendKeys("PasswordMoltoSicura1234!");
+        {
+            WebElement dropdown = driver.findElement(By.id("nazionalitaRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Italia']")).click();
+        }
+        driver.findElement(By.id("dataNascitaRegistrationForm")).sendKeys("2004-04-01");
+        driver.findElement(By.id("numeroPassaportoRegistrationForm")).sendKeys("ASPASS");
+        driver.findElement(By.id("dataScadenzaPassaportoRegistrationForm")).sendKeys("2099-04-01");
+        driver.findElement(By.id("dataEmissionePassaportoRegistrationForm")).sendKeys("2010-04-01");
+        driver.findElement(By.id("passaportoRegistrationForm")).sendKeys(getWebpFilePath());
+        {
+            WebElement dropdown = driver.findElement(By.id("sessoRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Maschio']")).click();
+        }
+        driver.findElement(By.cssSelector(".btn")).click();
+        assertEquals(driver.findElement(By.cssSelector(".invalid-feedback")).getText(), "Tipo di file non valido");
+    }
+
 }
 
 

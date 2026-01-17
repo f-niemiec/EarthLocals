@@ -69,7 +69,7 @@ public class UtenteDTO implements PasswordMatchingVerifiable {
     @PositiveOrZero
     private Integer nazionalita;
 
-    @NotNull
+    @NotNull(message = "La data di nascita è obbligatoria")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Past(message = "La data di nascita inserita non è valida")
     private LocalDate dataNascita;
