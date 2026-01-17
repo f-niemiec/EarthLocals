@@ -11,6 +11,7 @@
 <th:block layout:fragment="account_content">
     <h1 class="mb-4">Informazioni profilo</h1>
     <form class="" enctype="multipart/form-data" id="editForm" method="post"
+          novalidate
           th:action="@{/account/edit}"
           th:object="${user}">
         <div>

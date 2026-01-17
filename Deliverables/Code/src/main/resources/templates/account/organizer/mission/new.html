@@ -10,8 +10,8 @@
     <div class="alert alert-success mb-4" th:if="${param.success}">
         <strong>Creazione missione effettuata con successo!</strong> <br/>
     </div>
-    <form enctype="multipart/form-data" method="post" th:action="@{/account/organizer/mission/new}"
-          th:object="${missioneDTO}">
+    <form enctype="multipart/form-data" method="post" novalidate
+          th:action="@{/account/organizer/mission/new}" th:object="${missioneDTO}">
 
         <div class="mb-4">
             <!--TODO: Aggiungere controllo client side per la dimensione del file-->

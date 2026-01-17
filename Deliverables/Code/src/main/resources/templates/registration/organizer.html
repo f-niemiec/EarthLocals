@@ -13,7 +13,7 @@
             <div class="alert alert-danger" th:if="${param.error}">
                 E-mail o password non valida
             </div>
-            <form class="" enctype="multipart/form-data" id="registrationForm" method="post"
+            <form class="" enctype="multipart/form-data" id="registrationForm" method="post" novalidate
                   th:action="@{/registration/organizer}"
                   th:object="${user}">
                 <div>
@@ -63,9 +63,10 @@
                 <div>
                     <label class="form-label" for="nazionalitaRegistrationForm">Nazionalità</label>
                     <select class="form-select" id="nazionalitaRegistrationForm" required
-                            th:classappend="${#fields.hasErrors('nazionalita')} ? 'is-invalid' : ''" th:field="*{nazionalita}">
+                            th:classappend="${#fields.hasErrors('nazionalita')} ? 'is-invalid' : ''"
+                            th:field="*{nazionalita}">
                         <th:block th:each="paese:${paesi}">
-                            <option th:value="${paese.id}" th:text="${paese.nome}"></option>
+                            <option th:text="${paese.nome}" th:value="${paese.id}"></option>
                         </th:block>
                     </select>
                     <div class="invalid-feedback" th:each="error : ${#fields.errors('nazionalita')}"
