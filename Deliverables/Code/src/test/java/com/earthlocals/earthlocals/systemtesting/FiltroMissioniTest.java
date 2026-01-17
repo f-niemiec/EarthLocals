@@ -101,5 +101,22 @@ public class FiltroMissioniTest {
             assert(elements.size() > 0);
         }
     }
-
+    @Test
+    public void TC12_3FiltroMissioniNessuna() {
+        driver.get("http://localhost:8080/");
+        driver.manage().window().setSize(new Dimension(1280, 672));
+        driver.findElement(By.linkText("Opportunità")).click();
+        driver.findElement(By.name("paeseId")).click();
+        {
+            WebElement dropdown = driver.findElement(By.name("paeseId"));
+            dropdown.findElement(By.xpath("//option[. = 'Morocco']")).click();
+        }
+        driver.findElement(By.cssSelector("option:nth-child(158)")).click();
+        driver.findElement(By.cssSelector(".btn-success")).click();
+        driver.findElement(By.cssSelector(".container-fluid")).click();
+        {
+            List<WebElement> elements = driver.findElements(By.cssSelector("span:nth-child(3)"));
+            assert(elements.size() > 0);
+        }
+    }
 }
