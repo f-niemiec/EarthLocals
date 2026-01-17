@@ -110,7 +110,6 @@ public class GestioneUtente {
 
         utente.setNome(editUtenteDTO.getNome());
         utente.setCognome(editUtenteDTO.getCognome());
-        utente.setEmail(editUtenteDTO.getEmail());
         utente.setDataNascita(editUtenteDTO.getDataNascita());
         utente.setSesso(editUtenteDTO.getSesso());
         utente.setNazionalita(p);

@@ -23,7 +23,6 @@ public class EditUtenteDTOUnitTest {
         var editUtenteDTO = new EditUtenteDTO(
                 "nome",
                 "cognome",
-                "utente@email.com",
                 1,
                 LocalDate.ofEpochDay(-1),
                 'F'
@@ -38,7 +37,6 @@ public class EditUtenteDTOUnitTest {
         var editUtenteDTO = new EditUtenteDTO(
                 null,
                 "cognome",
-                "utente@email.com",
                 1,
                 LocalDate.ofEpochDay(-1),
                 'F'
@@ -55,7 +53,6 @@ public class EditUtenteDTOUnitTest {
         var editUtenteDTO = new EditUtenteDTO(
                 "",
                 "cognome",
-                "utente@email.com",
                 1,
                 LocalDate.ofEpochDay(-1),
                 'F'
@@ -72,7 +69,6 @@ public class EditUtenteDTOUnitTest {
         var editUtenteDTO = new EditUtenteDTO(
                 " ",
                 "cognome",
-                "utente@email.com",
                 1,
                 LocalDate.ofEpochDay(-1),
                 'F'
@@ -89,7 +85,6 @@ public class EditUtenteDTOUnitTest {
         var editUtenteDTO = new EditUtenteDTO(
                 "nome",
                 null,
-                "utente@email.com",
                 1,
                 LocalDate.ofEpochDay(-1),
                 'F'
@@ -106,7 +101,6 @@ public class EditUtenteDTOUnitTest {
         var editUtenteDTO = new EditUtenteDTO(
                 "nome",
                 "",
-                "utente@email.com",
                 1,
                 LocalDate.ofEpochDay(-1),
                 'F'
@@ -123,7 +117,6 @@ public class EditUtenteDTOUnitTest {
         var editUtenteDTO = new EditUtenteDTO(
                 "nome",
                 " ",
-                "utente@email.com",
                 1,
                 LocalDate.ofEpochDay(-1),
                 'F'
@@ -135,114 +128,113 @@ public class EditUtenteDTOUnitTest {
         assertEquals(constraintValidations, constraintValidationsCognome);
     }
 
-    @Test
-    void EditUtenteDTONullEmailFails() {
-        var editUtenteDTO = new EditUtenteDTO(
-                "nome",
-                "cognome",
-                null,
-                1,
-                LocalDate.ofEpochDay(-1),
-                'F'
-        );
+//    @Test
+//    void EditUtenteDTONullEmailFails() {
+//        var editUtenteDTO = new EditUtenteDTO(
+//                "nome",
+//                "cognome",
+//                null,
+//                1,
+//                LocalDate.ofEpochDay(-1),
+//                'F'
+//        );
+//
+//        var constraintValidations = validator.validate(editUtenteDTO);
+//        var constraintValidationsEmail = validator.validateProperty(editUtenteDTO, "email");
+//        assertFalse(constraintValidationsEmail.isEmpty());
+//        assertEquals(constraintValidations, constraintValidationsEmail);
+//    }
+//
+//    @Test
+//    void EditUtenteDTOEmptyEmailFails() {
+//        var editUtenteDTO = new EditUtenteDTO(
+//                "nome",
+//                "cognome",
+//                "",
+//                1,
+//                LocalDate.ofEpochDay(-1),
+//                'F'
+//        );
+//
+//        var constraintValidations = validator.validate(editUtenteDTO);
+//        var constraintValidationsEmail = validator.validateProperty(editUtenteDTO, "email");
+//        assertFalse(constraintValidationsEmail.isEmpty());
+//        assertEquals(constraintValidations, constraintValidationsEmail);
+//    }
+//
+//    @Test
+//    void EditUtenteDTOBlankEmailFails() {
+//        var editUtenteDTO = new EditUtenteDTO(
+//                "nome",
+//                "cognome",
+//                " ",
+//                1,
+//                LocalDate.ofEpochDay(-1),
+//                'F'
+//        );
+//
+//        var constraintValidations = validator.validate(editUtenteDTO);
+//        var constraintValidationsEmail = validator.validateProperty(editUtenteDTO, "email");
+//        assertFalse(constraintValidationsEmail.isEmpty());
+//        assertEquals(constraintValidations, constraintValidationsEmail);
+//    }
 
-        var constraintValidations = validator.validate(editUtenteDTO);
-        var constraintValidationsEmail = validator.validateProperty(editUtenteDTO, "email");
-        assertFalse(constraintValidationsEmail.isEmpty());
-        assertEquals(constraintValidations, constraintValidationsEmail);
-    }
+//    @Test
+//    void EditUtenteDTOMissingChiocciolaEmailFails() {
+//        var editUtenteDTO = new EditUtenteDTO(
+//                "nome",
+//                "cognome",
+//                "user.domain",
+//                1,
+//                LocalDate.ofEpochDay(-1),
+//                'F'
+//        );
+//
+//        var constraintValidations = validator.validate(editUtenteDTO);
+//        var constraintValidationsEmail = validator.validateProperty(editUtenteDTO, "email");
+//        assertFalse(constraintValidationsEmail.isEmpty());
+//        assertEquals(constraintValidations, constraintValidationsEmail);
+//    }
 
-    @Test
-    void EditUtenteDTOEmptyEmailFails() {
-        var editUtenteDTO = new EditUtenteDTO(
-                "nome",
-                "cognome",
-                "",
-                1,
-                LocalDate.ofEpochDay(-1),
-                'F'
-        );
+//    @Test
+//    void EditUtenteDTOMissingUsernameEmailFails() {
+//        var editUtenteDTO = new EditUtenteDTO(
+//                "nome",
+//                "cognome",
+//                "@domain",
+//                1,
+//                LocalDate.ofEpochDay(-1),
+//                'F'
+//        );
+//
+//        var constraintValidations = validator.validate(editUtenteDTO);
+//        var constraintValidationsEmail = validator.validateProperty(editUtenteDTO, "email");
+//        assertFalse(constraintValidationsEmail.isEmpty());
+//        assertEquals(constraintValidations, constraintValidationsEmail);
+//    }
 
-        var constraintValidations = validator.validate(editUtenteDTO);
-        var constraintValidationsEmail = validator.validateProperty(editUtenteDTO, "email");
-        assertFalse(constraintValidationsEmail.isEmpty());
-        assertEquals(constraintValidations, constraintValidationsEmail);
-    }
-
-    @Test
-    void EditUtenteDTOBlankEmailFails() {
-        var editUtenteDTO = new EditUtenteDTO(
-                "nome",
-                "cognome",
-                " ",
-                1,
-                LocalDate.ofEpochDay(-1),
-                'F'
-        );
-
-        var constraintValidations = validator.validate(editUtenteDTO);
-        var constraintValidationsEmail = validator.validateProperty(editUtenteDTO, "email");
-        assertFalse(constraintValidationsEmail.isEmpty());
-        assertEquals(constraintValidations, constraintValidationsEmail);
-    }
-
-    @Test
-    void EditUtenteDTOMissingChiocciolaEmailFails() {
-        var editUtenteDTO = new EditUtenteDTO(
-                "nome",
-                "cognome",
-                "user.domain",
-                1,
-                LocalDate.ofEpochDay(-1),
-                'F'
-        );
-
-        var constraintValidations = validator.validate(editUtenteDTO);
-        var constraintValidationsEmail = validator.validateProperty(editUtenteDTO, "email");
-        assertFalse(constraintValidationsEmail.isEmpty());
-        assertEquals(constraintValidations, constraintValidationsEmail);
-    }
-
-    @Test
-    void EditUtenteDTOMissingUsernameEmailFails() {
-        var editUtenteDTO = new EditUtenteDTO(
-                "nome",
-                "cognome",
-                "@domain",
-                1,
-                LocalDate.ofEpochDay(-1),
-                'F'
-        );
-
-        var constraintValidations = validator.validate(editUtenteDTO);
-        var constraintValidationsEmail = validator.validateProperty(editUtenteDTO, "email");
-        assertFalse(constraintValidationsEmail.isEmpty());
-        assertEquals(constraintValidations, constraintValidationsEmail);
-    }
-
-    @Test
-    void EditUtenteDTOMissingDomainEmailFails() {
-        var editUtenteDTO = new EditUtenteDTO(
-                "nome",
-                "cognome",
-                "utente@",
-                1,
-                LocalDate.ofEpochDay(-1),
-                'F'
-        );
-
-        var constraintValidations = validator.validate(editUtenteDTO);
-        var constraintValidationsEmail = validator.validateProperty(editUtenteDTO, "email");
-        assertFalse(constraintValidationsEmail.isEmpty());
-        assertEquals(constraintValidations, constraintValidationsEmail);
-    }
+//    @Test
+//    void EditUtenteDTOMissingDomainEmailFails() {
+//        var editUtenteDTO = new EditUtenteDTO(
+//                "nome",
+//                "cognome",
+//                "utente@",
+//                1,
+//                LocalDate.ofEpochDay(-1),
+//                'F'
+//        );
+//
+//        var constraintValidations = validator.validate(editUtenteDTO);
+//        var constraintValidationsEmail = validator.validateProperty(editUtenteDTO, "email");
+//        assertFalse(constraintValidationsEmail.isEmpty());
+//        assertEquals(constraintValidations, constraintValidationsEmail);
+//    }
 
     @Test
     void EditUtenteDTONullNazionalitaFails() {
         var editUtenteDTO = new EditUtenteDTO(
                 "nome",
                 "cognome",
-                "utente@email.com",
                 null,
                 LocalDate.ofEpochDay(-1),
                 'F'
@@ -259,7 +251,6 @@ public class EditUtenteDTOUnitTest {
         var editUtenteDTO = new EditUtenteDTO(
                 "nome",
                 "cognome",
-                "utente@email.com",
                 -1,
                 LocalDate.ofEpochDay(-1),
                 'F'
@@ -276,7 +267,6 @@ public class EditUtenteDTOUnitTest {
         var editUtenteDTO = new EditUtenteDTO(
                 "nome",
                 "cognome",
-                "utente@email.com",
                 0,
                 LocalDate.ofEpochDay(-1),
                 'F'
@@ -291,7 +281,6 @@ public class EditUtenteDTOUnitTest {
         var editUtenteDTO = new EditUtenteDTO(
                 "nome",
                 "cognome",
-                "utente@email.com",
                 1,
                 null,
                 'F'
@@ -308,7 +297,6 @@ public class EditUtenteDTOUnitTest {
         var editUtenteDTO = new EditUtenteDTO(
                 "nome",
                 "cognome",
-                "utente@email.com",
                 1,
                 LocalDate.ofEpochDay(0),
                 'F'
@@ -325,7 +313,6 @@ public class EditUtenteDTOUnitTest {
         var editUtenteDTO = new EditUtenteDTO(
                 "nome",
                 "cognome",
-                "utente@email.com",
                 1,
                 LocalDate.ofEpochDay(1),
                 'F'
@@ -342,7 +329,6 @@ public class EditUtenteDTOUnitTest {
         var editUtenteDTO = new EditUtenteDTO(
                 "nome",
                 "cognome",
-                "utente@email.com",
                 1,
                 LocalDate.ofEpochDay(-1),
                 null
@@ -359,7 +345,6 @@ public class EditUtenteDTOUnitTest {
         var editUtenteDTO = new EditUtenteDTO(
                 "nome",
                 "cognome",
-                "utente@email.com",
                 1,
                 LocalDate.ofEpochDay(-1),
                 'M'
@@ -374,7 +359,6 @@ public class EditUtenteDTOUnitTest {
         var editUtenteDTO = new EditUtenteDTO(
                 "nome",
                 "cognome",
-                "utente@email.com",
                 1,
                 LocalDate.ofEpochDay(-1),
                 'G'
