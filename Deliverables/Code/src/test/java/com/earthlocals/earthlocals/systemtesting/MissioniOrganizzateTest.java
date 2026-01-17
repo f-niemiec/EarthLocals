@@ -65,7 +65,7 @@ public class MissioniOrganizzateTest {
     }
 
     @Test
-    public void TC12_1MissioniOrganizzate() {
+    public void TC11_1MissioniOrganizzate() {
         driver.get("http://localhost:8080/");
         driver.manage().window().setSize(new Dimension(1280, 672));
         driver.findElement(By.linkText("Log in")).click();

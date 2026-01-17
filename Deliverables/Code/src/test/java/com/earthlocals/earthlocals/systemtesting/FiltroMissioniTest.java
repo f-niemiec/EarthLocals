@@ -67,18 +67,37 @@ public class FiltroMissioniTest {
     }
 
     @Test
-    public void TC13_1FiltroMissioni(){
+    public void TC12_2FiltroMissioniUnaPresente(){
         driver.get("http://localhost:8080/");
         driver.manage().window().setSize(new Dimension(1280, 672));
         driver.findElement(By.linkText("Opportunità")).click();
         {
             WebElement dropdown = driver.findElement(By.name("paeseId"));
-            dropdown.findElement(By.xpath("//option[. = 'Cina']")).click();
+            dropdown.findElement(By.xpath("//option[. = 'Taiwan']")).click();
         }
         driver.findElement(By.cssSelector("option:nth-child(44)")).click();
         driver.findElement(By.cssSelector(".btn-success")).click();
         {
             List<WebElement> elements = driver.findElements(By.cssSelector(".card-img"));
+            assert(elements.size() > 0);
+        }
+    }
+
+    @Test
+    public void TC12_1FiltroMissioniDuePresenti() {
+        driver.get("http://localhost:8080/");
+        driver.manage().window().setSize(new Dimension(1280, 672));
+        driver.findElement(By.linkText("Opportunità")).click();
+        driver.findElement(By.name("paeseId")).click();
+        {
+            WebElement dropdown = driver.findElement(By.name("paeseId"));
+            dropdown.findElement(By.xpath("//option[. = 'Italia']")).click();
+        }
+        driver.findElement(By.cssSelector("option:nth-child(124)")).click();
+        driver.findElement(By.cssSelector(".btn-success")).click();
+        driver.findElement(By.cssSelector(".row-cols-md-2")).click();
+        {
+            List<WebElement> elements = driver.findElements(By.cssSelector(".col:nth-child(2) .card-img"));
             assert(elements.size() > 0);
         }
     }
