@@ -614,7 +614,6 @@ public class VolunteerRegistrationSystemTest {
         assertEquals(driver.findElement(By.cssSelector(".invalid-feedback")).getText(), "Il numero del passaporto deve contenere al massimo 9 caratteri");
     }
 
-
 }
 
 
