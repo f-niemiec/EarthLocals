@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class CreateMissioneSystemTest {
     private final ClassPathResource photo = new ClassPathResource("static/resources/files/sample.jpg");
-
+    private final ClassPathResource pdf = new ClassPathResource("static/resources/files/sample.pdf");
     JavascriptExecutor js;
     @LocalServerPort
     private int port;
@@ -56,6 +56,11 @@ public class CreateMissioneSystemTest {
     private String getFilePath() throws IOException {
         return photo.getFilePath().toAbsolutePath().toString();
     }
+
+    private String getFilePathPdf() throws IOException {
+        return pdf.getFilePath().toAbsolutePath().toString();
+    }
+
 
     @AfterEach
     public void tearDown() {
@@ -419,6 +424,76 @@ public class CreateMissioneSystemTest {
         driver.findElement(By.cssSelector(".btn-primary")).click();
         driver.findElement(By.cssSelector("div:nth-child(4) > .invalid-feedback")).click();
         assertEquals(driver.findElement(By.cssSelector("div:nth-child(4) > .invalid-feedback")).getText(), "La data di fine deve essere nel futuro");
+    }
+
+    @Test
+    public void TC8_12SalvataggioMissioneDataFineErrata() throws IOException {
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
+        driver.manage().window().setSize(new Dimension(1534, 766));
+        driver.findElement(By.linkText("Log in")).click();
+        driver.findElement(By.id("inputEmailLoginForm")).sendKeys("organizer1@earthlocals.com");
+        driver.findElement(By.id("inputPasswordLoginForm")).sendKeys("PasswordMoltoSicura1234!");
+        driver.findElement(By.id("inputEmailLoginForm")).click();
+        driver.findElement(By.id("inputPasswordLoginForm")).click();
+        driver.findElement(By.cssSelector(".btn")).click();
+        driver.findElement(By.linkText("Profilo")).click();
+        driver.findElement(By.linkText("Nuova missione")).click();
+        driver.findElement(By.id("passaportoEditPassportForm")).sendKeys(getFilePath());
+        driver.findElement(By.id("title")).click();
+        driver.findElement(By.id("title")).click();
+        driver.findElement(By.id("title")).sendKeys("Help Teaching a Pechino");
+        driver.findElement(By.id("description")).click();
+        driver.findElement(By.id("description")).click();
+        driver.findElement(By.id("description")).sendKeys("Vieni ad insegnare l’inglese in un doposcuola nel quartiere Dongsi a ragazzi delle scuole medie");
+        {
+            WebElement dropdown = driver.findElement(By.id("paese"));
+            dropdown.findElement(By.xpath("//option[. = 'Cina']")).click();
+        }
+        driver.findElement(By.cssSelector("option:nth-child(43)")).click();
+        driver.findElement(By.id("citta")).click();
+        driver.findElement(By.id("citta")).sendKeys("Pechino");
+        driver.findElement(By.id("dataInizio")).click();
+        driver.findElement(By.id("dataInizio")).sendKeys("2026-01-14");
+        driver.findElement(By.id("dataFine")).click();
+        driver.findElement(By.id("dataFine")).sendKeys("2026-01-15");
+        driver.findElement(By.id("competenze")).click();
+        driver.findElement(By.id("competenze")).sendKeys("Esperienza con i bambini e nell’insegnamento dell'inglese");
+        driver.findElement(By.cssSelector(".btn-primary")).click();
+        driver.findElement(By.cssSelector("div:nth-child(4) > .invalid-feedback")).click();
+        assertEquals(driver.findElement(By.cssSelector("div:nth-child(4) > .invalid-feedback")).getText(), "La data di fine deve essere nel futuro");
+    }
+
+    @Test
+    public void TC8_13SalvataggioMissioneDataOverLap() throws IOException {
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
+        driver.manage().window().setSize(new Dimension(1534, 766));
+        driver.findElement(By.linkText("Log in")).click();
+        driver.findElement(By.id("inputEmailLoginForm")).sendKeys("organizer1@earthlocals.com");
+        driver.findElement(By.id("inputPasswordLoginForm")).sendKeys("PasswordMoltoSicura1234!");
+        driver.findElement(By.cssSelector(".btn")).click();
+        driver.findElement(By.linkText("Profilo")).click();
+        driver.findElement(By.linkText("Nuova missione")).click();
+        driver.findElement(By.id("passaportoEditPassportForm")).sendKeys(getFilePath());
+        driver.findElement(By.id("title")).click();
+        driver.findElement(By.id("title")).sendKeys("Help Teaching a Pechino");
+        driver.findElement(By.id("description")).click();
+        driver.findElement(By.id("description")).sendKeys("Vieni ad insegnare l’inglese in un doposcuola nel quartiere Dongsi a dei ragazzi delle scuole medie");
+        {
+            WebElement dropdown = driver.findElement(By.id("paese"));
+            dropdown.findElement(By.xpath("//option[. = 'Cina']")).click();
+        }
+        driver.findElement(By.cssSelector("option:nth-child(43)")).click();
+        driver.findElement(By.id("citta")).click();
+        driver.findElement(By.id("citta")).sendKeys("Pechino");
+        driver.findElement(By.id("dataInizio")).click();
+        driver.findElement(By.id("dataInizio")).sendKeys("2026-02-17");
+        driver.findElement(By.id("dataFine")).click();
+        driver.findElement(By.id("dataFine")).sendKeys("2026-02-08");
+        driver.findElement(By.id("competenze")).click();
+        driver.findElement(By.id("competenze")).sendKeys("Esperienza con i bambini e nell’insegnamento dell’inglese");
+        driver.findElement(By.cssSelector(".btn-primary")).click();
+        driver.findElement(By.cssSelector(".row-cols-md-2 > div:nth-child(4)")).click();
+        assertEquals(driver.findElement(By.cssSelector(".invalid-feedback")).getText(), "La data di fine deve essere più in avanti rispetto alla data di inizio");
     }
 
 
