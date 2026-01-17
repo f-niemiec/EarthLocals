@@ -10,6 +10,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -101,6 +102,245 @@ public class EditPasswordSystemTest {
         driver.findElement(By.id("matchingPasswordEditPasswordForm")).sendKeys("Lc67Jk!d");
         driver.findElement(By.cssSelector("#editPasswordForm button.btn[type=submit]")).click();
         assertEquals(driver.findElement(By.cssSelector(".alert.alert-success")).getText(), "Cambio password effettuato con successo! :]");
+    }
+
+    @Test
+    public void TC5_2ModificaPasswordUtenteNonAutenticato() {
+        var oldPassword = "mGdk02@L";
+        var paese = paeseRepository.findById(1);
+        var utente = Utente.utenteBuilder()
+                .nome("Mario")
+                .cognome("Rossi")
+                .email("mario.rossi@mariorossi.com")
+                .password(passwordEncoder.encode(oldPassword))
+                .dataNascita(LocalDate.of(1999, 12, 25))
+                .sesso('M')
+                .nazionalita(paese.orElseThrow()).pending(false)
+                .build();
+        utenteRepository.save(utente);
+
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
+        driver.manage().window().setSize(new Dimension(1550, 830));
+        driver.findElement(By.linkText("Log in")).click();
+        driver.findElement(By.id("inputEmailLoginForm")).sendKeys("mario.rossi@mariorossi.com");
+        driver.findElement(By.id("inputPasswordLoginForm")).sendKeys("mGdk02@L");
+        driver.findElement(By.cssSelector(".btn")).click();
+        driver.findElement(By.linkText("Profilo")).click();
+        driver.findElement(By.linkText("Cambia password")).click();
+
+        driver.manage().deleteAllCookies();
+
+        driver.findElement(By.id("currentPasswordEditPasswordForm")).click();
+        driver.findElement(By.id("currentPasswordEditPasswordForm")).sendKeys("mGdk02@L");
+        driver.findElement(By.id("newPasswordEditPasswordForm")).click();
+        driver.findElement(By.id("newPasswordEditPasswordForm")).sendKeys("Lc67Jk!d");
+        driver.findElement(By.id("matchingPasswordEditPasswordForm")).click();
+        driver.findElement(By.id("matchingPasswordEditPasswordForm")).sendKeys("Lc67Jk!d");
+        driver.findElement(By.cssSelector(".btn-primary")).click();
+        assertEquals(driver.findElement(By.cssSelector(".col-md-12 > p")).getText(), "Ci dispiace, non sei autorizzato a vedere questa risorsa.");
+    }
+
+    @Test
+    public void TC5_3ModificaPasswordVecchiaPasswordErrata() throws InterruptedException {
+        var oldPassword = "mGdk02@L";
+        var paese = paeseRepository.findById(1);
+        var utente = Utente.utenteBuilder()
+                .nome("Mario")
+                .cognome("Rossi")
+                .email("mario.rossi@mariorossi.com")
+                .password(passwordEncoder.encode(oldPassword))
+                .dataNascita(LocalDate.of(1999, 12, 25))
+                .sesso('M')
+                .nazionalita(paese.orElseThrow()).pending(false)
+                .build();
+        utenteRepository.save(utente);
+
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
+        driver.findElement(By.linkText("Log in")).click();
+        driver.findElement(By.id("inputEmailLoginForm")).sendKeys("mario.rossi@mariorossi.com");
+        driver.findElement(By.id("inputPasswordLoginForm")).sendKeys(oldPassword);
+        driver.findElement(By.cssSelector(".btn")).click();
+        driver.findElement(By.cssSelector("a[href=\"/account/edit\"]")).click();
+        driver.findElement(By.cssSelector("a[href=\"/account/edit-password\"]")).click();
+        driver.findElement(By.id("currentPasswordEditPasswordForm")).sendKeys("mGdk02@1");
+        driver.findElement(By.id("newPasswordEditPasswordForm")).sendKeys("Lc67Jk!d");
+        driver.findElement(By.id("matchingPasswordEditPasswordForm")).sendKeys("Lc67Jk!d");
+        driver.findElement(By.cssSelector("#editPasswordForm button.btn[type=submit]")).click();
+        assertEquals(driver.findElement(By.cssSelector(".invalid-feedback")).getText(), "Password errata.");
+    }
+
+    @Test
+    public void TC5_4ModificaPasswordCarattereSpecialeMancante() throws InterruptedException {
+        var oldPassword = "mGdk02@L";
+        var paese = paeseRepository.findById(1);
+        var utente = Utente.utenteBuilder()
+                .nome("Mario")
+                .cognome("Rossi")
+                .email("mario.rossi@mariorossi.com")
+                .password(passwordEncoder.encode(oldPassword))
+                .dataNascita(LocalDate.of(1999, 12, 25))
+                .sesso('M')
+                .nazionalita(paese.orElseThrow()).pending(false)
+                .build();
+        utenteRepository.save(utente);
+
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
+        driver.findElement(By.linkText("Log in")).click();
+        driver.findElement(By.id("inputEmailLoginForm")).sendKeys("mario.rossi@mariorossi.com");
+        driver.findElement(By.id("inputPasswordLoginForm")).sendKeys(oldPassword);
+        driver.findElement(By.cssSelector(".btn")).click();
+        driver.findElement(By.cssSelector("a[href=\"/account/edit\"]")).click();
+        driver.findElement(By.cssSelector("a[href=\"/account/edit-password\"]")).click();
+        driver.findElement(By.id("currentPasswordEditPasswordForm")).sendKeys(oldPassword);
+        driver.findElement(By.id("newPasswordEditPasswordForm")).sendKeys("Lc67Jk1d");
+        driver.findElement(By.id("matchingPasswordEditPasswordForm")).sendKeys("Lc67Jk1d");
+        driver.findElement(By.cssSelector("#editPasswordForm button.btn[type=submit]")).click();
+        assertEquals(driver.findElement(By.cssSelector(".invalid-feedback")).getText(), "La nuova password deve contenere almeno un carattere speciale");
+    }
+
+    @Test
+    public void TC5_5ModificaPasswordCarattereMinuscoloMancante() throws InterruptedException {
+        var oldPassword = "mGdk02@L";
+        var paese = paeseRepository.findById(1);
+        var utente = Utente.utenteBuilder()
+                .nome("Mario")
+                .cognome("Rossi")
+                .email("mario.rossi@mariorossi.com")
+                .password(passwordEncoder.encode(oldPassword))
+                .dataNascita(LocalDate.of(1999, 12, 25))
+                .sesso('M')
+                .nazionalita(paese.orElseThrow()).pending(false)
+                .build();
+        utenteRepository.save(utente);
+
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
+        driver.findElement(By.linkText("Log in")).click();
+        driver.findElement(By.id("inputEmailLoginForm")).sendKeys("mario.rossi@mariorossi.com");
+        driver.findElement(By.id("inputPasswordLoginForm")).sendKeys(oldPassword);
+        driver.findElement(By.cssSelector(".btn")).click();
+        driver.findElement(By.cssSelector("a[href=\"/account/edit\"]")).click();
+        driver.findElement(By.cssSelector("a[href=\"/account/edit-password\"]")).click();
+        driver.findElement(By.id("currentPasswordEditPasswordForm")).sendKeys(oldPassword);
+        driver.findElement(By.id("newPasswordEditPasswordForm")).sendKeys("LC67JK!D");
+        driver.findElement(By.id("matchingPasswordEditPasswordForm")).sendKeys("LC67JK!D");
+        driver.findElement(By.cssSelector("#editPasswordForm button.btn[type=submit]")).click();
+        assertEquals(driver.findElement(By.cssSelector(".invalid-feedback")).getText(), "La nuova password deve contenere almeno un carattere minuscolo");
+    }
+
+    @Test
+    public void TC5_6ModificaPasswordCarattereMaiuscoloMancante() throws InterruptedException {
+        var oldPassword = "mGdk02@L";
+        var paese = paeseRepository.findById(1);
+        var utente = Utente.utenteBuilder()
+                .nome("Mario")
+                .cognome("Rossi")
+                .email("mario.rossi@mariorossi.com")
+                .password(passwordEncoder.encode(oldPassword))
+                .dataNascita(LocalDate.of(1999, 12, 25))
+                .sesso('M')
+                .nazionalita(paese.orElseThrow()).pending(false)
+                .build();
+        utenteRepository.save(utente);
+
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
+        driver.findElement(By.linkText("Log in")).click();
+        driver.findElement(By.id("inputEmailLoginForm")).sendKeys("mario.rossi@mariorossi.com");
+        driver.findElement(By.id("inputPasswordLoginForm")).sendKeys(oldPassword);
+        driver.findElement(By.cssSelector(".btn")).click();
+        driver.findElement(By.cssSelector("a[href=\"/account/edit\"]")).click();
+        driver.findElement(By.cssSelector("a[href=\"/account/edit-password\"]")).click();
+        driver.findElement(By.id("currentPasswordEditPasswordForm")).sendKeys(oldPassword);
+        driver.findElement(By.id("newPasswordEditPasswordForm")).sendKeys("lc67jk!d");
+        driver.findElement(By.id("matchingPasswordEditPasswordForm")).sendKeys("lc67jk!d");
+        driver.findElement(By.cssSelector("#editPasswordForm button.btn[type=submit]")).click();
+        assertEquals(driver.findElement(By.cssSelector(".invalid-feedback")).getText(), "La nuova password deve contenere almeno un carattere maiuscolo");
+    }
+
+    @Test
+    public void TC5_7ModificaPasswordNumeroMancante() throws InterruptedException {
+        var oldPassword = "mGdk02@L";
+        var paese = paeseRepository.findById(1);
+        var utente = Utente.utenteBuilder()
+                .nome("Mario")
+                .cognome("Rossi")
+                .email("mario.rossi@mariorossi.com")
+                .password(passwordEncoder.encode(oldPassword))
+                .dataNascita(LocalDate.of(1999, 12, 25))
+                .sesso('M')
+                .nazionalita(paese.orElseThrow()).pending(false)
+                .build();
+        utenteRepository.save(utente);
+
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
+        driver.findElement(By.linkText("Log in")).click();
+        driver.findElement(By.id("inputEmailLoginForm")).sendKeys("mario.rossi@mariorossi.com");
+        driver.findElement(By.id("inputPasswordLoginForm")).sendKeys(oldPassword);
+        driver.findElement(By.cssSelector(".btn")).click();
+        driver.findElement(By.cssSelector("a[href=\"/account/edit\"]")).click();
+        driver.findElement(By.cssSelector("a[href=\"/account/edit-password\"]")).click();
+        driver.findElement(By.id("currentPasswordEditPasswordForm")).sendKeys(oldPassword);
+        driver.findElement(By.id("newPasswordEditPasswordForm")).sendKeys("LcdTJk!d");
+        driver.findElement(By.id("matchingPasswordEditPasswordForm")).sendKeys("LcdTJk!d");
+        driver.findElement(By.cssSelector("#editPasswordForm button.btn[type=submit]")).click();
+        assertEquals(driver.findElement(By.cssSelector(".invalid-feedback")).getText(), "La nuova password deve contenere almeno un numero");
+    }
+
+    @Test
+    public void TC5_8ModificaPasswordTroppoCorta() throws InterruptedException {
+        var oldPassword = "mGdk02@L";
+        var paese = paeseRepository.findById(1);
+        var utente = Utente.utenteBuilder()
+                .nome("Mario")
+                .cognome("Rossi")
+                .email("mario.rossi@mariorossi.com")
+                .password(passwordEncoder.encode(oldPassword))
+                .dataNascita(LocalDate.of(1999, 12, 25))
+                .sesso('M')
+                .nazionalita(paese.orElseThrow()).pending(false)
+                .build();
+        utenteRepository.save(utente);
+
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
+        driver.findElement(By.linkText("Log in")).click();
+        driver.findElement(By.id("inputEmailLoginForm")).sendKeys("mario.rossi@mariorossi.com");
+        driver.findElement(By.id("inputPasswordLoginForm")).sendKeys(oldPassword);
+        driver.findElement(By.cssSelector(".btn")).click();
+        driver.findElement(By.cssSelector("a[href=\"/account/edit\"]")).click();
+        driver.findElement(By.cssSelector("a[href=\"/account/edit-password\"]")).click();
+        driver.findElement(By.id("currentPasswordEditPasswordForm")).sendKeys(oldPassword);
+        driver.findElement(By.id("newPasswordEditPasswordForm")).sendKeys("Lc67Jk!");
+        driver.findElement(By.id("matchingPasswordEditPasswordForm")).sendKeys("Lc67Jk!");
+        driver.findElement(By.cssSelector("#editPasswordForm button.btn[type=submit]")).click();
+        assertEquals(driver.findElement(By.cssSelector(".invalid-feedback")).getText(), "La nuova password deve essere lunga almeno 8 caratteri");
+    }
+
+    @Test
+    public void TC5_9ModificaPasswordNuoveNonCoincidenti() throws InterruptedException {
+        var oldPassword = "mGdk02@L";
+        var paese = paeseRepository.findById(1);
+        var utente = Utente.utenteBuilder()
+                .nome("Mario")
+                .cognome("Rossi")
+                .email("mario.rossi@mariorossi.com")
+                .password(passwordEncoder.encode(oldPassword))
+                .dataNascita(LocalDate.of(1999, 12, 25))
+                .sesso('M')
+                .nazionalita(paese.orElseThrow()).pending(false)
+                .build();
+        utenteRepository.save(utente);
+
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
+        driver.findElement(By.linkText("Log in")).click();
+        driver.findElement(By.id("inputEmailLoginForm")).sendKeys("mario.rossi@mariorossi.com");
+        driver.findElement(By.id("inputPasswordLoginForm")).sendKeys(oldPassword);
+        driver.findElement(By.cssSelector(".btn")).click();
+        driver.findElement(By.cssSelector("a[href=\"/account/edit\"]")).click();
+        driver.findElement(By.cssSelector("a[href=\"/account/edit-password\"]")).click();
+        driver.findElement(By.id("currentPasswordEditPasswordForm")).sendKeys(oldPassword);
+        driver.findElement(By.id("newPasswordEditPasswordForm")).sendKeys("Lc67Jk!d");
+        driver.findElement(By.id("matchingPasswordEditPasswordForm")).sendKeys("Lc67Jk?d");
+        driver.findElement(By.cssSelector("#editPasswordForm button.btn[type=submit]")).click();
+        assertEquals(driver.findElement(By.cssSelector(".invalid-feedback")).getText(), "Le password non coincidono");
     }
 
 
