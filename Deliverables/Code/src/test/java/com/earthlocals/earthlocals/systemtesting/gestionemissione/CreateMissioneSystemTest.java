@@ -151,6 +151,7 @@ public class CreateMissioneSystemTest {
         driver.findElement(By.linkText("Nuova missione")).click();
         driver.findElement(By.id("passaportoEditPassportForm")).sendKeys(getFilePath());
         driver.findElement(By.id("title")).click();
+        driver.findElement(By.id("title")).sendKeys(" ");
         driver.findElement(By.id("description")).click();
         driver.findElement(By.id("description")).sendKeys("Vieni ad insegnare l’inglese in un doposcuola nel quartiere Dongsi a dei ragazzi delle scuole medie");
         {
@@ -185,7 +186,7 @@ public class CreateMissioneSystemTest {
         driver.findElement(By.linkText("Nuova missione")).click();
         driver.findElement(By.id("passaportoEditPassportForm")).sendKeys(getFilePath());
         driver.findElement(By.id("title")).click();
-        driver.findElement(By.id("title")).sendKeys("aaa");
+        driver.findElement(By.id("title")).sendKeys("a".repeat(3));
         driver.findElement(By.id("description")).click();
         driver.findElement(By.id("description")).sendKeys("Vieni ad insegnare l’inglese in un doposcuola nel quartiere Dongsi a dei ragazzi delle scuole medie");
         {
@@ -205,6 +206,147 @@ public class CreateMissioneSystemTest {
         driver.findElement(By.cssSelector(".invalid-feedback:nth-child(3)")).click();
         assertEquals(driver.findElement(By.cssSelector(".invalid-feedback:nth-child(3)")).getText(), "Il nome deve essere tra 5 e 100 caratteri");
     }
-    
+
+    @Test
+    public void TC8_6SalvataggioMissioneNomeTroppoLungo() throws IOException {
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
+        driver.manage().window().setSize(new Dimension(1534, 766));
+        driver.findElement(By.linkText("Log in")).click();
+        driver.findElement(By.id("inputEmailLoginForm")).sendKeys("organizer1@earthlocals.com");
+        driver.findElement(By.id("inputPasswordLoginForm")).sendKeys("PasswordMoltoSicura1234!");
+        driver.findElement(By.id("inputEmailLoginForm")).click();
+        driver.findElement(By.id("inputPasswordLoginForm")).click();
+        driver.findElement(By.cssSelector(".btn")).click();
+        driver.findElement(By.linkText("Profilo")).click();
+        driver.findElement(By.linkText("Nuova missione")).click();
+        driver.findElement(By.id("passaportoEditPassportForm")).sendKeys(getFilePath());
+        driver.findElement(By.id("title")).click();
+        driver.findElement(By.id("title")).sendKeys("a".repeat(120));
+        driver.findElement(By.id("description")).click();
+        driver.findElement(By.id("description")).sendKeys("Vieni ad insegnare l’inglese in un doposcuola nel quartiere Dongsi a dei ragazzi delle scuole medie");
+        {
+            WebElement dropdown = driver.findElement(By.id("paese"));
+            dropdown.findElement(By.xpath("//option[. = 'Cina']")).click();
+        }
+        driver.findElement(By.cssSelector("option:nth-child(43)")).click();
+        driver.findElement(By.id("citta")).click();
+        driver.findElement(By.id("citta")).sendKeys("Pechino");
+        driver.findElement(By.id("dataInizio")).click();
+        driver.findElement(By.id("dataInizio")).sendKeys("2026-02-17");
+        driver.findElement(By.id("dataFine")).click();
+        driver.findElement(By.id("dataFine")).sendKeys("2026-04-01");
+        driver.findElement(By.id("competenze")).click();
+        driver.findElement(By.id("competenze")).sendKeys("Esperienza con i bambini e nell’insegnamento dell’inglese");
+        driver.findElement(By.cssSelector(".btn-primary")).click();
+        driver.findElement(By.cssSelector(".invalid-feedback:nth-child(3)")).click();
+        assertEquals(driver.findElement(By.cssSelector(".invalid-feedback:nth-child(3)")).getText(), "Il nome deve essere tra 5 e 100 caratteri");
+    }
+
+    @Test
+    public void TC8_7SalvataggioMissioneCittaObbligatoria() throws IOException {
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
+        driver.manage().window().setSize(new Dimension(1534, 766));
+        driver.findElement(By.linkText("Log in")).click();
+        driver.findElement(By.id("inputEmailLoginForm")).sendKeys("organizer1@earthlocals.com");
+        driver.findElement(By.id("inputPasswordLoginForm")).sendKeys("PasswordMoltoSicura1234!");
+        driver.findElement(By.id("inputEmailLoginForm")).click();
+        driver.findElement(By.id("inputPasswordLoginForm")).click();
+        driver.findElement(By.cssSelector(".btn")).click();
+        driver.findElement(By.linkText("Profilo")).click();
+        driver.findElement(By.linkText("Nuova missione")).click();
+        driver.findElement(By.id("passaportoEditPassportForm")).sendKeys(getFilePath());
+        driver.findElement(By.id("title")).click();
+        driver.findElement(By.id("title")).sendKeys("Help Teaching a Pechino");
+        driver.findElement(By.id("description")).click();
+        driver.findElement(By.id("description")).sendKeys("Vieni ad insegnare l’inglese in un doposcuola nel quartiere Dongsi a dei ragazzi delle scuole medie");
+        {
+            WebElement dropdown = driver.findElement(By.id("paese"));
+            dropdown.findElement(By.xpath("//option[. = 'Cina']")).click();
+        }
+        driver.findElement(By.cssSelector("option:nth-child(43)")).click();
+        driver.findElement(By.id("citta")).click();
+        driver.findElement(By.id("citta")).sendKeys(" ");
+        driver.findElement(By.id("dataInizio")).click();
+        driver.findElement(By.id("dataInizio")).sendKeys("2026-02-17");
+        driver.findElement(By.id("dataFine")).click();
+        driver.findElement(By.id("dataFine")).sendKeys("2026-04-01");
+        driver.findElement(By.id("competenze")).click();
+        driver.findElement(By.id("competenze")).sendKeys("Esperienza con i bambini e nell’insegnamento dell’inglese");
+        driver.findElement(By.cssSelector(".btn-primary")).click();
+        driver.findElement(By.cssSelector(".row > div:nth-child(2) > .invalid-feedback")).click();
+        assertEquals(driver.findElement(By.cssSelector(".row > div:nth-child(2) > .invalid-feedback")).getText(), "La città è obbligatoria");
+    }
+
+    @Test
+    public void TC8_8SalvataggioMissioneDescrizioneObbligatoria() throws IOException {
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
+        driver.manage().window().setSize(new Dimension(1534, 766));
+        driver.findElement(By.linkText("Log in")).click();
+        driver.findElement(By.id("inputEmailLoginForm")).sendKeys("organizer1@earthlocals.com");
+        driver.findElement(By.id("inputPasswordLoginForm")).sendKeys("PasswordMoltoSicura1234!");
+        driver.findElement(By.id("inputEmailLoginForm")).click();
+        driver.findElement(By.id("inputPasswordLoginForm")).click();
+        driver.findElement(By.cssSelector(".btn")).click();
+        driver.findElement(By.linkText("Profilo")).click();
+        driver.findElement(By.linkText("Nuova missione")).click();
+        driver.findElement(By.id("passaportoEditPassportForm")).sendKeys(getFilePath());
+        driver.findElement(By.id("title")).click();
+        driver.findElement(By.id("title")).sendKeys("Help Teaching a Pechino");
+        driver.findElement(By.id("description")).click();
+        driver.findElement(By.id("description")).sendKeys(" ".repeat(20));
+        {
+            WebElement dropdown = driver.findElement(By.id("paese"));
+            dropdown.findElement(By.xpath("//option[. = 'Cina']")).click();
+        }
+        driver.findElement(By.cssSelector("option:nth-child(43)")).click();
+        driver.findElement(By.id("citta")).click();
+        driver.findElement(By.id("citta")).sendKeys("Pechino");
+        driver.findElement(By.id("dataInizio")).click();
+        driver.findElement(By.id("dataInizio")).sendKeys("2026-02-17");
+        driver.findElement(By.id("dataFine")).click();
+        driver.findElement(By.id("dataFine")).sendKeys("2026-04-01");
+        driver.findElement(By.id("competenze")).click();
+        driver.findElement(By.id("competenze")).sendKeys("Esperienza con i bambini e nell’insegnamento dell’inglese");
+        driver.findElement(By.cssSelector(".btn-primary")).click();
+        driver.findElement(By.cssSelector(".col-lg-8")).click();
+        assertEquals(driver.findElement(By.cssSelector(".mb-4:nth-child(4) > .invalid-feedback:nth-child(3)")).getText(), "La descrizione è obbligatoria");
+    }
+
+    @Test
+    public void TC8_9SalvataggioMissioneDescrizioneTroppoCorta() throws IOException {
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
+        driver.manage().window().setSize(new Dimension(1534, 766));
+        driver.findElement(By.linkText("Log in")).click();
+        driver.findElement(By.id("inputEmailLoginForm")).sendKeys("organizer1@earthlocals.com");
+        driver.findElement(By.id("inputPasswordLoginForm")).sendKeys("PasswordMoltoSicura1234!");
+        driver.findElement(By.id("inputEmailLoginForm")).click();
+        driver.findElement(By.id("inputPasswordLoginForm")).click();
+        driver.findElement(By.cssSelector(".btn")).click();
+        driver.findElement(By.linkText("Profilo")).click();
+        driver.findElement(By.linkText("Nuova missione")).click();
+        driver.findElement(By.id("passaportoEditPassportForm")).sendKeys(getFilePath());
+        driver.findElement(By.id("title")).click();
+        driver.findElement(By.id("title")).click();
+        driver.findElement(By.id("title")).sendKeys("Help Teaching a Pechino");
+        driver.findElement(By.id("description")).click();
+        driver.findElement(By.id("description")).sendKeys("a");
+        {
+            WebElement dropdown = driver.findElement(By.id("paese"));
+            dropdown.findElement(By.xpath("//option[. = 'Cina']")).click();
+        }
+        driver.findElement(By.cssSelector("option:nth-child(43)")).click();
+        driver.findElement(By.id("citta")).click();
+        driver.findElement(By.id("citta")).sendKeys("Pechino");
+        driver.findElement(By.id("dataInizio")).click();
+        driver.findElement(By.id("dataInizio")).sendKeys("2026-02-17");
+        driver.findElement(By.id("dataFine")).click();
+        driver.findElement(By.id("dataFine")).sendKeys("2026-04-01");
+        driver.findElement(By.id("competenze")).click();
+        driver.findElement(By.id("competenze")).sendKeys("Esperienza con i bambini e nell'insegnamento dell'inglese");
+        driver.findElement(By.cssSelector(".btn-primary")).click();
+        driver.findElement(By.cssSelector(".invalid-feedback")).click();
+        assertEquals(driver.findElement(By.cssSelector(".invalid-feedback")).getText(), "La descrizione deve essere di almeno 20 caratteri");
+    }
+
 
 }
