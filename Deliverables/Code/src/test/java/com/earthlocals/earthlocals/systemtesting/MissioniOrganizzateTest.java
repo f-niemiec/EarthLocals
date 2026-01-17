@@ -78,7 +78,7 @@ public class MissioniOrganizzateTest {
     }
 
     @Test
-    public void TC11_1MissioniOrganizzate() {
+    public void TC11_1MissioniOrganizzateOne() {
         driver.get("http://localhost:8080/");
         driver.manage().window().setSize(new Dimension(1280, 672));
         driver.findElement(By.linkText("Log in")).click();
@@ -91,7 +91,7 @@ public class MissioniOrganizzateTest {
         driver.findElement(By.linkText("Gestione missioni")).click();
         {
             List<WebElement> elements = driver.findElements(By.cssSelector(".col:nth-child(3) .card-img"));
-            assert (elements.size() > 0);
+            assert (elements.size() == 1);
         }
     }
 
@@ -152,6 +152,24 @@ public class MissioniOrganizzateTest {
         {
             List<WebElement> elements = driver.findElements(By.cssSelector(".col:nth-child(2) .card-text"));
             assert(elements.size() > 0);
+        }
+    }
+
+    @Test
+    public void TC11_5MissioniNonPresenti() {
+        driver.get("http://localhost:8080/");
+        driver.manage().window().setSize(new Dimension(1280, 672));
+        driver.findElement(By.linkText("Log in")).click();
+        driver.findElement(By.id("inputEmailLoginForm")).click();
+        driver.findElement(By.id("inputEmailLoginForm")).sendKeys("organizer1@earthlocals.com");
+        driver.findElement(By.id("inputPasswordLoginForm")).click();
+        driver.findElement(By.id("inputPasswordLoginForm")).sendKeys("PasswordMoltoSicura1234!");
+        driver.findElement(By.cssSelector(".btn")).click();
+        driver.findElement(By.linkText("Profilo")).click();
+        driver.findElement(By.linkText("Gestione missioni")).click();
+        {
+            List<WebElement> elements = driver.findElements(By.cssSelector(".col:nth-child(3) .card-img"));
+            assert (elements.size() == 0);
         }
     }
 }
