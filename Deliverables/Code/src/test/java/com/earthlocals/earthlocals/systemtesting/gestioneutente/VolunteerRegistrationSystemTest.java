@@ -348,7 +348,44 @@ public class VolunteerRegistrationSystemTest {
     }
 
     @Test
-    public void TC1_7RegistrazioneVolontarioDataEmissionePassaportoNonValida() throws IOException {
+    public void TC1_7RegistrazioneVolontarioDataScadenzaSuccessivaDataEmissione() throws IOException {
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
+        driver.manage().window().setSize(new Dimension(1550, 830));
+        driver.findElement(By.linkText("Iscriviti")).click();
+        driver.findElement(By.id("firstNameRegistrationForm")).click();
+        driver.findElement(By.id("firstNameRegistrationForm")).sendKeys("Andrea");
+        driver.findElement(By.id("lastNameRegistrationForm")).sendKeys("Squitieri");
+        driver.findElement(By.id("emailRegistrationForm")).sendKeys("andrea.squitieri@mail.com");
+        driver.findElement(By.id("passwordRegistrationForm")).sendKeys("PasswordMoltoSicura1234!");
+        driver.findElement(By.id("confirmPasswordRegistrationForm")).sendKeys("PasswordMoltoSicura1234!");
+        driver.findElement(By.id("nazionalitaRegistrationForm")).click();
+        {
+            WebElement dropdown = driver.findElement(By.id("nazionalitaRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Italia']")).click();
+        }
+        driver.findElement(By.cssSelector("option:nth-child(123)")).click();
+        driver.findElement(By.cssSelector("#registrationForm > div:nth-child(4)")).click();
+        driver.findElement(By.id("dataNascitaRegistrationForm")).click();
+        driver.findElement(By.id("dataNascitaRegistrationForm")).sendKeys("2004-04-01");
+        driver.findElement(By.id("numeroPassaportoRegistrationForm")).click();
+        driver.findElement(By.id("numeroPassaportoRegistrationForm")).sendKeys("ASPASS");
+        driver.findElement(By.id("dataScadenzaPassaportoRegistrationForm")).click();
+        driver.findElement(By.id("dataScadenzaPassaportoRegistrationForm")).sendKeys("2099-03-01");
+        driver.findElement(By.id("dataEmissionePassaportoRegistrationForm")).sendKeys("2099-04-01");
+        driver.findElement(By.id("passaportoRegistrationForm")).sendKeys(getFilePath());
+        driver.findElement(By.id("sessoRegistrationForm")).click();
+        {
+            WebElement dropdown = driver.findElement(By.id("sessoRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Maschio']")).click();
+        }
+        driver.findElement(By.cssSelector("#sessoRegistrationForm > option:nth-child(2)")).click();
+        driver.findElement(By.cssSelector(".btn")).click();
+        driver.findElement(By.id("registrationForm")).click();
+        assertEquals(driver.findElement(By.cssSelector("div:nth-child(11) > .invalid-feedback")).getText(), "La data di scadenza deve essere successiva alla data di emissione");
+    }
+
+    @Test
+    public void TC1_8RegistrazioneVolontarioDataEmissionePassaportoNonValida() throws IOException {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1550, 830));
         driver.findElement(By.linkText("Iscriviti")).click();
@@ -377,7 +414,7 @@ public class VolunteerRegistrationSystemTest {
     }
 
     @Test
-    public void TC1_8RegistrazioneVolontarioEmailNonValidaUsernameMancante() throws IOException {
+    public void TC1_9RegistrazioneVolontarioEmailNonValidaUsernameMancante() throws IOException {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1550, 830));
         driver.findElement(By.linkText("Iscriviti")).click();
@@ -404,7 +441,7 @@ public class VolunteerRegistrationSystemTest {
     }
 
     @Test
-    public void TC1_9RegistrazioneVolontarioEmailNonValidaChiocciolaMancante() throws IOException {
+    public void TC1_10RegistrazioneVolontarioEmailNonValidaChiocciolaMancante() throws IOException {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1550, 830));
         driver.findElement(By.linkText("Iscriviti")).click();
@@ -431,7 +468,7 @@ public class VolunteerRegistrationSystemTest {
     }
 
     @Test
-    public void TC1_10RegistrazioneVolontarioEmailNonValidaDominioMancante() throws IOException {
+    public void TC1_11RegistrazioneVolontarioEmailNonValidaDominioMancante() throws IOException {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1550, 830));
         driver.findElement(By.linkText("Iscriviti")).click();
@@ -458,7 +495,7 @@ public class VolunteerRegistrationSystemTest {
     }
 
     @Test
-    public void TC1_11RegistrazioneVolontarioPasswordCarattereSpecialeMancante() throws IOException {
+    public void TC1_12RegistrazioneVolontarioPasswordCarattereSpecialeMancante() throws IOException {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1550, 830));
         driver.findElement(By.linkText("Iscriviti")).click();
@@ -485,7 +522,7 @@ public class VolunteerRegistrationSystemTest {
     }
 
     @Test
-    public void TC1_12RegistrazioneVolontarioPasswordCarattereMinuscoloMancante() throws IOException {
+    public void TC1_13RegistrazioneVolontarioPasswordCarattereMinuscoloMancante() throws IOException {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1550, 830));
         driver.findElement(By.linkText("Iscriviti")).click();
@@ -513,7 +550,7 @@ public class VolunteerRegistrationSystemTest {
 
 
     @Test
-    public void TC1_13RegistrazioneVolontarioPasswordCarattereMaiuscoloMancante() throws IOException {
+    public void TC1_14RegistrazioneVolontarioPasswordCarattereMaiuscoloMancante() throws IOException {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1550, 830));
         driver.findElement(By.linkText("Iscriviti")).click();
@@ -541,7 +578,7 @@ public class VolunteerRegistrationSystemTest {
 
 
     @Test
-    public void TC1_14RegistrazioneVolontarioPasswordNumeroMancante() throws IOException {
+    public void TC1_15RegistrazioneVolontarioPasswordNumeroMancante() throws IOException {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1550, 830));
         driver.findElement(By.linkText("Iscriviti")).click();
@@ -568,7 +605,7 @@ public class VolunteerRegistrationSystemTest {
     }
 
     @Test
-    public void TC1_15RegistrazioneVolontarioPasswordTroppoCorta() throws IOException {
+    public void TC1_16RegistrazioneVolontarioPasswordTroppoCorta() throws IOException {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1550, 830));
         driver.findElement(By.linkText("Iscriviti")).click();
@@ -595,7 +632,7 @@ public class VolunteerRegistrationSystemTest {
     }
 
     @Test
-    public void TC1_16RegistrazioneVolontarioNumeroPassaportoTroppoLungo() throws IOException {
+    public void TC1_17RegistrazioneVolontarioNumeroPassaportoTroppoLungo() throws IOException {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1550, 830));
         driver.findElement(By.linkText("Iscriviti")).click();
@@ -622,7 +659,7 @@ public class VolunteerRegistrationSystemTest {
     }
 
     @Test
-    public void TC1_17RegistrazioneVolontarioNumeroPassaportoCarattereSpecialeNonValido() throws IOException {
+    public void TC1_18RegistrazioneVolontarioNumeroPassaportoCarattereSpecialeNonValido() throws IOException {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1550, 830));
         driver.findElement(By.linkText("Iscriviti")).click();
@@ -649,7 +686,7 @@ public class VolunteerRegistrationSystemTest {
     }
 
     @Test
-    public void TC1_18RegistrazioneVolontarioNumeroPassaportoCarattereMinuscoloNonValido() throws IOException {
+    public void TC1_19RegistrazioneVolontarioNumeroPassaportoCarattereMinuscoloNonValido() throws IOException {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1550, 830));
         driver.findElement(By.linkText("Iscriviti")).click();
@@ -676,7 +713,7 @@ public class VolunteerRegistrationSystemTest {
     }
 
     @Test
-    public void TC1_19RegistrazioneVolontarioFilePassaportoNonValido() throws IOException {
+    public void TC1_20RegistrazioneVolontarioFilePassaportoNonValido() throws IOException {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1550, 830));
         driver.findElement(By.linkText("Iscriviti")).click();
