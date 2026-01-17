@@ -36,6 +36,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class VolunteerRegistrationSystemTest {
     private final ClassPathResource file = new ClassPathResource("static/resources/files/sample.pdf");
+    private final ClassPathResource webpFile = new ClassPathResource("static/resources/files/sample.webp");
+
     JavascriptExecutor js;
     @LocalServerPort
     private int port;
@@ -60,6 +62,11 @@ public class VolunteerRegistrationSystemTest {
 
     private String getFilePath() throws IOException {
         return file.getFilePath().toAbsolutePath().toString();
+
+    }
+
+    private String getWebpFilePath() throws IOException {
+        return webpFile.getFilePath().toAbsolutePath().toString();
 
     }
 
@@ -666,6 +673,33 @@ public class VolunteerRegistrationSystemTest {
         }
         driver.findElement(By.cssSelector(".btn")).click();
         assertEquals(driver.findElement(By.cssSelector(".invalid-feedback")).getText(), "Il numero del passaporto deve contenere solo caratteri alfanumerici maiuscoli");
+    }
+
+    @Test
+    public void TC1_19RegistrazioneVolontarioFilePassaportoNonValido() throws IOException {
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
+        driver.manage().window().setSize(new Dimension(1550, 830));
+        driver.findElement(By.linkText("Iscriviti")).click();
+        driver.findElement(By.id("firstNameRegistrationForm")).sendKeys("Andrea");
+        driver.findElement(By.id("lastNameRegistrationForm")).sendKeys("Squitieri");
+        driver.findElement(By.id("emailRegistrationForm")).sendKeys("andrea.squitieri@mail.com");
+        driver.findElement(By.id("passwordRegistrationForm")).sendKeys("PasswordMoltoSicura1234!");
+        driver.findElement(By.id("confirmPasswordRegistrationForm")).sendKeys("PasswordMoltoSicura1234!");
+        {
+            WebElement dropdown = driver.findElement(By.id("nazionalitaRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Italia']")).click();
+        }
+        driver.findElement(By.id("dataNascitaRegistrationForm")).sendKeys("2004-04-01");
+        driver.findElement(By.id("numeroPassaportoRegistrationForm")).sendKeys("ASPASS");
+        driver.findElement(By.id("dataScadenzaPassaportoRegistrationForm")).sendKeys("2099-04-01");
+        driver.findElement(By.id("dataEmissionePassaportoRegistrationForm")).sendKeys("2010-04-01");
+        driver.findElement(By.id("passaportoRegistrationForm")).sendKeys(getWebpFilePath());
+        {
+            WebElement dropdown = driver.findElement(By.id("sessoRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Maschio']")).click();
+        }
+        driver.findElement(By.cssSelector(".btn")).click();
+        assertEquals(driver.findElement(By.cssSelector(".invalid-feedback")).getText(), "Tipo di file non valido");
     }
 
 }
