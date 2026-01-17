@@ -46,7 +46,7 @@ public class CreateMissioneSystemTest {
     @BeforeEach
     public void setUp(WebApplicationContext context) {
         FirefoxOptions options = new FirefoxOptions();
-        //options.addArguments("-headless");
+        options.addArguments("-headless");
         driver = new FirefoxDriver(options);
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(15));
         js = (JavascriptExecutor) driver;
