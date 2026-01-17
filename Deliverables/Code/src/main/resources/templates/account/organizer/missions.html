@@ -20,7 +20,7 @@
         <th:block th:each="missione : ${missioni}">
             <div class="col">
                 <th:block
-                        th:replace="fragments/card_missione :: card_missione(${missione}, ~{ :: #missionButton}, ~{:: badge})">
+                        th:replace="~{fragments/card_missione :: card_missione(${missione}, ~{ :: #missionButton}, ~{:: badge})}">
                     <a class="btn btn-primary w-100 rounded-pill" id="missionButton"
                        th:href="@{/mission(id = ${missione.id})}">
                         Visualizza Dettagli <i class="fa-solid fa-arrow-right ms-1"></i>
@@ -47,7 +47,7 @@
         </th:block>
     </div>
 
-    <th:block th:replace="fragments/pagination :: pagination(${missioni})"></th:block>
+    <th:block th:replace="~{fragments/pagination :: pagination(${missioni})}"></th:block>
 </th:block>
 </body>
 </html>

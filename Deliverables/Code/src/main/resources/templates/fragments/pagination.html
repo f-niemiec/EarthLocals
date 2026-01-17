@@ -24,7 +24,7 @@
         <div class="pagination justify-content-center">
             <div class="page-item" th:classappend="${pageObject.number == 0 ? 'disabled' : ''}">
                 <th:block
-                        th:replace="fragments/pagination :: pageButton(${pageObject.number - 1}, '&laquo;', 'Precendente', ${pageObject.size})"></th:block>
+                        th:replace="~{fragments/pagination :: pageButton(${pageObject.number - 1}, '&laquo;', 'Precendente', ${pageObject.size})}"></th:block>
             </div>
             <div class="page-item disabled" th:if="${pageObject.number  - 2 > 0}">
                 <div class="page-link">
@@ -34,7 +34,7 @@
             <div class="page-item" th:classappend="${page == pageObject.number} ? 'active'"
                  th:each="page: ${#numbers.sequence((pageObject.number > 1 ? pageObject.number - 2 : 0), (pageObject.number + 3 < pageObject.totalPages ? pageObject.number + 2 : pageObject.totalPages - 1))}">
                 <th:block
-                        th:replace="fragments/pagination :: pageButton(${page}, ${page + 1}, 'Pagina ' + ${page + 1}, ${pageObject.size})"></th:block>
+                        th:replace="~{fragments/pagination :: pageButton(${page}, ${page + 1}, 'Pagina ' + ${page + 1}, ${pageObject.size})}"></th:block>
             </div>
             <div class="page-item disabled" th:if="${pageObject.number  + 3 < pageObject.totalPages}">
                 <div class="page-link">
@@ -43,7 +43,7 @@
             </div>
             <div class="page-item" th:classappend="${pageObject.number + 1== pageObject.totalPages ? 'disabled' : ''}">
                 <th:block
-                        th:replace="fragments/pagination :: pageButton(${pageObject.number + 1}, '&raquo;', 'Successivo', ${pageObject.size})"></th:block>
+                        th:replace="~{fragments/pagination :: pageButton(${pageObject.number + 1}, '&raquo;', 'Successivo', ${pageObject.size})}"></th:block>
             </div>
 
         </div>

@@ -30,7 +30,7 @@
 
 <body class="d-flex flex-column h-100">
 
-<div th:replace="fragments/header :: header"></div>
+<div th:replace="~{fragments/header :: header}"></div>
 
 <th:block layout:fragment="banner"/>
 
@@ -39,10 +39,10 @@
         <th:block layout:fragment="content"/>
     </div>
 </div>
-<div th:replace="fragments/footer :: footer"></div>
+<div th:replace="~{fragments/footer :: footer}"></div>
 
 <script th:src="@{/webjars/popper.js/umd/popper.min.js}"></script>
-<script th:src="@{/js/bootstrap/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/resources/js/bootstrap/bootstrap.bundle.min.js}"></script>
 <script th:src="@{/webjars/font-awesome/js/all.min.js}"></script>
 
 </body>
