@@ -24,16 +24,16 @@ public class VolontarioDTO extends UtenteDTO {
                     message = "Il numero del passaporto deve contenere al massimo 9 caratteri"
             ),
             @Pattern(
-                    regexp = "^.[A-Z0-9]$",
+                    regexp = "^[A-Z0-9]*$",
                     message = "Il numero del passaporto deve contenere solo caratteri alfanumerici maiuscoli"
             )
     })
     private String numeroPassaporto;
-    @NotNull
+    @NotNull(message = "La data di scadenza del passaporto è obbligatoria")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @FutureOrPresent(message = "La data di scadenza del passaporto inserita non è valida")
     private LocalDate dataScadenzaPassaporto;
-    @NotNull
+    @NotNull(message = "La data di emissione del passaporto è obbligatoria")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @PastOrPresent(message = "La data di emissione del passaporto inserita non è valida")
     private LocalDate dataEmissionePassaporto;

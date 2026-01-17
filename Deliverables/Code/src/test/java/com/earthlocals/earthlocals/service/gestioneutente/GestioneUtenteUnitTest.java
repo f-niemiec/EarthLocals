@@ -399,7 +399,6 @@ public class GestioneUtenteUnitTest {
         var paeseId = 1;
         when(editUtenteDTO.getNome()).thenReturn("Nome");
         when(editUtenteDTO.getCognome()).thenReturn("Cognome");
-        when(editUtenteDTO.getEmail()).thenReturn("email@example.com");
         when(editUtenteDTO.getDataNascita()).thenReturn(LocalDate.of(2004, Month.APRIL, 1));
         when(editUtenteDTO.getSesso()).thenReturn('M');
         when(editUtenteDTO.getNazionalita()).thenReturn(paeseId);
@@ -420,10 +419,6 @@ public class GestioneUtenteUnitTest {
         var cognomeCaptor = ArgumentCaptor.forClass(String.class);
         verify(utente, times(1)).setCognome(cognomeCaptor.capture());
         assertEquals(editUtenteDTO.getCognome(), cognomeCaptor.getValue());
-
-        var emailCaptor = ArgumentCaptor.forClass(String.class);
-        verify(utente, times(1)).setEmail(emailCaptor.capture());
-        assertEquals(editUtenteDTO.getEmail(), emailCaptor.getValue());
 
         var dataNascitaCaptor = ArgumentCaptor.forClass(LocalDate.class);
         verify(utente, times(1)).setDataNascita(dataNascitaCaptor.capture());
