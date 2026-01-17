@@ -205,6 +205,6 @@ public class CreateMissioneSystemTest {
         driver.findElement(By.cssSelector(".invalid-feedback:nth-child(3)")).click();
         assertEquals(driver.findElement(By.cssSelector(".invalid-feedback:nth-child(3)")).getText(), "Il nome deve essere tra 5 e 100 caratteri");
     }
-
+    
 
 }
