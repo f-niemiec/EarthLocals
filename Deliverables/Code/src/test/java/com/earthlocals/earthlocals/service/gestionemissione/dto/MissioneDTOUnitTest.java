@@ -89,7 +89,7 @@ public class MissioneDTOUnitTest {
         var utente = mock(Utente.class);
 
         var missioneDTO = new MissioneDTO(
-                "     ",
+                " ".repeat(6),
                 0,
                 "città",
                 "la descrizione deve essere di almeno venti caratteri",
@@ -111,7 +111,7 @@ public class MissioneDTOUnitTest {
         var utente = mock(Utente.class);
 
         var missioneDTO = new MissioneDTO(
-                "abc",
+                "a".repeat(3),
                 0,
                 "città",
                 "la descrizione deve essere di almeno venti caratteri",
@@ -133,7 +133,7 @@ public class MissioneDTOUnitTest {
         var utente = mock(Utente.class);
 
         var missioneDTO = new MissioneDTO(
-                "abcde",
+                "a".repeat(5),
                 0,
                 "città",
                 "la descrizione deve essere di almeno venti caratteri",
@@ -153,7 +153,7 @@ public class MissioneDTOUnitTest {
         var utente = mock(Utente.class);
 
         var missioneDTO = new MissioneDTO(
-                "ggdafgxcrufdxerjiuecyxkoiwwuamovrzcdadrsrlupseqluvzweugrqasoerspcikevdjkjfrlsttkaszonjaqsxexhalceanty",
+                "a".repeat(101),
                 0,
                 "città",
                 "la descrizione deve essere di almeno venti caratteri",
@@ -175,7 +175,7 @@ public class MissioneDTOUnitTest {
         var utente = mock(Utente.class);
 
         var missioneDTO = new MissioneDTO(
-                "ggdafgxcrufdxerjiuecyxkoiwwuamovrzcdadrsrlupseqluvzweugrqasoerspcikevdjkjfrlsttkaszonjaqsxexhalceant",
+                "a".repeat(100),
                 0,
                 "città",
                 "la descrizione deve essere di almeno venti caratteri",
