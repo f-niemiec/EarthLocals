@@ -1,7 +1,9 @@
 package com.earthlocals.earthlocals.service.gestioneutente.dto;
 
 
+import com.earthlocals.earthlocals.utility.constraints.DateOverlap;
 import com.earthlocals.earthlocals.utility.constraints.FileType;
+import com.earthlocals.earthlocals.utility.interfaces.DateOverlapVerifier;
 import jakarta.validation.constraints.*;
 import jakarta.validation.groups.Default;
 import lombok.Data;
@@ -15,7 +17,8 @@ import java.time.LocalDate;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
-public class VolontarioDTO extends UtenteDTO {
+@DateOverlap(connectedField = "dataScadenzaPassaporto", message = "La data di scadenza deve essere successiva alla data di emissione")
+public class VolontarioDTO extends UtenteDTO implements DateOverlapVerifier {
 
     @NotBlank(message = "Il numero del passaporto è obbligatorio")
     @Pattern.List({
@@ -47,6 +50,14 @@ public class VolontarioDTO extends UtenteDTO {
         this.dataScadenzaPassaporto = dataScadenzaPassaporto;
         this.dataEmissionePassaporto = dataEmissionePassaporto;
         this.passaporto = passaporto;
+    }
+
+    @Override
+    public boolean isDateOverlapping() {
+        if (dataEmissionePassaporto == null || dataScadenzaPassaporto == null) {
+            return false;
+        }
+        return dataScadenzaPassaporto.isBefore(dataEmissionePassaporto);
     }
 
     public interface PassaportoGroup {
