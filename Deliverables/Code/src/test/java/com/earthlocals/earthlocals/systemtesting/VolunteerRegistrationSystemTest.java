@@ -112,7 +112,7 @@ public class VolunteerRegistrationSystemTest {
     }
 
     @Test
-    public void TC1_2Registrazionevolontarioconemailpresente() throws IOException {
+    public void TC1_2RegistrazioneVolontarioConEmailPresente() throws IOException {
         var utente = Utente.utenteBuilder()
                 .nome("Mario")
                 .cognome("Rossi")
