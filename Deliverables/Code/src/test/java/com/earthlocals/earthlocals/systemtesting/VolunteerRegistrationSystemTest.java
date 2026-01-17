@@ -30,7 +30,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@ActiveProfiles("test") // Ensures application-test.yml is used
+@ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import({SystemTestAppConfig.class, TestcontainerConfig.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -213,7 +213,7 @@ public class VolunteerRegistrationSystemTest {
         driver.findElement(By.linkText("Iscriviti")).click();
         driver.findElement(By.id("firstNameRegistrationForm")).click();
         driver.findElement(By.id("firstNameRegistrationForm")).sendKeys("Andrea");
-        driver.findElement(By.id("lastNameRegistrationForm")).sendKeys("星期五 ");
+        driver.findElement(By.id("lastNameRegistrationForm")).sendKeys(" ");
         driver.findElement(By.id("emailRegistrationForm")).sendKeys("andrea.squitieri@mail.com");
         driver.findElement(By.id("passwordRegistrationForm")).sendKeys("PasswordMoltoSicura1234!");
         driver.findElement(By.id("confirmPasswordRegistrationForm")).sendKeys("PasswordMoltoSicura1234!");
@@ -236,8 +236,7 @@ public class VolunteerRegistrationSystemTest {
         }
         driver.findElement(By.cssSelector("#sessoRegistrationForm > option:nth-child(2)")).click();
         driver.findElement(By.cssSelector(".btn")).click();
-        driver.findElement(By.cssSelector(".alert")).click();
-        assertEquals(driver.findElement(By.cssSelector(".alert")).getText(), "Ti abbiamo inviato una mail!\\\\nConferma l\\'attivazione dell\\'account accedendo attraverso il link che trovi nella tua casella di posta elettronica.");
+        assertEquals(driver.findElement(By.cssSelector(".invalid-feedback")).getText(), "Il cognome è obbligatorio");
     }
 
 

@@ -32,6 +32,9 @@
         <div class="alert alert-danger" th:if="${param.expiredReset}">
             <strong>Il token di reset è scaduto</strong> <br/>
         </div>
+        <div class="alert alert-danger" th:if="${param.verTokenError}">
+            <strong>Il token di verifica non è valido</strong> <br/>
+        </div>
         <div class="alert alert-success" th:if="${param.confirmed}">
             <strong>Il tuo account è stato verificato con successo</strong>
         </div>
