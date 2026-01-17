@@ -165,19 +165,157 @@ public class GestioneUtenteSystemTest {
     }
 
     @Test
+    public void TC1_3RegistrazioneVolontarioFormatoNomeErrato() throws IOException {
+        driver.get("http://localhost:8080/");
+        driver.manage().window().setSize(new Dimension(1550, 830));
+        driver.findElement(By.linkText("Iscriviti")).click();
+        driver.findElement(By.id("firstNameRegistrationForm")).click();
+        driver.findElement(By.id("firstNameRegistrationForm")).sendKeys(" ");
+        driver.findElement(By.id("lastNameRegistrationForm")).click();
+        driver.findElement(By.id("lastNameRegistrationForm")).sendKeys("Squitieri");
+        driver.findElement(By.id("emailRegistrationForm")).click();
+        driver.findElement(By.id("emailRegistrationForm")).sendKeys("andrea.squitieri@mail.com");
+        driver.findElement(By.id("passwordRegistrationForm")).sendKeys("PasswordMoltoSicura1234!");
+        driver.findElement(By.id("confirmPasswordRegistrationForm")).sendKeys("PasswordMoltoSicura1234!");
+        {
+            WebElement dropdown = driver.findElement(By.id("nazionalitaRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Italia']")).click();
+        }
+        driver.findElement(By.cssSelector("option:nth-child(123)")).click();
+        driver.findElement(By.id("dataNascitaRegistrationForm")).click();
+        driver.findElement(By.id("dataNascitaRegistrationForm")).sendKeys("2004-04-01");
+        driver.findElement(By.id("numeroPassaportoRegistrationForm")).sendKeys("ASPASS");
+        driver.findElement(By.id("dataScadenzaPassaportoRegistrationForm")).sendKeys("2099-04-01");
+        driver.findElement(By.id("dataEmissionePassaportoRegistrationForm")).sendKeys("2010-04-01");
+        driver.findElement(By.id("passaportoRegistrationForm")).sendKeys(getFilePath());
+        {
+            WebElement dropdown = driver.findElement(By.id("sessoRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Maschio']")).click();
+        }
+        driver.findElement(By.cssSelector("#sessoRegistrationForm > option:nth-child(2)")).click();
+        driver.findElement(By.cssSelector(".btn")).click();
+        driver.findElement(By.cssSelector(".p-4:nth-child(1)")).click();
+        assertEquals(driver.findElement(By.cssSelector(".invalid-feedback")).getText(), "Il nome è obbligatorio");
+    }
+
+    //N.B. Test corretto è la validazione a non esserci
+    @Test
+    public void TC1_4RegistrazioneFormatoCognomeErrato() throws IOException{
+        driver.get("http://localhost:8080/");
+        driver.manage().window().setSize(new Dimension(1908, 1023));
+        driver.findElement(By.linkText("Iscriviti")).click();
+        driver.findElement(By.id("firstNameRegistrationForm")).click();
+        driver.findElement(By.id("firstNameRegistrationForm")).sendKeys("Andrea");
+        driver.findElement(By.id("lastNameRegistrationForm")).sendKeys("星期五 ");
+        driver.findElement(By.id("emailRegistrationForm")).sendKeys("andrea.squitieri@mail.com");
+        driver.findElement(By.id("passwordRegistrationForm")).sendKeys("PasswordMoltoSicura1234!");
+        driver.findElement(By.id("confirmPasswordRegistrationForm")).sendKeys("PasswordMoltoSicura1234!");
+        {
+            WebElement dropdown = driver.findElement(By.id("nazionalitaRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'India']")).click();
+        }
+        {
+            WebElement dropdown = driver.findElement(By.id("nazionalitaRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Italia']")).click();
+        }
+        driver.findElement(By.id("dataNascitaRegistrationForm")).sendKeys("2004-04-01");
+        driver.findElement(By.id("numeroPassaportoRegistrationForm")).sendKeys("ASPASS");
+        driver.findElement(By.id("dataScadenzaPassaportoRegistrationForm")).sendKeys("2099-04-01");
+        driver.findElement(By.id("dataEmissionePassaportoRegistrationForm")).sendKeys("2010-04-01");
+        driver.findElement(By.id("passaportoRegistrationForm")).sendKeys(getFilePath());
+        {
+            WebElement dropdown = driver.findElement(By.id("sessoRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Maschio']")).click();
+        }
+        driver.findElement(By.cssSelector("#sessoRegistrationForm > option:nth-child(2)")).click();
+        driver.findElement(By.cssSelector(".btn")).click();
+        driver.findElement(By.cssSelector(".alert")).click();
+        assertEquals(driver.findElement(By.cssSelector(".alert")).getText(), "Ti abbiamo inviato una mail!\\\\nConferma l\\\'attivazione dell\\\'account accedendo attraverso il link che trovi nella tua casella di posta elettronica.");
+    }
+
+
+
+    @Test
+    public void TC1_5RegistrazioneVolontarioFormatoDataNascitaErrato() throws IOException {
+        driver.get("http://localhost:8080/");
+        driver.manage().window().setSize(new Dimension(1550, 830));
+        driver.findElement(By.linkText("Iscriviti")).click();
+        driver.findElement(By.id("firstNameRegistrationForm")).click();
+        driver.findElement(By.id("firstNameRegistrationForm")).sendKeys("Andrea");
+        driver.findElement(By.id("lastNameRegistrationForm")).click();
+        driver.findElement(By.id("lastNameRegistrationForm")).sendKeys("Squitieri");
+        driver.findElement(By.id("emailRegistrationForm")).click();
+        driver.findElement(By.id("emailRegistrationForm")).sendKeys("andrea.squitieri@mail.com");
+        driver.findElement(By.cssSelector("div:nth-child(6)")).click();
+        driver.findElement(By.id("passwordRegistrationForm")).click();
+        driver.findElement(By.id("passwordRegistrationForm")).sendKeys("PasswordMoltoSicura1234!");
+        driver.findElement(By.id("confirmPasswordRegistrationForm")).click();
+        driver.findElement(By.id("confirmPasswordRegistrationForm")).sendKeys("PasswordMoltoSicura1234!");
+        {
+            WebElement element = driver.findElement(By.id("nazionalitaRegistrationForm"));
+            Actions builder = new Actions(driver);
+            builder.moveToElement(element).clickAndHold().perform();
+        }
+        {
+            WebElement element = driver.findElement(By.id("nazionalitaRegistrationForm"));
+            Actions builder = new Actions(driver);
+            builder.moveToElement(element).perform();
+        }
+        {
+            WebElement element = driver.findElement(By.id("nazionalitaRegistrationForm"));
+            Actions builder = new Actions(driver);
+            builder.moveToElement(element).release().perform();
+        }
+        driver.findElement(By.id("nazionalitaRegistrationForm")).click();
+        {
+            WebElement dropdown = driver.findElement(By.id("nazionalitaRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Iran']")).click();
+        }
+        driver.findElement(By.cssSelector("option:nth-child(97)")).click();
+        driver.findElement(By.id("dataNascitaRegistrationForm")).click();
+        driver.findElement(By.id("dataNascitaRegistrationForm")).click();
+        driver.findElement(By.id("dataNascitaRegistrationForm")).click();
+        {
+            WebElement element = driver.findElement(By.id("dataNascitaRegistrationForm"));
+            Actions builder = new Actions(driver);
+            builder.doubleClick(element).perform();
+        }
+        driver.findElement(By.id("dataNascitaRegistrationForm")).sendKeys("2030-04-01");
+        driver.findElement(By.id("numeroPassaportoRegistrationForm")).click();
+        driver.findElement(By.id("numeroPassaportoRegistrationForm")).sendKeys("ASPASS");
+        driver.findElement(By.id("dataScadenzaPassaportoRegistrationForm")).click();
+        driver.findElement(By.id("dataScadenzaPassaportoRegistrationForm")).click();
+        driver.findElement(By.id("dataScadenzaPassaportoRegistrationForm")).sendKeys("2099-04-01");
+        driver.findElement(By.id("dataEmissionePassaportoRegistrationForm")).click();
+        driver.findElement(By.id("dataEmissionePassaportoRegistrationForm")).sendKeys("2010-04-01");
+        driver.findElement(By.id("passaportoRegistrationForm")).sendKeys(getFilePath());
+        driver.findElement(By.id("sessoRegistrationForm")).click();
+        {
+            WebElement dropdown = driver.findElement(By.id("sessoRegistrationForm"));
+            dropdown.findElement(By.xpath("//option[. = 'Maschio']")).click();
+        }
+        driver.findElement(By.cssSelector("#sessoRegistrationForm > option:nth-child(2)")).click();
+        driver.findElement(By.cssSelector(".btn")).click();
+        driver.findElement(By.cssSelector(".invalid-feedback")).click();
+        assertEquals(driver.findElement(By.cssSelector(".invalid-feedback")).getText(), "La data di nascita inserita non è valida");
+    }
+
+
+
+    @Test
     public void TC3_1Loginsuccessfull() {
-         driver.get("http://localhost:8080/");
-         driver.manage().window().setSize(new Dimension(1280, 672));
-         driver.findElement(By.linkText("Log in")).click();
-         driver.findElement(By.id("inputEmailLoginForm")).click();
-         driver.findElement(By.id("inputEmailLoginForm")).sendKeys("francesconiemiec23@gmail.com");
-         driver.findElement(By.id("inputPasswordLoginForm")).click();
-         driver.findElement(By.id("inputPasswordLoginForm")).sendKeys("MiaoMeow24!");
-         driver.findElement(By.cssSelector(".btn")).click();
-         {
-             List<WebElement> elements = driver.findElements(By.id("bannerHomePage"));
-             assert(elements.size() == 0);
-         }
+        driver.get("http://localhost:8080/");
+        driver.manage().window().setSize(new Dimension(1280, 672));
+        driver.findElement(By.linkText("Log in")).click();
+        driver.findElement(By.id("inputEmailLoginForm")).click();
+        driver.findElement(By.id("inputEmailLoginForm")).sendKeys("francesconiemiec23@gmail.com");
+        driver.findElement(By.id("inputPasswordLoginForm")).click();
+        driver.findElement(By.id("inputPasswordLoginForm")).sendKeys("MiaoMeow24!");
+        driver.findElement(By.cssSelector(".btn")).click();
+        {
+            List<WebElement> elements = driver.findElements(By.id("bannerHomePage"));
+            assert (elements.size() == 0);
+        }
     }
 
     @Test
@@ -206,7 +344,49 @@ public class GestioneUtenteSystemTest {
         assertEquals(driver.findElement(By.cssSelector(".alert")).getText(), "E-mail o password non valida");
     }
 
+    /*
+    Dobbiamo prima riflettere se è opportuno inserire
+    @Test
+    public void TC4_1ModificaSuccess() {
+        driver.findElement(By.linkText("Profilo")).click();
+        {
+            WebElement element = driver.findElement(By.cssSelector("html"));
+            Actions builder = new Actions(driver);
+            builder.moveToElement(element).clickAndHold().perform();
+        }
+        {
+            WebElement element = driver.findElement(By.cssSelector("html"));
+            Actions builder = new Actions(driver);
+            builder.moveToElement(element).perform();
+        }
+        {
+            WebElement element = driver.findElement(By.cssSelector("html"));
+            Actions builder = new Actions(driver);
+            builder.moveToElement(element).release().perform();
+        }
+        {
+            WebElement element = driver.findElement(By.linkText("Le mie candidature"));
+            Actions builder = new Actions(driver);
+            builder.moveToElement(element).clickAndHold().perform();
+        }
+        {
+            WebElement element = driver.findElement(By.linkText("Le mie candidature"));
+            Actions builder = new Actions(driver);
+            builder.moveToElement(element).perform();
+        }
+        {
+            WebElement element = driver.findElement(By.linkText("Le mie candidature"));
+            Actions builder = new Actions(driver);
+            builder.moveToElement(element).release().perform();
+        }
+        driver.findElement(By.cssSelector(".g-4")).click();
+        driver.findElement(By.id("emailEditForm")).sendKeys("francesconiemiec@gmail.com");
+        driver.findElement(By.cssSelector(".btn-primary")).click();
+        driver.findElement(By.cssSelector(".container-fluid")).click();
+        assertEquals(driver.findElement(By.cssSelector(".container-fluid")).getText(), "Informazioni profilo\\\\nCambia password\\\\nDettagli passaporto\\\\nLe mie candidature\\\\nLe mie esperienze\\\\nInformazioni profilo\\\\nNome\\\\nCognome\\\\nE-mail\\\\nNazionalità\\\\nAfghanistan\\\\nAlbania\\\\nAlgeria\\\\nAndorra\\\\nAngola\\\\nAnguilla\\\\nAntartide\\\\nAntigua e Barbuda\\\\nAntille Francesi\\\\nArabia Saudita\\\\nArgentina\\\\nArmenia\\\\nAruba\\\\nAustralia\\\\nAustria\\\\nAzerbaijan\\\\nBahamas\\\\nBahrein\\\\nBangladesh\\\\nBarbados\\\\nBelgio\\\\nBelize\\\\nBenin\\\\nBermuda\\\\nBhutan\\\\nBielorussia\\\\nBirmania\\\\nBolivia\\\\nBonaire, Saint-Eustache e Saba\\\\nBosnia ed Erzegovina\\\\nBotswana\\\\nBrasile\\\\nBrunei\\\\nBulgaria\\\\nBurkina Faso\\\\nBurundi\\\\nCambogia\\\\nCamerun\\\\nCanada\\\\nCapo Verde\\\\nCiad\\\\nCile\\\\nCina\\\\nCipro\\\\nColombia\\\\nComore\\\\nCongo\\\\nCongo (Rep. Dem.)\\\\nCorea del Nord\\\\nCorea del Sud\\\\nCosta D\\\'Avorio\\\\nCosta Rica\\\\nCroazia\\\\nCuba\\\\nCuraçao\\\\nDanimarca\\\\nDominica\\\\nEcuador\\\\nEgitto\\\\nEl Salvador\\\\nEmirati Arabi Uniti\\\\nEritrea\\\\nEstonia\\\\nEtiopia\\\\nFigi\\\\nFilippine\\\\nFinlandia\\\\nFrancia\\\\nGabon\\\\nGambia\\\\nGeorgia\\\\nGeorgia del Sud e Isole Sandwich Meridionali\\\\nGermania\\\\nGhana\\\\nGiamaica\\\\nGiappone\\\\nGibilterra\\\\nGibuti\\\\nGiordania\\\\nGrecia\\\\nGrenada\\\\nGroenlandia\\\\nGuadeloupa\\\\nGuam\\\\nGuatemala\\\\nGuernsey\\\\nGuinea\\\\nGuinea-Bissau\\\\nGuinea Equatoriale\\\\nGuyana\\\\nGuyana francese\\\\nHaiti\\\\nHonduras\\\\nHong Kong\\\\nIndia\\\\nIndonesia\\\\nIran\\\\nIraq\\\\nIrlanda\\\\nIslanda\\\\nIsola Bouvet\\\\nIsola di Jersey\\\\nIsola di Man\\\\nIsola di Natale\\\\nIsola Norfolk\\\\nIsole Aland\\\\nIsole Cayman\\\\nIsole Cocos e Keeling\\\\nIsole Cook\\\\nIsole Falkland o Isole Malvine\\\\nIsole Far Oer\\\\nIsole Heard e McDonald\\\\nIsole Marianne Settentrionali\\\\nIsole Marshall\\\\nIsole minori esterne degli Stati Uniti d\\\'America\\\\nIsole Pitcairn\\\\nIsole Salomone\\\\nIsole Tokelau\\\\nIsole Turks e Caicos\\\\nIsole Vergini americane\\\\nIsole Vergini Britanniche\\\\nIsraele\\\\nItalia\\\\nKazakistan\\\\nKenya\\\\nKirghizistan\\\\nKiribati\\\\nKosovo\\\\nKuwait\\\\nLaos\\\\nLesotho\\\\nLettonia\\\\nLibano\\\\nLiberia\\\\nLibia\\\\nLiechtenstein\\\\nLituania\\\\nLussemburgo\\\\nMacao\\\\nMacedonia del Nord\\\\nMadagascar\\\\nMalawi\\\\nMaldive\\\\nMalesia\\\\nMali\\\\nMalta\\\\nMartinica\\\\nMauritania\\\\nMauritius\\\\nMayotte\\\\nMessico\\\\nMicronesia\\\\nMoldavia\\\\nMongolia\\\\nMontenegro\\\\nMontserrat\\\\nMorocco\\\\nMozambico\\\\nNamibia\\\\nNauru\\\\nNepal\\\\nNicaragua\\\\nNiger\\\\nNigeria\\\\nNiue\\\\nNorvegia\\\\nNuova Caledonia\\\\nNuova Zelanda\\\\nOman\\\\nPaesi Bassi\\\\nPakistan\\\\nPalau\\\\nPalestina\\\\nPanama\\\\nPapua Nuova Guinea\\\\nParaguay\\\\nPerù\\\\nPolinesia Francese\\\\nPolonia\\\\nPortogallo\\\\nPrincipato di Monaco\\\\nPuerto Rico\\\\nQatar\\\\nRegno Unito\\\\nRepubblica Ceca\\\\nRepubblica Centrafricana\\\\nRepubblica Dominicana\\\\nRiunione\\\\nRomania\\\\nRuanda\\\\nRussia\\\\nSahara Occidentale\\\\nSaint Kitts e Nevis\\\\nSaint Martin\\\\nSaint Martin (parte olandese)\\\\nSaint-Pierre e Miquelon\\\\nSaint Vincent e Grenadine\\\\nSamoa\\\\nSamoa Americane\\\\nSan Marino\\\\nSanta Lucia\\\\nSanta Sede\\\\nSant\\\'Elena\\\\nSão Tomé e Príncipe\\\\nSenegal\\\\nSerbia\\\\nSeychelles\\\\nSierra Leone\\\\nSingapore\\\\nSiria\\\\nSlovacchia\\\\nSlovenia\\\\nSomalia\\\\nSpagna\\\\nSri Lanka\\\\nStati Uniti D\\\'America\\\\nSud Africa\\\\nSudan\\\\nSudan del sud\\\\nSuriname\\\\nSvalbard e Jan Mayen\\\\nSvezia\\\\nSvizzera\\\\nSwaziland\\\\nTagikistan\\\\nTailandia\\\\nTaiwan\\\\nTanzania\\\\nTerritori Francesi del Sud\\\\nTerritorio britannico dell\\\'oceano indiano\\\\nTimor Est\\\\nTogo\\\\nTonga\\\\nTrinidad e Tobago\\\\nTunisia\\\\nTurchia\\\\nTurkmenistan\\\\nTuvalu\\\\nUcraina\\\\nUganda\\\\nUngheria\\\\nUruguay\\\\nUzbekistan\\\\nVanuatu\\\\nVenezuela\\\\nVietnam\\\\nWallis e Futuna\\\\nYemen\\\\nZambia\\\\nZimbabwe\\\\nData di nascita\\\\nSesso\\\\nFemmina\\\\nMaschio\\\\nSalva modifiche");
+    }
 
+     */
 }
 
 
