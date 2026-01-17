@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import({SystemTestAppConfig.class, TestcontainerConfig.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class PasswordRecoveryFinalization {
+public class PasswordRecoveryFinalizationSystemTest {
     private final ClassPathResource file = new ClassPathResource("static/resources/files/sample.pdf");
     JavascriptExecutor js;
     @Autowired
