@@ -182,6 +182,24 @@
     </dependencies>
 
     <build>
+
+        <resources>
+            <resource>
+                <directory>${project.basedir}/src/main/resources</directory>
+            </resource>
+            <resource>
+                <directory>${project.basedir}/node_modules/jquery/dist</directory>
+                <targetPath>static/resources/js/jquery</targetPath>
+            </resource>
+            <resource>
+                <directory>${project.basedir}/node_modules/popper.js/dist</directory>
+                <targetPath>static/resources/js/popperjs</targetPath>
+            </resource>
+            <resource>
+                <directory>${project.basedir}/node_modules/bootstrap/dist/js</directory>
+                <targetPath>static/resources/js/bootstrap</targetPath>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>com.github.eirslett</groupId>
