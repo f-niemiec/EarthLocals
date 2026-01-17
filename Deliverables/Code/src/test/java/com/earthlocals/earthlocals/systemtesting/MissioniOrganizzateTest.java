@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ActiveProfiles("test")
@@ -80,6 +81,25 @@ public class MissioniOrganizzateTest {
             List<WebElement> elements = driver.findElements(By.cssSelector(".col:nth-child(3) .card-img"));
             assert (elements.size() > 0);
         }
+    }
+
+    @Test
+    public void TC11_2MissioniNotLoggedAnymore() {
+        driver.get("http://localhost:8080/");
+        driver.manage().window().setSize(new Dimension(1280, 672));
+        driver.findElement(By.linkText("Log in")).click();
+        driver.findElement(By.id("inputEmailLoginForm")).click();
+        driver.findElement(By.id("inputEmailLoginForm")).sendKeys("organizer2@earthlocals.com");
+        driver.findElement(By.id("inputPasswordLoginForm")).click();
+        driver.findElement(By.id("inputPasswordLoginForm")).sendKeys("PasswordMoltoSicura1234!");
+        driver.findElement(By.cssSelector(".btn")).click();
+        driver.findElement(By.linkText("Profilo")).click();
+
+        driver.manage().deleteAllCookies();
+
+        driver.findElement(By.linkText("Gestione missioni")).click();
+        driver.findElement(By.cssSelector(".text-center")).click();
+        assertEquals(driver.findElement(By.cssSelector(".text-center")).getText(), "Log in");
     }
 }
 
