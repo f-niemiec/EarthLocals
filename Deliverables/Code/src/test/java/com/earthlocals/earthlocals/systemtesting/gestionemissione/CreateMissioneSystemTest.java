@@ -151,7 +151,7 @@ public class CreateMissioneSystemTest {
         driver.findElement(By.linkText("Nuova missione")).click();
         driver.findElement(By.id("passaportoEditPassportForm")).sendKeys(getFilePath());
         driver.findElement(By.id("title")).click();
-        driver.findElement(By.id("title")).sendKeys(" ");
+        driver.findElement(By.id("title")).sendKeys(" ".repeat(5));
         driver.findElement(By.id("description")).click();
         driver.findElement(By.id("description")).sendKeys("Vieni ad insegnare l’inglese in un doposcuola nel quartiere Dongsi a dei ragazzi delle scuole medie");
         {
@@ -168,8 +168,7 @@ public class CreateMissioneSystemTest {
         driver.findElement(By.id("competenze")).click();
         driver.findElement(By.id("competenze")).sendKeys("Esperienza con i bambini e nell’insegnamento dell’inglese");
         driver.findElement(By.cssSelector(".btn-primary")).click();
-        driver.findElement(By.cssSelector(".invalid-feedback:nth-child(4)")).click();
-        assertEquals(driver.findElement(By.cssSelector(".invalid-feedback:nth-child(4)")).getText(), "Il nome della missione è obbligatorio");
+        assertEquals(driver.findElement(By.cssSelector(".invalid-feedback")).getText(), "Il nome della missione è obbligatorio");
     }
 
     @Test
