@@ -18,10 +18,16 @@ import java.time.LocalDate;
 public class VolontarioDTO extends UtenteDTO {
 
     @NotBlank(message = "Il numero del passaporto è obbligatorio")
-    @Pattern(
-            regexp = "^[A-Z0-9]{1,9}$",
-            message = "Il numero del passaporto deve contenere al massimo 9 cifre "
-    )
+    @Pattern.List({
+            @Pattern(
+                    regexp = "^.{1,9}$",
+                    message = "Il numero del passaporto deve contenere al massimo 9 caratteri"
+            ),
+            @Pattern(
+                    regexp = "^.[A-Z0-9]$",
+                    message = "Il numero del passaporto deve contenere solo caratteri alfanumerici maiuscoli"
+            )
+    })
     private String numeroPassaporto;
     @NotNull
     @DateTimeFormat(pattern = "yyyy-MM-dd")
