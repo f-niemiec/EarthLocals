@@ -135,6 +135,25 @@ public class MissioniOrganizzateTest {
         driver.findElement(By.cssSelector("h2")).click();
         assertEquals(driver.findElement(By.cssSelector("h2")).getText(), "403 - Accesso negato!");
     }
+
+    @Test
+    public void TC11_4MissioniMoreThanOne() {
+        driver.get("http://localhost:8080/");
+        driver.manage().window().setSize(new Dimension(1280, 672));
+        driver.findElement(By.linkText("Log in")).click();
+        driver.findElement(By.id("inputEmailLoginForm")).click();
+        driver.findElement(By.id("inputEmailLoginForm")).sendKeys("organizer3@earthlocals.com");
+        driver.findElement(By.id("inputPasswordLoginForm")).click();
+        driver.findElement(By.id("inputPasswordLoginForm")).sendKeys("PasswordMoltoSicura1234!");
+        driver.findElement(By.cssSelector(".btn")).click();
+        driver.findElement(By.linkText("Profilo")).click();
+        driver.findElement(By.linkText("Gestione missioni")).click();
+        driver.findElement(By.cssSelector(".row-cols-md-2")).click();
+        {
+            List<WebElement> elements = driver.findElements(By.cssSelector(".col:nth-child(2) .card-text"));
+            assert(elements.size() > 0);
+        }
+    }
 }
 
 
