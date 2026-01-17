@@ -48,6 +48,9 @@ public class FiltroMissioniTest {
     private MissioneRepository missioneRepository;
     @Autowired
     private CandidaturaRepository candidaturaRepository;
+    @Autowired
+    private PaeseRepository paeseRepository;
+
     @BeforeEach
     public void setUp(WebApplicationContext context) {
         FirefoxOptions options = new FirefoxOptions();
@@ -66,17 +69,6 @@ public class FiltroMissioniTest {
     @AfterEach
     public void tearDown() {
         driver.quit();
-    }
-
-    private List<Missione> snapshotMissioni;
-
-    private void snapshotDBMissioni() {
-        snapshotMissioni = missioneRepository.findAll();
-    }
-
-    private void restoreDBMissioni() {
-        missioneRepository.deleteAll();
-        missioneRepository.saveAll(snapshotMissioni);
     }
 
     @Test
@@ -129,6 +121,38 @@ public class FiltroMissioniTest {
         driver.findElement(By.cssSelector(".container-fluid")).click();
         {
             List<WebElement> elements = driver.findElements(By.cssSelector("span:nth-child(3)"));
+            assert(elements.size() > 0);
+        }
+    }
+
+    @Test
+    public void TC12_5FiltroMissioniSoloUna(){
+        Paese paese = paeseRepository.findAll().getFirst();
+        Utente creatore = utenteRepository.findByEmail("organizer2@earthlocals.com");
+        Missione missione = Missione.missioneBuilder()
+                .nome("Missione")
+                .paese(paese)
+                .citta("Città test")
+                .descrizione("Descrizione test")
+                .dataInizio(LocalDate.now())
+                .dataFine(LocalDate.now().plusDays(7))
+                .competenzeRichieste("Competenze test")
+                .requisitiExtra("Requisiti extra")
+                .immagine("test.jpg")
+                .creatore(creatore)
+                .build();
+        missioneRepository.save(missione);
+        driver.get("http://localhost:8080/");
+        driver.manage().window().setSize(new Dimension(1280, 672));
+        driver.findElement(By.linkText("Opportunità")).click();
+        {
+            WebElement dropdown = driver.findElement(By.name("paeseId"));
+            dropdown.findElement(By.xpath("//option[. = 'Taiwan']")).click();
+        }
+        driver.findElement(By.cssSelector("option:nth-child(44)")).click();
+        driver.findElement(By.cssSelector(".btn-success")).click();
+        {
+            List<WebElement> elements = driver.findElements(By.cssSelector(".card-img"));
             assert(elements.size() > 0);
         }
     }
