@@ -992,7 +992,7 @@ VALUES (false, 'M', '2004-04-01', '1999-01-06', '2027-04-01', 1, NULL, 'Volontar
         'a240fe66-f323-4c34-a5d8-527c8d6b732f-basic-text.pdf', NULL, 1);
 INSERT INTO public.utente
 VALUES (false, 'M', '2004-03-23', '2004-03-23', '3223-03-23', 352, NULL, 'Volontario', NULL, 'Niemiec',
-        'francesconiemiec23@gmail.com', NULL, 'Francesco', 'FN2323232',
+        'john.travolta68@email.it', NULL, 'Francesco', 'FN2323232',
         '$argon2id$v=19$m=16384,t=2,p=1$7f64SB2ngs0ox4hmE77+Eg$E4gjipQhkIOK/EGBR2oIonl6RmrbsPPa3qYeUxJ8I20',
         '52ab3eac-66f2-4ee7-815b-c68e820f0927-03.Introduzione ad UML.pdf', NULL, 1);
 INSERT INTO public.utente
