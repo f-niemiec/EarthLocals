@@ -73,7 +73,7 @@ public class FiltroMissioniTest {
 
     @Test
     public void TC12_2FiltroMissioniUnaPresente(){
-        driver.get("http://localhost:8080/");
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1280, 672));
         driver.findElement(By.linkText("Opportunità")).click();
         {
@@ -90,7 +90,7 @@ public class FiltroMissioniTest {
 
     @Test
     public void TC12_1FiltroMissioniDuePresenti() {
-        driver.get("http://localhost:8080/");
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1280, 672));
         driver.findElement(By.linkText("Opportunità")).click();
         driver.findElement(By.name("paeseId")).click();
@@ -108,7 +108,7 @@ public class FiltroMissioniTest {
     }
     @Test
     public void TC12_3FiltroMissioniNessuna() {
-        driver.get("http://localhost:8080/");
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1280, 672));
         driver.findElement(By.linkText("Opportunità")).click();
         driver.findElement(By.name("paeseId")).click();
@@ -142,7 +142,7 @@ public class FiltroMissioniTest {
                 .creatore(creatore)
                 .build();
         missioneRepository.save(missione);
-        driver.get("http://localhost:8080/");
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1280, 672));
         driver.findElement(By.linkText("Opportunità")).click();
         {
@@ -162,7 +162,7 @@ public class FiltroMissioniTest {
     public void TC12_6FiltroEmpty(){
         candidaturaRepository.deleteAll();
         missioneRepository.deleteAll();
-        driver.get("http://localhost:8080/");
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1280, 672));
         driver.findElement(By.linkText("Opportunità")).click();
         driver.findElement(By.cssSelector(".container-fluid")).click();
@@ -174,7 +174,7 @@ public class FiltroMissioniTest {
 
     @Test
     public void TC12_5FiltroNotSelected() {
-        driver.get("http://localhost:8080/");
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1280, 672));
         driver.findElement(By.linkText("Opportunità")).click();
         {

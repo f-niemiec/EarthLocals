@@ -11,6 +11,7 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.http.server.LocalTestWebServer;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
@@ -65,7 +66,7 @@ public class MissioniOrganizzateTest {
 
     private void forceLogin() {
         driver.manage().deleteAllCookies();
-        driver.get("http://localhost:8080/");
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1280, 672));
         driver.findElement(By.linkText("Log in")).click();
         driver.findElement(By.id("inputEmailLoginForm")).click();
@@ -77,7 +78,7 @@ public class MissioniOrganizzateTest {
 
     @Test
     public void TC11_1MissioniOrganizzateOne() {
-        driver.get("http://localhost:8080/");
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1280, 672));
         driver.findElement(By.linkText("Log in")).click();
         driver.findElement(By.id("inputEmailLoginForm")).click();
@@ -95,7 +96,7 @@ public class MissioniOrganizzateTest {
 
     @Test
     public void TC11_2MissioniNotLoggedAnymore() {
-        driver.get("http://localhost:8080/");
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1280, 672));
         driver.findElement(By.linkText("Log in")).click();
         driver.findElement(By.id("inputEmailLoginForm")).click();
@@ -114,7 +115,7 @@ public class MissioniOrganizzateTest {
 
     @Test
     public void TC11_3MissioniNotAuthorized() {
-        driver.get("http://localhost:8080/");
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1280, 672));
         driver.findElement(By.linkText("Log in")).click();
         driver.findElement(By.cssSelector("form > .mb-3:nth-child(2)")).click();
@@ -127,7 +128,7 @@ public class MissioniOrganizzateTest {
 
         forceLogin();
 
-        driver.get("http://localhost:8080/account/organizer/missions");
+        driver.get(LocalTestWebServer.obtain(this.context).uri("/account/organizer/missions"));
         driver.findElement(By.cssSelector(".col-md-12")).click();
         driver.findElement(By.cssSelector("h2")).click();
         driver.findElement(By.cssSelector("h2")).click();
@@ -136,7 +137,7 @@ public class MissioniOrganizzateTest {
 
     @Test
     public void TC11_4MissioniMoreThanOne() {
-        driver.get("http://localhost:8080/");
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1280, 672));
         driver.findElement(By.linkText("Log in")).click();
         driver.findElement(By.id("inputEmailLoginForm")).click();
@@ -155,7 +156,7 @@ public class MissioniOrganizzateTest {
 
     @Test
     public void TC11_5MissioniNonPresenti() {
-        driver.get("http://localhost:8080/");
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1280, 672));
         driver.findElement(By.linkText("Log in")).click();
         driver.findElement(By.id("inputEmailLoginForm")).click();
