@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.*;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.http.server.LocalTestWebServer;
@@ -47,10 +49,6 @@ public class AcceptMissioniTest {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private MissioneRepository missioneRepository;
-    @Autowired
-    private CandidaturaRepository candidaturaRepository;
-    @Autowired
-    private PaeseRepository paeseRepository;
 
     @BeforeEach
     public void setUp(WebApplicationContext context) {
@@ -144,4 +142,47 @@ public class AcceptMissioniTest {
         driver.findElement(By.cssSelector(".col-md-12")).click();
         assertEquals(driver.findElement(By.cssSelector("h2")).getText(), "403 - Accesso negato!");
     }
+
+    @Test
+    public void TC10_4AcceptMissioneAlreadyAccepted() throws Exception {
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
+        driver.manage().window().setSize(new Dimension(1280, 672));
+        driver.findElement(By.linkText("Log in")).click();
+        driver.findElement(By.id("inputEmailLoginForm")).sendKeys("moderator@earthlocals.com");
+        driver.findElement(By.id("inputPasswordLoginForm")).sendKeys("test");
+        driver.findElement(By.cssSelector(".btn")).click();
+        driver.findElement(By.linkText("Profilo")).click();
+        driver.findElement(By.linkText("Gestione missioni")).click();
+
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebElement checkBtn = wait.until(
+                ExpectedConditions.elementToBeClickable(
+                        By.cssSelector("tr:nth-child(3) .fa-check")
+                )
+        );
+        checkBtn.click();
+
+        long missioneId = 402;
+        Missione missione = missioneRepository.findById(missioneId).orElseThrow();
+        missioneRepository.delete(missione);
+
+        WebElement confermaBtn = wait.until(
+                ExpectedConditions.elementToBeClickable(
+                        By.cssSelector("div[aria-modal=true] form > .btn")
+                )
+        );
+        confermaBtn.click();
+
+        WebElement errorMsg = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(
+                        By.cssSelector(".col-md-12 > p")
+                )
+        );
+        assertEquals(
+                "Ci dispiace, si è verificato un errore. Attendi e riprova.",
+                errorMsg.getText()
+        );
+    }
+
+
 }
