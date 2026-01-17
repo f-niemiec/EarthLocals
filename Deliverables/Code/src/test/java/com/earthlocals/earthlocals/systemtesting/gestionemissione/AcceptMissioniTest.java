@@ -72,6 +72,19 @@ public class AcceptMissioniTest {
     public void tearDown() {
         driver.quit();
     }
+
+    private void forceLogin() {
+        driver.manage().deleteAllCookies();
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
+        driver.manage().window().setSize(new Dimension(1280, 672));
+        driver.findElement(By.linkText("Log in")).click();
+        driver.findElement(By.id("inputEmailLoginForm")).click();
+        driver.findElement(By.id("inputEmailLoginForm")).sendKeys("organizer1@gmail.com");
+        driver.findElement(By.id("inputPasswordLoginForm")).click();
+        driver.findElement(By.id("inputPasswordLoginForm")).sendKeys("PasswordMoltoSicura1234!");
+        driver.findElement(By.cssSelector(".btn")).click();
+    }
+
     @Test
     public void TC10_1AcceptMissioneSuccess() throws Exception{
         driver.get(LocalTestWebServer.obtain(this.context).uri());
@@ -111,5 +124,24 @@ public class AcceptMissioniTest {
         driver.findElement(By.linkText("Gestione missioni")).click();
         driver.findElement(By.cssSelector(".text-center")).click();
         assertEquals(driver.findElement(By.cssSelector(".text-center")).getText(), "Log in");
+    }
+
+    @Test
+    public void TC10_3AcceptMissioneNotModerator() throws Exception{
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
+        driver.manage().window().setSize(new Dimension(1280, 672));
+        driver.findElement(By.linkText("Log in")).click();
+        driver.findElement(By.id("inputEmailLoginForm")).click();
+        driver.findElement(By.id("inputEmailLoginForm")).sendKeys("organizer1@earthlocals.com");
+        driver.findElement(By.id("inputPasswordLoginForm")).click();
+        driver.findElement(By.id("inputPasswordLoginForm")).sendKeys("PasswordMoltoSicura1234!");
+        driver.findElement(By.cssSelector(".btn")).click();
+
+        driver.get(LocalTestWebServer.obtain(this.context).uri("/account/moderator/missions"));
+
+        driver.findElement(By.cssSelector(".col-md-12")).click();
+        driver.findElement(By.cssSelector(".col-md-12")).click();
+        driver.findElement(By.cssSelector(".col-md-12")).click();
+        assertEquals(driver.findElement(By.cssSelector("h2")).getText(), "403 - Accesso negato!");
     }
 }
