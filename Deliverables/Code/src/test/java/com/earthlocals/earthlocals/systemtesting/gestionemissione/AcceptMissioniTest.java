@@ -93,4 +93,23 @@ public class AcceptMissioniTest {
         assertEquals(driver.findElement(By.linkText("Programma di volontariato per la pianificazione agricola e la mappatura delle risorse in permacultura")).getText(), "Programma di volontariato per la pianificazione agricola e la mappatura delle risorse in permacultura");
 
     }
+
+    @Test
+    public void TC10_2AcceptMissioneNotLoggedAnymore() throws Exception{
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
+        driver.manage().window().setSize(new Dimension(1280, 672));
+        driver.findElement(By.linkText("Log in")).click();
+        driver.findElement(By.id("inputEmailLoginForm")).click();
+        driver.findElement(By.id("inputEmailLoginForm")).sendKeys("moderator@earthlocals.com");
+        driver.findElement(By.id("inputPasswordLoginForm")).click();
+        driver.findElement(By.id("inputPasswordLoginForm")).sendKeys("test");
+        driver.findElement(By.cssSelector(".btn")).click();
+        driver.findElement(By.linkText("Profilo")).click();
+
+        driver.manage().deleteAllCookies();
+
+        driver.findElement(By.linkText("Gestione missioni")).click();
+        driver.findElement(By.cssSelector(".text-center")).click();
+        assertEquals(driver.findElement(By.cssSelector(".text-center")).getText(), "Log in");
+    }
 }
