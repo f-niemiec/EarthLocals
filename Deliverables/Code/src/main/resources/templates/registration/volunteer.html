@@ -15,8 +15,8 @@
                 E-mail o password non valida
             </div>
             <form class="" enctype="multipart/form-data" id="registrationForm" method="post"
-                  th:action="@{/registration/volunteer}"
-                  th:object="${user}">
+                  novalidate
+                  th:action="@{/registration/volunteer}" th:object="${user}">
                 <div>
                     <label class="form-label" for="firstNameRegistrationForm">Nome</label>
                     <input class="form-control" id="firstNameRegistrationForm" placeholder="Mario" required

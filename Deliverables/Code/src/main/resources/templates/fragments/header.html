@@ -48,7 +48,9 @@
                             <i class="fa-solid fa-circle-user"></i>
                             Profilo
                         </a>
-                        <form class="d-flex align-items-center" method="post" th:action="@{/logout}">
+                        <form class="d-flex align-items-center" method="post"
+                              novalidate
+                              th:action="@{/logout}">
                             <button class="nav-link btn btn-link" type="submit">
                                 <i class="fa-solid fa-arrow-right-from-bracket"></i>
                                 Log out
