@@ -30,7 +30,10 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -81,6 +84,19 @@ public class GestioneMissioneBottomUpIntegrationTest {
         return missioneDTO;
     }
 
+    private Missione validMissioneEntity() throws Exception{
+        var paese = paeseRepository.findAll().getFirst();
+        var missione = new Missione("Help teaching a Pechino ", paese,
+                "Beijing", "Descrizione di almeno 20 caratteri", LocalDate.now().plusDays(2),
+                LocalDate.now().plusDays(3), "Competenze richieste",
+                "Requisiti Extra", "static/resources/files/sample.png",
+                new TreeSet<Candidatura>(),
+                utenteRepository.findAll().iterator().next());
+
+        missione.setCreatore(utenteRepository.findAll().iterator().next());
+        missioneRepository.save(missione);
+        return missione;
+    }
 
     @Test
     @WithMockUser(roles = "ORGANIZER")
@@ -128,6 +144,18 @@ public class GestioneMissioneBottomUpIntegrationTest {
 
         assertThrows(ConstraintViolationException.class, () -> gestioneMissione.registerMissione(missioneDTO));
         verify(validator).validate(missioneDTO);
+    }
+
+    @Test
+    @WithMockUser(roles = "MODERATOR")
+    void acceptMissione() throws Exception{
+        Missione missione = validMissioneEntity();
+        assertEquals(missione.getStato(), Missione.MissioneStato.PENDING);
+        Long id = missione.getId();
+
+        assertDoesNotThrow(() -> gestioneMissione.acceptMissione(id));
+        Missione updated = missioneRepository.findById(id).orElseThrow();
+        assertEquals(Missione.MissioneStato.ACCETTATA, updated.getStato());
     }
 
 }
