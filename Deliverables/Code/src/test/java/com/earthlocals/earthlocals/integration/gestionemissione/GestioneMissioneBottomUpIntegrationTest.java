@@ -22,6 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.test.context.support.WithAnonymousUser;
@@ -271,5 +272,38 @@ public class GestioneMissioneBottomUpIntegrationTest {
                         && m.getStato() == Missione.MissioneStato.PENDING &&
                         m.getDataFine().isAfter(LocalDate.now())));
     }
+
+    // Commento perchè non sono assolutamente convinto
+    @Test
+    void getMissioniApertePaeseNotFound() throws Exception {
+        Missione missione = validMissioneEntity();
+        Page<Missione> res = gestioneMissione.getMissioniAperte(2222, 0, 10);
+        assertFalse(res.getContent().stream()
+                .allMatch(m -> m.getPaese().getId().equals(paeseRepository.findAll().getLast().getId())
+                        && m.getStato() == Missione.MissioneStato.PENDING &&
+                        m.getDataFine().isAfter(LocalDate.now())));
+    }
+
+    @Test
+    void getMissioniApertePaeseNull() throws Exception {
+        Missione missione1 = validMissioneEntity();
+        missione1.forceInternalStatoForTest(Missione.InternalMissioneStato.PENDING);
+        missione1.setDataFine(LocalDate.now().plusDays(10));
+        missioneRepository.saveAndFlush(missione1);
+        Missione missione2 = validMissioneEntity();
+        missione2.forceInternalStatoForTest(Missione.InternalMissioneStato.PENDING);
+        missione2.setDataFine(LocalDate.now().plusDays(5));
+        missioneRepository.saveAndFlush(missione2);
+        Page<Missione> res = gestioneMissione.getMissioniAperte(null, 0, 10);
+        assertTrue(res.getTotalElements() >= 2);
+    }
+
+
+
+
+
+
+
+
 
 }
