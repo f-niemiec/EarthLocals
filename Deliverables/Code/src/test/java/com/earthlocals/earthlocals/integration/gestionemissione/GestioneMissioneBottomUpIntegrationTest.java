@@ -18,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -28,8 +29,9 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -93,6 +95,15 @@ public class GestioneMissioneBottomUpIntegrationTest {
         assertEquals(Missione.MissioneStato.PENDING, res.getStato());
         assertNotNull(res.getCreatore());
         assertNotNull(res.getPaese());
+    }
+
+    @Test
+    @WithMockUser(roles = {"VOLUNTEER", "MODERATOR", "ACCOUNT_MANAGER"})
+    void registerMissioneNotOrganizerFails() throws Exception{
+        var missioneDTO = validMissioneDTO();
+
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneMissione.registerMissione(missioneDTO));
+        verify(missioneRepository, never()).save(any(Missione.class));
     }
 
 
