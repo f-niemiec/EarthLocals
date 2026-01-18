@@ -9,21 +9,16 @@ import com.earthlocals.earthlocals.service.gestionemissioni.exceptions.MissioneN
 import com.earthlocals.earthlocals.service.gestionemissioni.exceptions.MissioneNotFoundException;
 import com.earthlocals.earthlocals.service.gestionemissioni.pictures.PicturesFilesystemStorage;
 import jakarta.transaction.Transactional;
-import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.authorization.AuthorizationDeniedException;
@@ -32,19 +27,18 @@ import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.never;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -74,7 +68,7 @@ public class GestioneMissioneBottomUpIntegrationTest {
     }
 
 
-    private MissioneDTO validMissioneDTO() throws Exception{
+    private MissioneDTO validMissioneDTO() throws Exception {
         var picture = new MockMultipartFile("sample.png", pictureResource.getInputStream());
         var nazioneId = 1;
 
@@ -92,14 +86,14 @@ public class GestioneMissioneBottomUpIntegrationTest {
         return missioneDTO;
     }
 
-    private Missione validMissioneEntity() throws Exception{
+    private Missione validMissioneEntity() throws Exception {
         var paese = paeseRepository.findAll().getFirst();
         var missione = new Missione("Help teaching a Pechino ", paese,
-                "Beijing", "Descrizione di almeno 20 caratteri", LocalDate.now().plusDays(2),
-                LocalDate.now().plusDays(3), "Competenze richieste",
-                "Requisiti Extra", "static/resources/files/sample.png",
-                new TreeSet<Candidatura>(),
-                utenteRepository.findAll().iterator().next());
+            "Beijing", "Descrizione di almeno 20 caratteri", LocalDate.now().plusDays(2),
+            LocalDate.now().plusDays(3), "Competenze richieste",
+            "Requisiti Extra", "static/resources/files/sample.png",
+            new TreeSet<Candidatura>(),
+            utenteRepository.findAll().iterator().next());
 
         missione.setCreatore(utenteRepository.findAll().iterator().next());
         missioneRepository.save(missione);
@@ -127,7 +121,7 @@ public class GestioneMissioneBottomUpIntegrationTest {
 
     @Test
     @WithMockUser(roles = {"VOLUNTEER", "MODERATOR", "ACCOUNT_MANAGER"})
-    void registerMissioneNotOrganizerFails() throws Exception{
+    void registerMissioneNotOrganizerFails() throws Exception {
         var missioneDTO = validMissioneDTO();
 
         assertThrows(AuthorizationDeniedException.class, () -> gestioneMissione.registerMissione(missioneDTO));
@@ -136,7 +130,7 @@ public class GestioneMissioneBottomUpIntegrationTest {
 
     @Test
     @WithAnonymousUser
-    void registerMissioneAnonymousFails() throws Exception{
+    void registerMissioneAnonymousFails() throws Exception {
         var missioneDTO = validMissioneDTO();
 
         assertThrows(AuthorizationDeniedException.class, () -> gestioneMissione.registerMissione(missioneDTO));
@@ -156,7 +150,7 @@ public class GestioneMissioneBottomUpIntegrationTest {
 
     @Test
     @WithMockUser(roles = "MODERATOR")
-    void acceptMissione() throws Exception{
+    void acceptMissione() throws Exception {
         Missione missione = validMissioneEntity();
         assertEquals(missione.getStato(), Missione.MissioneStato.PENDING);
         Long id = missione.getId();
@@ -168,7 +162,7 @@ public class GestioneMissioneBottomUpIntegrationTest {
 
     @Test
     @WithMockUser(roles = {"VOLUNTEER", "ORGANIZER", "ACCOUNT_MANAGER"})
-    void acceptMissioneNotModeratorFails() throws Exception{
+    void acceptMissioneNotModeratorFails() throws Exception {
         Missione missione = validMissioneEntity();
         Long id = missione.getId();
         assertEquals(Missione.MissioneStato.PENDING, missione.getStato());
@@ -180,7 +174,7 @@ public class GestioneMissioneBottomUpIntegrationTest {
 
     @Test
     @WithAnonymousUser
-    void acceptMissioneAnonymousFails() throws Exception{
+    void acceptMissioneAnonymousFails() throws Exception {
         Missione missione = validMissioneEntity();
         Long id = missione.getId();
         assertEquals(Missione.MissioneStato.PENDING, missione.getStato());
@@ -192,7 +186,7 @@ public class GestioneMissioneBottomUpIntegrationTest {
 
     @Test
     @WithMockUser(roles = "MODERATOR")
-    void acceptMissioneNotPending() throws Exception{
+    void acceptMissioneNotPending() throws Exception {
         Missione.InternalMissioneStato internalStato = Missione.InternalMissioneStato.RIFIUTATA;
         Missione missione = validMissioneEntity();
         missione.forceInternalStatoForTest(internalStato);
@@ -213,7 +207,7 @@ public class GestioneMissioneBottomUpIntegrationTest {
 
     @Test
     @WithMockUser(roles = "MODERATOR")
-    void rejectMissione() throws Exception{
+    void rejectMissione() throws Exception {
         Missione missione = validMissioneEntity();
         Long id = missione.getId();
 
@@ -224,7 +218,7 @@ public class GestioneMissioneBottomUpIntegrationTest {
 
     @Test
     @WithMockUser(roles = {"VOLUNTEER", "ORGANIZER", "ACCOUNT_MANAGER"})
-    void rejectMissioneNotModeratorFails() throws Exception{
+    void rejectMissioneNotModeratorFails() throws Exception {
         Missione missione = validMissioneEntity();
         Long id = missione.getId();
         assertEquals(Missione.MissioneStato.PENDING, missione.getStato());
@@ -236,7 +230,7 @@ public class GestioneMissioneBottomUpIntegrationTest {
 
     @Test
     @WithAnonymousUser
-    void rejectMissioneAnonymousFails() throws Exception{
+    void rejectMissioneAnonymousFails() throws Exception {
         Missione missione = validMissioneEntity();
         Long id = missione.getId();
         assertEquals(Missione.MissioneStato.PENDING, missione.getStato());
@@ -248,7 +242,7 @@ public class GestioneMissioneBottomUpIntegrationTest {
 
     @Test
     @WithMockUser(roles = "MODERATOR")
-    void rejectMissioneNotPending() throws Exception{
+    void rejectMissioneNotPending() throws Exception {
         Missione.InternalMissioneStato internalStato = Missione.InternalMissioneStato.ACCETTATA;
         Missione missione = validMissioneEntity();
         missione.forceInternalStatoForTest(internalStato);
@@ -272,9 +266,9 @@ public class GestioneMissioneBottomUpIntegrationTest {
         Missione missione = validMissioneEntity();
         Page<Missione> res = gestioneMissione.getMissioniAperte(paeseRepository.findAll().getLast().getId(), 0, 10);
         assertTrue(res.getContent().stream()
-                .allMatch(m -> m.getPaese().getId().equals(paeseRepository.findAll().getLast().getId())
-                        && m.getStato() == Missione.MissioneStato.PENDING &&
-                        m.getDataFine().isAfter(LocalDate.now())));
+            .allMatch(m -> m.getPaese().getId().equals(paeseRepository.findAll().getLast().getId())
+                && m.getStato() == Missione.MissioneStato.PENDING &&
+                m.getDataFine().isAfter(LocalDate.now())));
     }
 
     // Commento perchè non sono assolutamente convinto
@@ -283,9 +277,9 @@ public class GestioneMissioneBottomUpIntegrationTest {
         Missione missione = validMissioneEntity();
         Page<Missione> res = gestioneMissione.getMissioniAperte(2222, 0, 10);
         assertFalse(res.getContent().stream()
-                .allMatch(m -> m.getPaese().getId().equals(paeseRepository.findAll().getLast().getId())
-                        && m.getStato() == Missione.MissioneStato.PENDING &&
-                        m.getDataFine().isAfter(LocalDate.now())));
+            .allMatch(m -> m.getPaese().getId().equals(paeseRepository.findAll().getLast().getId())
+                && m.getStato() == Missione.MissioneStato.PENDING &&
+                m.getDataFine().isAfter(LocalDate.now())));
     }
 
     @Test
@@ -304,7 +298,7 @@ public class GestioneMissioneBottomUpIntegrationTest {
 
     //Again, non sono assolutamente convinto
     @Test
-    void getMissioniApertePaeseZero() throws Exception{
+    void getMissioniApertePaeseZero() throws Exception {
         Paese paese = paeseRepository.findAll().get(0);
         Missione missione1 = validMissioneEntity();
         missione1.setPaese(paese);
@@ -363,19 +357,19 @@ public class GestioneMissioneBottomUpIntegrationTest {
     }
 
     @Test
-    void getMissioniOrganizzatore() throws Exception{
+    void getMissioniOrganizzatore() throws Exception {
         Ruolo organizerRole = new Ruolo(Ruolo.ORGANIZER);
         ruoloRepository.save(organizerRole);
         Utente organizer = Utente.utenteBuilder()
-                .nome("Mario")
-                .cognome("Rossi")
-                .email("organizer@test.com")
-                .password("password")
-                .dataNascita(LocalDate.of(1990, 1, 1))
-                .sesso('M')
-                .pending(false)
-                .ruoli(Set.of(organizerRole))
-                .build();
+            .nome("Mario")
+            .cognome("Rossi")
+            .email("organizer@test.com")
+            .password("password")
+            .dataNascita(LocalDate.of(1990, 1, 1))
+            .sesso('M')
+            .pending(false)
+            .ruoli(Set.of(organizerRole))
+            .build();
         utenteRepository.save(organizer);
         Missione missione1 = validMissioneEntity();
         missione1.setCreatore(organizer);
@@ -423,14 +417,17 @@ public class GestioneMissioneBottomUpIntegrationTest {
     }
 
 
+    @Test
+    void getImmagineMissione() throws IOException {
+        var filename = "immagine";
+        var res = gestioneMissione.getImmagineMissione(filename);
+        assertEquals(res.getFilename(), filename);
+    }
 
-
-
-
-
-
-
-
-
-
+    @Test
+    void getImmagineMissioneImageNotFound() throws IOException {
+        var filename = "../../../immagine";
+        var res = assertDoesNotThrow(() -> gestioneMissione.getImmagineMissione(filename));
+        assertNotEquals(res.getFilename(), filename);
+    }
 }
