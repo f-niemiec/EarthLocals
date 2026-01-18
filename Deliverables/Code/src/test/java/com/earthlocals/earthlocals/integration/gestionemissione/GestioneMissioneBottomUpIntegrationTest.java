@@ -326,6 +326,14 @@ public class GestioneMissioneBottomUpIntegrationTest {
         assertThrows(IllegalArgumentException.class, () -> gestioneMissione.getMissioniAperte(1, 1, 0));
     }
 
+    @Test
+    @WithMockUser(roles = "MODERATOR")
+    void getMissioniPending() {
+        Page<Missione> res = gestioneMissione.getMissioniPending(0, 10);
+        assertNotNull(res);
+        assertTrue(res.getContent().stream().allMatch(m -> m.getStato() == Missione.MissioneStato.PENDING));
+    }
+
 
 
 }
