@@ -4,10 +4,12 @@ import com.earthlocals.earthlocals.config.SystemTestAppConfig;
 import com.earthlocals.earthlocals.config.TestcontainerConfig;
 import com.earthlocals.earthlocals.model.*;
 import com.earthlocals.earthlocals.service.gestioneutente.GestioneUtente;
+import com.earthlocals.earthlocals.service.gestioneutente.dto.EditPasswordDTO;
 import com.earthlocals.earthlocals.service.gestioneutente.dto.EditUtenteDTO;
 import com.earthlocals.earthlocals.service.gestioneutente.dto.UtenteDTO;
 import com.earthlocals.earthlocals.service.gestioneutente.dto.VolontarioDTO;
 import com.earthlocals.earthlocals.service.gestioneutente.exceptions.UserAlreadyExistsException;
+import com.earthlocals.earthlocals.service.gestioneutente.exceptions.WrongPasswordException;
 import com.earthlocals.earthlocals.service.gestioneutente.passport.PassportStorageService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolationException;
@@ -25,6 +27,7 @@ import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
@@ -107,6 +110,7 @@ public class GestioneUtenteBottomUpIntegrationTest {
 
     }
 
+
     private Utente validUtenteEntity() throws IOException {
         var utente = new Utente();
         var nazioneId = 1;
@@ -114,7 +118,7 @@ public class GestioneUtenteBottomUpIntegrationTest {
         utente.setNome("Nome");
         utente.setCognome("Cognome");
         utente.setEmail("email@example.com");
-        utente.setPassword("PasswordMoltoSicura1234!");
+        utente.setPassword(passwordEncoder.encode("PasswordMoltoSicura1234!"));
         utente.setDataNascita(LocalDate.of(2004, Month.APRIL, 1));
         utente.setSesso('M');
         utente.setNazionalita(paese);
@@ -168,18 +172,18 @@ public class GestioneUtenteBottomUpIntegrationTest {
         Ruolo ruolo = ruoloRepository.findByNome(Ruolo.VOLUNTEER);
 
         var utenteBuilder = Volontario.volontarioBuilder()
-                .nome(volontarioDTO.getNome())
-                .cognome(volontarioDTO.getCognome())
-                .email(volontarioDTO.getEmail())
-                .password(passwordEncoder.encode(volontarioDTO.getPassword()))
-                .dataNascita(volontarioDTO.getDataNascita())
-                .sesso(volontarioDTO.getSesso())
-                .nazionalita(p)
-                .pending(false)
-                .ruoli(Collections.singletonList(ruolo))
-                .numeroPassaporto(volontarioDTO.getNumeroPassaporto())
-                .dataScadenzaPassaporto(volontarioDTO.getDataScadenzaPassaporto())
-                .dataEmissionePassaporto(volontarioDTO.getDataEmissionePassaporto());
+            .nome(volontarioDTO.getNome())
+            .cognome(volontarioDTO.getCognome())
+            .email(volontarioDTO.getEmail())
+            .password(passwordEncoder.encode(volontarioDTO.getPassword()))
+            .dataNascita(volontarioDTO.getDataNascita())
+            .sesso(volontarioDTO.getSesso())
+            .nazionalita(p)
+            .pending(false)
+            .ruoli(Collections.singletonList(ruolo))
+            .numeroPassaporto(volontarioDTO.getNumeroPassaporto())
+            .dataScadenzaPassaporto(volontarioDTO.getDataScadenzaPassaporto())
+            .dataEmissionePassaporto(volontarioDTO.getDataEmissionePassaporto());
 
         volontarioRepository.save(utenteBuilder.build());
 
@@ -246,15 +250,15 @@ public class GestioneUtenteBottomUpIntegrationTest {
         Ruolo ruolo = ruoloRepository.findByNome(Ruolo.VOLUNTEER);
 
         var utenteBuilder = Utente.utenteBuilder()
-                .nome(utenteDTO.getNome())
-                .cognome(utenteDTO.getCognome())
-                .email(utenteDTO.getEmail())
-                .password(passwordEncoder.encode(utenteDTO.getPassword()))
-                .dataNascita(utenteDTO.getDataNascita())
-                .sesso(utenteDTO.getSesso())
-                .nazionalita(p)
-                .pending(false)
-                .ruoli(Collections.singletonList(ruolo));
+            .nome(utenteDTO.getNome())
+            .cognome(utenteDTO.getCognome())
+            .email(utenteDTO.getEmail())
+            .password(passwordEncoder.encode(utenteDTO.getPassword()))
+            .dataNascita(utenteDTO.getDataNascita())
+            .sesso(utenteDTO.getSesso())
+            .nazionalita(p)
+            .pending(false)
+            .ruoli(Collections.singletonList(ruolo));
 
         utenteRepository.save(utenteBuilder.build());
 
@@ -296,7 +300,7 @@ public class GestioneUtenteBottomUpIntegrationTest {
         var authentication = new TestingAuthenticationToken(utente, null, "ROLE_USER");
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
-        reset(utenteRepository);
+        clearInvocations(utenteRepository);
 
         var editUtenteDTO = new EditUtenteDTO();
         editUtenteDTO.setNome("NuovoNome");
@@ -325,7 +329,7 @@ public class GestioneUtenteBottomUpIntegrationTest {
         var authentication = new TestingAuthenticationToken(utente, null, "ROLE_USER");
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
-        reset(utenteRepository);
+        clearInvocations(utenteRepository);
 
         var editUtenteDTO = new EditUtenteDTO();
         editUtenteDTO.setNome("NuovoNome");
@@ -361,7 +365,7 @@ public class GestioneUtenteBottomUpIntegrationTest {
         var authentication = new TestingAuthenticationToken(utente, null, "ROLE_USER");
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
-        reset(utenteRepository);
+        clearInvocations(utenteRepository);
 
         var editUtenteDTO = new EditUtenteDTO();
         editUtenteDTO.setNome("NuovoNome");
@@ -372,6 +376,83 @@ public class GestioneUtenteBottomUpIntegrationTest {
 
         assertThrows(Exception.class, () -> gestioneUtente.editUser(editUtenteDTO));
 
+        verify(utenteRepository, never()).save(any());
+    }
+
+    @Test
+    void editPassword() throws IOException {
+        var utente = spy(validUtenteEntity());
+
+        utenteRepository.save(utente);
+        var context = SecurityContextHolder.getContext();
+        var authentication = new TestingAuthenticationToken(utente, null, "ROLE_USER");
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+        clearInvocations(utenteRepository);
+
+        var editPasswordDTO = new EditPasswordDTO();
+        editPasswordDTO.setCurrentPassword("PasswordMoltoSicura1234!");
+        editPasswordDTO.setNewPassword("NewPassword1234!");
+        editPasswordDTO.setMatchingPassword("NewPassword1234!");
+        var res = assertDoesNotThrow(() -> gestioneUtente.editPassword(editPasswordDTO));
+
+        var passwordCaptor = ArgumentCaptor.forClass(String.class);
+        var inOrder = inOrder(utente, utenteRepository);
+        inOrder.verify(utente, times(1)).setPassword(passwordCaptor.capture());
+        inOrder.verify(utenteRepository, times(1)).save(utente);
+
+        assertTrue(
+            passwordEncoder.matches(
+                editPasswordDTO.getNewPassword(),
+                passwordCaptor.getValue()
+            ));
+
+        assertEquals(utente, res);
+        verify(utenteRepository, times(1)).save(any());
+
+    }
+
+    @Test
+    @WithAnonymousUser
+    void editPasswordAnonymousFails() throws IOException {
+        var editPasswordDTO = new EditPasswordDTO();
+        editPasswordDTO.setCurrentPassword("PasswordMoltoSicura1234!");
+        editPasswordDTO.setNewPassword("NewPassword1234!");
+        editPasswordDTO.setMatchingPassword("NewPassword1234!");
+
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneUtente.editPassword(editPasswordDTO));
+        verify(utenteRepository, never()).save(any());
+    }
+
+    @Test
+    @WithMockUser
+    void editPasswordValidationFails() {
+        var editPasswordDTO = new EditPasswordDTO();
+        editPasswordDTO.setCurrentPassword("PasswordMoltoSicura1234!");
+        editPasswordDTO.setNewPassword("NewPassword1234");
+        editPasswordDTO.setMatchingPassword("NewPassword1234");
+
+        assertThrows(ConstraintViolationException.class, () -> gestioneUtente.editPassword(editPasswordDTO));
+        verify(utenteRepository, never()).save(any());
+    }
+
+    @Test
+    void editPasswordNotMatchingFails() throws IOException {
+        var utente = spy(validUtenteEntity());
+
+        utenteRepository.save(utente);
+        var context = SecurityContextHolder.getContext();
+        var authentication = new TestingAuthenticationToken(utente, null, "ROLE_USER");
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+        clearInvocations(utenteRepository);
+
+        var editPasswordDTO = new EditPasswordDTO();
+        editPasswordDTO.setCurrentPassword("PasswordMoltoSicura1234");
+        editPasswordDTO.setNewPassword("NewPassword1234!");
+        editPasswordDTO.setMatchingPassword("NewPassword1234!");
+
+        assertThrows(WrongPasswordException.class, () -> gestioneUtente.editPassword(editPasswordDTO));
         verify(utenteRepository, never()).save(any());
     }
 
