@@ -4,20 +4,20 @@ import com.earthlocals.earthlocals.config.SystemTestAppConfig;
 import com.earthlocals.earthlocals.config.TestcontainerConfig;
 import com.earthlocals.earthlocals.model.*;
 import com.earthlocals.earthlocals.service.gestioneutente.GestioneUtente;
-import com.earthlocals.earthlocals.service.gestioneutente.dto.EditPasswordDTO;
-import com.earthlocals.earthlocals.service.gestioneutente.dto.EditUtenteDTO;
-import com.earthlocals.earthlocals.service.gestioneutente.dto.UtenteDTO;
-import com.earthlocals.earthlocals.service.gestioneutente.dto.VolontarioDTO;
+import com.earthlocals.earthlocals.service.gestioneutente.dto.*;
 import com.earthlocals.earthlocals.service.gestioneutente.exceptions.UserAlreadyExistsException;
 import com.earthlocals.earthlocals.service.gestioneutente.exceptions.WrongPasswordException;
 import com.earthlocals.earthlocals.service.gestioneutente.passport.PassportStorageService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
+import lombok.Getter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -110,7 +110,6 @@ public class GestioneUtenteBottomUpIntegrationTest {
 
     }
 
-
     private Utente validUtenteEntity() throws IOException {
         var utente = new Utente();
         var nazioneId = 1;
@@ -123,6 +122,26 @@ public class GestioneUtenteBottomUpIntegrationTest {
         utente.setSesso('M');
         utente.setNazionalita(paese);
         utente.setPending(false);
+        return utente;
+
+    }
+
+    private Volontario validVolontarioEntity() throws IOException {
+        var utente = new Volontario();
+        var nazioneId = 1;
+        var paese = paeseRepository.findById(nazioneId).orElseThrow();
+        utente.setNome("Nome");
+        utente.setCognome("Cognome");
+        utente.setEmail("email@example.com");
+        utente.setPassword(passwordEncoder.encode("PasswordMoltoSicura1234!"));
+        utente.setDataNascita(LocalDate.of(2004, Month.APRIL, 1));
+        utente.setSesso('M');
+        utente.setNazionalita(paese);
+        utente.setPending(false);
+        utente.setNumeroPassaporto("012345678");
+        utente.setDataScadenzaPassaporto(LocalDate.of(2027, Month.APRIL, 1));
+        utente.setDataEmissionePassaporto(LocalDate.of(2022, Month.APRIL, 1));
+        utente.setPathPassaporto("passaporto.pdf");
         return utente;
 
     }
@@ -454,6 +473,177 @@ public class GestioneUtenteBottomUpIntegrationTest {
 
         assertThrows(WrongPasswordException.class, () -> gestioneUtente.editPassword(editPasswordDTO));
         verify(utenteRepository, never()).save(any());
+    }
+
+    @Test
+    void editPassport() throws Exception {
+        var volontario = spy(validVolontarioEntity());
+
+        var context = SecurityContextHolder.getContext();
+        var authentication = new TestingAuthenticationToken(volontario, null, "ROLE_VOLUNTEER");
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+        volontarioRepository.save(volontario);
+        clearInvocations(volontarioRepository);
+
+        var passportOldPath = volontario.getPathPassaporto();
+        var passport = spy(new MockMultipartFile("sample.pdf", passportResource.getInputStream()));
+        var editPassportDTO = spy(new EditPassportDTO());
+        editPassportDTO.setNumeroPassaporto("876543210");
+        editPassportDTO.setDataScadenzaPassaporto(LocalDate.of(2027, Month.APRIL, 2));
+        editPassportDTO.setDataEmissionePassaporto(LocalDate.of(2022, Month.APRIL, 2));
+        editPassportDTO.setPassaporto(passport);
+
+        var resultCaptor = new ResultCaptor<String>();
+        when(passportStorageService.acceptUpload(editPassportDTO.getPassaporto())).thenAnswer(resultCaptor);
+
+        var res = assertDoesNotThrow(() -> gestioneUtente.editPassport(editPassportDTO));
+
+        assertEquals(res, volontario);
+
+        verify(passportStorageService, times(1)).removeFile(passportOldPath);
+
+        var inOrder = inOrder(volontario, volontarioRepository, passportStorageService);
+
+        inOrder.verify(volontario, times(1)).setNumeroPassaporto(editPassportDTO.getNumeroPassaporto());
+        assertEquals(editPassportDTO.getNumeroPassaporto(), volontario.getNumeroPassaporto());
+        inOrder.verify(volontario, times(1)).setDataScadenzaPassaporto(editPassportDTO.getDataScadenzaPassaporto());
+        assertEquals(editPassportDTO.getDataScadenzaPassaporto(), volontario.getDataScadenzaPassaporto());
+        inOrder.verify(volontario, times(1)).setDataEmissionePassaporto(editPassportDTO.getDataEmissionePassaporto());
+        assertEquals(editPassportDTO.getDataEmissionePassaporto(), volontario.getDataEmissionePassaporto());
+
+        inOrder.verify(passportStorageService, times(1)).acceptUpload(editPassportDTO.getPassaporto());
+        inOrder.verify(volontario, times(1)).setPathPassaporto(resultCaptor.getResult());
+        assertEquals(resultCaptor.getResult(), volontario.getPathPassaporto());
+        inOrder.verify(volontarioRepository, times(1)).save(volontario);
+
+    }
+
+    @Test
+    @WithMockUser(roles = {"ORGANIZER", "MODERATOR", "ACCOUNT_MANAGER"})
+    void editPassportNotVolunteerFails() throws IOException {
+        var passport = spy(new MockMultipartFile("sample.pdf", passportResource.getInputStream()));
+        var editPassportDTO = spy(new EditPassportDTO());
+        editPassportDTO.setNumeroPassaporto("876543210");
+        editPassportDTO.setDataScadenzaPassaporto(LocalDate.of(2027, Month.APRIL, 2));
+        editPassportDTO.setDataEmissionePassaporto(LocalDate.of(2022, Month.APRIL, 2));
+        editPassportDTO.setPassaporto(passport);
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneUtente.editPassport(editPassportDTO));
+        verify(volontarioRepository, never()).save(any());
+
+    }
+
+    @Test
+    @WithAnonymousUser
+    void editPassportAnonymousFails() throws IOException {
+        var passport = spy(new MockMultipartFile("sample.pdf", passportResource.getInputStream()));
+        var editPassportDTO = spy(new EditPassportDTO());
+        editPassportDTO.setNumeroPassaporto("876543210");
+        editPassportDTO.setDataScadenzaPassaporto(LocalDate.of(2027, Month.APRIL, 2));
+        editPassportDTO.setDataEmissionePassaporto(LocalDate.of(2022, Month.APRIL, 2));
+        editPassportDTO.setPassaporto(passport);
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneUtente.editPassport(editPassportDTO));
+        verify(volontarioRepository, never()).save(any());
+    }
+
+    @Test
+    void editPassportValidationFails() throws Exception {
+        var volontario = spy(validVolontarioEntity());
+
+        var context = SecurityContextHolder.getContext();
+        var authentication = new TestingAuthenticationToken(volontario, null, "ROLE_VOLUNTEER");
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+        volontarioRepository.save(volontario);
+        clearInvocations(volontarioRepository);
+
+        var passport = spy(new MockMultipartFile("sample.pdf", passportResource.getInputStream()));
+        var editPassportDTO = spy(new EditPassportDTO());
+        editPassportDTO.setNumeroPassaporto("876543210./");
+        editPassportDTO.setDataScadenzaPassaporto(LocalDate.of(2027, Month.APRIL, 2));
+        editPassportDTO.setDataEmissionePassaporto(LocalDate.of(2022, Month.APRIL, 2));
+        editPassportDTO.setPassaporto(passport);
+
+
+        assertThrows(ConstraintViolationException.class, () -> gestioneUtente.editPassport(editPassportDTO));
+
+        verify(volontarioRepository, never()).save(volontario);
+    }
+
+    @Test
+    void editPassportUploadFails() throws Exception {
+        var volontario = spy(validVolontarioEntity());
+
+        var context = SecurityContextHolder.getContext();
+        var authentication = new TestingAuthenticationToken(volontario, null, "ROLE_VOLUNTEER");
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+        volontarioRepository.save(volontario);
+        clearInvocations(volontarioRepository);
+
+        var passport = spy(new MockMultipartFile("../../../../sample.pdf", passportResource.getInputStream()));
+        when(passport.getOriginalFilename()).thenReturn("../../../../sample.pdf");
+        var editPassportDTO = spy(new EditPassportDTO());
+        editPassportDTO.setNumeroPassaporto("876543210");
+        editPassportDTO.setDataScadenzaPassaporto(LocalDate.of(2027, Month.APRIL, 2));
+        editPassportDTO.setDataEmissionePassaporto(LocalDate.of(2022, Month.APRIL, 2));
+        editPassportDTO.setPassaporto(passport);
+
+
+        assertThrows(Exception.class, () -> gestioneUtente.editPassport(editPassportDTO));
+
+        verify(volontarioRepository, never()).save(volontario);
+    }
+
+    @Test
+    void getPassportVolontarioFileResource() throws IOException {
+        var volontario = validVolontarioEntity();
+        var context = SecurityContextHolder.getContext();
+        var authentication = new TestingAuthenticationToken(volontario, null, "ROLE_VOLUNTEER");
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+
+        var res = assertDoesNotThrow(() -> gestioneUtente.getPassportVolontarioFileResource());
+        assertEquals(res.getFilename(), volontario.getPathPassaporto());
+
+    }
+
+    @Test
+    @WithAnonymousUser
+    void getPassportVolontarioFileResourceAnonymousFails() {
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneUtente.getPassportVolontarioFileResource());
+    }
+
+    @Test
+    @WithMockUser(roles = {"ORGANIZER", "MODERATOR", "ACCOUNT_MANAGER"})
+    void getPassportVolontarioFileResourceNotVolunteerFails() {
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneUtente.getPassportVolontarioFileResource());
+    }
+
+    @Test
+    void getPassportVolontarioFileResourceDownloadFileFails() throws IOException {
+        var volontario = validVolontarioEntity();
+        volontario.setPathPassaporto("../../../../downloadFileFails");
+        var context = SecurityContextHolder.getContext();
+        var authentication = new TestingAuthenticationToken(volontario, null, "ROLE_VOLUNTEER");
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+
+        assertThrows(IllegalArgumentException.class, () -> gestioneUtente.getPassportVolontarioFileResource());
+
+    }
+
+
+    @Getter
+    static public class ResultCaptor<T> implements Answer<T> {
+        private T result = null;
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public T answer(InvocationOnMock invocationOnMock) throws Throwable {
+            result = (T) invocationOnMock.callRealMethod();
+            return result;
+        }
     }
 
 
