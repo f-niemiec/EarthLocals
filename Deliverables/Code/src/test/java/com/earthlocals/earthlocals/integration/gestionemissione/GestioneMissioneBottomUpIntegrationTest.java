@@ -20,6 +20,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -35,6 +36,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -401,6 +404,25 @@ public class GestioneMissioneBottomUpIntegrationTest {
     void getMissioniOrganizzatoreAnonymousFails() {
         assertThrows(AuthorizationDeniedException.class, () -> gestioneMissione.getMissioniOrganizzatore(0, 1));
     }
+
+    @Test
+    void getMissioneById() throws Exception {
+        Missione missione = validMissioneEntity();
+        Long id = missione.getId();
+        Missione res = assertDoesNotThrow(() -> gestioneMissione.getMissioneById(id));
+        assertNotNull(res);
+        assertEquals(missione.getId(), res.getId());
+        assertEquals(missione.getNome(), res.getNome());
+        assertEquals(missione.getCreatore(), res.getCreatore());
+    }
+
+    @Test
+    void getMissioneByIdNotFoundIntegration() {
+        Long nonExistentId = 9999L;
+        assertThrows(MissioneNotFoundException.class, () -> gestioneMissione.getMissioneById(nonExistentId));
+    }
+
+
 
 
 
