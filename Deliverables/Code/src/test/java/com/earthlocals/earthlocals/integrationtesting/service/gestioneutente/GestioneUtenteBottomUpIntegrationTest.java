@@ -4,6 +4,7 @@ import com.earthlocals.earthlocals.config.SystemTestAppConfig;
 import com.earthlocals.earthlocals.config.TestcontainerConfig;
 import com.earthlocals.earthlocals.model.*;
 import com.earthlocals.earthlocals.service.gestioneutente.GestioneUtente;
+import com.earthlocals.earthlocals.service.gestioneutente.dto.EditUtenteDTO;
 import com.earthlocals.earthlocals.service.gestioneutente.dto.UtenteDTO;
 import com.earthlocals.earthlocals.service.gestioneutente.dto.VolontarioDTO;
 import com.earthlocals.earthlocals.service.gestioneutente.exceptions.UserAlreadyExistsException;
@@ -19,7 +20,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.authorization.AuthorizationDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
@@ -99,6 +104,22 @@ public class GestioneUtenteBottomUpIntegrationTest {
         utenteDTO.setDataNascita(LocalDate.of(2004, Month.APRIL, 1));
         utenteDTO.setSesso('M');
         return utenteDTO;
+
+    }
+
+    private Utente validUtenteEntity() throws IOException {
+        var utente = new Utente();
+        var nazioneId = 1;
+        var paese = paeseRepository.findById(nazioneId).orElseThrow();
+        utente.setNome("Nome");
+        utente.setCognome("Cognome");
+        utente.setEmail("email@example.com");
+        utente.setPassword("PasswordMoltoSicura1234!");
+        utente.setDataNascita(LocalDate.of(2004, Month.APRIL, 1));
+        utente.setSesso('M');
+        utente.setNazionalita(paese);
+        utente.setPending(false);
+        return utente;
 
     }
 
@@ -264,6 +285,93 @@ public class GestioneUtenteBottomUpIntegrationTest {
         utenteDTO.setNazionalita(nazioneId);
 
         assertThrows(Exception.class, () -> gestioneUtente.registerOrganizer(utenteDTO));
+        verify(utenteRepository, never()).save(any());
+    }
+
+    @Test
+    void editUser() throws IOException {
+        var utente = validUtenteEntity();
+        utenteRepository.save(utente);
+        var context = SecurityContextHolder.getContext();
+        var authentication = new TestingAuthenticationToken(utente, null, "ROLE_USER");
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+        reset(utenteRepository);
+
+        var editUtenteDTO = new EditUtenteDTO();
+        editUtenteDTO.setNome("NuovoNome");
+        editUtenteDTO.setCognome("NuovoCognome");
+        editUtenteDTO.setNazionalita(1);
+        editUtenteDTO.setDataNascita(LocalDate.of(2000, Month.APRIL, 1));
+        editUtenteDTO.setSesso('M');
+        var res = gestioneUtente.editUser(editUtenteDTO);
+        var utenteCaptor = ArgumentCaptor.forClass(Utente.class);
+        verify(utenteRepository, times(1)).save(utenteCaptor.capture());
+        var savedUtente = utenteCaptor.getValue();
+        assertSame(savedUtente, res);
+
+        assertEquals(editUtenteDTO.getNome(), savedUtente.getNome());
+        assertEquals(editUtenteDTO.getCognome(), savedUtente.getCognome());
+        assertEquals(editUtenteDTO.getDataNascita(), savedUtente.getDataNascita());
+        assertEquals(editUtenteDTO.getSesso(), savedUtente.getSesso());
+        assertEquals(editUtenteDTO.getNazionalita(), savedUtente.getNazionalita().getId());
+    }
+
+    @Test
+    void editUserValidationFails() throws IOException {
+        var utente = validUtenteEntity();
+        utenteRepository.save(utente);
+        var context = SecurityContextHolder.getContext();
+        var authentication = new TestingAuthenticationToken(utente, null, "ROLE_USER");
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+        reset(utenteRepository);
+
+        var editUtenteDTO = new EditUtenteDTO();
+        editUtenteDTO.setNome("NuovoNome");
+        editUtenteDTO.setCognome("NuovoCognome");
+        editUtenteDTO.setNazionalita(1);
+        editUtenteDTO.setDataNascita(LocalDate.of(2077, Month.APRIL, 1));
+        editUtenteDTO.setSesso('M');
+        assertThrows(ConstraintViolationException.class, () -> gestioneUtente.editUser(editUtenteDTO));
+
+        verify(utenteRepository, never()).save(any());
+    }
+
+    @Test
+    @WithAnonymousUser
+    void editUserAnonymousFails() throws IOException {
+
+        var editUtenteDTO = new EditUtenteDTO();
+        editUtenteDTO.setNome("NuovoNome");
+        editUtenteDTO.setCognome("NuovoCognome");
+        editUtenteDTO.setNazionalita(1);
+        editUtenteDTO.setDataNascita(LocalDate.of(2077, Month.APRIL, 1));
+        editUtenteDTO.setSesso('M');
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneUtente.editUser(editUtenteDTO));
+
+        verify(utenteRepository, never()).save(any());
+    }
+
+    @Test
+    void editUserPaeseNotFound() throws IOException {
+        var utente = validUtenteEntity();
+        utenteRepository.save(utente);
+        var context = SecurityContextHolder.getContext();
+        var authentication = new TestingAuthenticationToken(utente, null, "ROLE_USER");
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+        reset(utenteRepository);
+
+        var editUtenteDTO = new EditUtenteDTO();
+        editUtenteDTO.setNome("NuovoNome");
+        editUtenteDTO.setCognome("NuovoCognome");
+        editUtenteDTO.setNazionalita(400);
+        editUtenteDTO.setDataNascita(LocalDate.of(2000, Month.APRIL, 1));
+        editUtenteDTO.setSesso('M');
+
+        assertThrows(Exception.class, () -> gestioneUtente.editUser(editUtenteDTO));
+
         verify(utenteRepository, never()).save(any());
     }
 
