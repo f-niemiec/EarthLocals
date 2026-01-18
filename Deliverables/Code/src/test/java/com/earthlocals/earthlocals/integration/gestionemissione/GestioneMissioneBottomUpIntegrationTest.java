@@ -298,10 +298,23 @@ public class GestioneMissioneBottomUpIntegrationTest {
         assertTrue(res.getTotalElements() >= 2);
     }
 
-
-
-
-
+    //Again, non sono assolutamente convinto
+    @Test
+    void getMissioniApertePaeseZero() throws Exception{
+        Paese paese = paeseRepository.findAll().get(0);
+        Missione missione1 = validMissioneEntity();
+        missione1.setPaese(paese);
+        missione1.forceInternalStatoForTest(Missione.InternalMissioneStato.PENDING);
+        missione1.setDataFine(LocalDate.now().plusDays(10));
+        missioneRepository.saveAndFlush(missione1);
+        Missione missione2 = validMissioneEntity();
+        missione2.setPaese(paese);
+        missione2.forceInternalStatoForTest(Missione.InternalMissioneStato.PENDING);
+        missione2.setDataFine(LocalDate.now().plusDays(5));
+        missioneRepository.saveAndFlush(missione2);
+        Page<Missione> res = gestioneMissione.getMissioniAperte(0, 0, 10);
+        assertTrue(res.getTotalElements() >= 2);
+    }
 
 
 
