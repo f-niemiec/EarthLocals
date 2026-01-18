@@ -4,6 +4,7 @@ import com.earthlocals.earthlocals.config.SystemTestAppConfig;
 import com.earthlocals.earthlocals.config.TestcontainerConfig;
 import com.earthlocals.earthlocals.model.*;
 import com.earthlocals.earthlocals.service.gestioneutente.GestioneUtente;
+import com.earthlocals.earthlocals.service.gestioneutente.dto.UtenteDTO;
 import com.earthlocals.earthlocals.service.gestioneutente.dto.VolontarioDTO;
 import com.earthlocals.earthlocals.service.gestioneutente.exceptions.UserAlreadyExistsException;
 import com.earthlocals.earthlocals.service.gestioneutente.passport.PassportStorageService;
@@ -38,7 +39,7 @@ import static org.mockito.Mockito.*;
 @ContextConfiguration(classes = {SystemTestAppConfig.class, TestcontainerConfig.class})
 @Testcontainers
 @Transactional
-public class GestioneUtenteIntegrationTest {
+public class GestioneUtenteBottomUpIntegrationTest {
     private final Resource passportResource = new ClassPathResource("static/resources/files/sample.pdf");
     @MockitoSpyBean
     private VolontarioRepository volontarioRepository;
@@ -83,6 +84,21 @@ public class GestioneUtenteIntegrationTest {
         volontarioDTO.setDataEmissionePassaporto(LocalDate.of(2022, Month.APRIL, 1));
         volontarioDTO.setPassaporto(passport);
         return volontarioDTO;
+
+    }
+
+    private UtenteDTO validUtenteDTO() throws IOException {
+        var utenteDTO = new UtenteDTO();
+        var nazioneId = 1;
+        utenteDTO.setNome("Nome");
+        utenteDTO.setCognome("Cognome");
+        utenteDTO.setEmail("email@example.com");
+        utenteDTO.setPassword("PasswordMoltoSicura1234!");
+        utenteDTO.setMatchingPassword("PasswordMoltoSicura1234!");
+        utenteDTO.setNazionalita(nazioneId);
+        utenteDTO.setDataNascita(LocalDate.of(2004, Month.APRIL, 1));
+        utenteDTO.setSesso('M');
+        return utenteDTO;
 
     }
 
@@ -153,5 +169,103 @@ public class GestioneUtenteIntegrationTest {
         verify(volontarioRepository, times(1)).save(any());
 
     }
+
+    @Test
+    void registerVolunteerAlreadyExistsPending() throws Exception {
+        var volontarioDTO = validVolontarioDTO();
+
+        assertDoesNotThrow(() -> gestioneUtente.registerVolunteer(volontarioDTO));
+
+        verify(volontarioRepository, times(1)).save(any());
+
+        assertDoesNotThrow(() -> gestioneUtente.registerVolunteer(volontarioDTO));
+
+        verify(volontarioRepository, times(2)).save(any());
+    }
+
+    @Test
+    void registerVolunteerPaeseNotFound() throws Exception {
+        var utenteDTO = validVolontarioDTO();
+        var nazioneId = 400;
+        utenteDTO.setNazionalita(nazioneId);
+
+        assertThrows(Exception.class, () -> gestioneUtente.registerVolunteer(utenteDTO));
+        verify(volontarioRepository, never()).save(any());
+    }
+
+    @Test
+    void registerOrganizer() throws Exception {
+        var utenteDTO = validUtenteDTO();
+
+
+        var res = assertDoesNotThrow(() -> gestioneUtente.registerOrganizer(utenteDTO));
+
+        var utenteCaptor = ArgumentCaptor.forClass(Utente.class);
+        verify(utenteRepository, times(1)).save(utenteCaptor.capture());
+        var savedUtente = utenteCaptor.getValue();
+        assertSame(savedUtente, res);
+
+    }
+
+    @Test
+    void registerOrganizerConstraintValidationFails() throws Exception {
+        var utenteDTO = validUtenteDTO();
+        utenteDTO.setEmail("email");
+
+        assertThrows(ConstraintViolationException.class, () -> gestioneUtente.registerOrganizer(utenteDTO));
+
+        verify(utenteRepository, never()).save(any());
+    }
+
+    @Test
+    void registerOrganizerAlreadyExistsNotPending() throws Exception {
+        var utenteDTO = validUtenteDTO();
+
+        Paese p = paeseRepository.findById(utenteDTO.getNazionalita()).orElseThrow();
+        Ruolo ruolo = ruoloRepository.findByNome(Ruolo.VOLUNTEER);
+
+        var utenteBuilder = Utente.utenteBuilder()
+                .nome(utenteDTO.getNome())
+                .cognome(utenteDTO.getCognome())
+                .email(utenteDTO.getEmail())
+                .password(passwordEncoder.encode(utenteDTO.getPassword()))
+                .dataNascita(utenteDTO.getDataNascita())
+                .sesso(utenteDTO.getSesso())
+                .nazionalita(p)
+                .pending(false)
+                .ruoli(Collections.singletonList(ruolo));
+
+        utenteRepository.save(utenteBuilder.build());
+
+        verify(utenteRepository, times(1)).save(any());
+
+        assertThrows(UserAlreadyExistsException.class, () -> gestioneUtente.registerOrganizer(utenteDTO));
+
+        verify(utenteRepository, times(1)).save(any());
+    }
+
+    @Test
+    void registerOrganizerAlreadyExistsPending() throws Exception {
+        var utenteDTO = validUtenteDTO();
+
+        assertDoesNotThrow(() -> gestioneUtente.registerOrganizer(utenteDTO));
+
+        verify(utenteRepository, times(1)).save(any());
+
+        assertDoesNotThrow(() -> gestioneUtente.registerOrganizer(utenteDTO));
+
+        verify(utenteRepository, times(2)).save(any());
+    }
+
+    @Test
+    void registerOrganizerPaeseNotFound() throws Exception {
+        var utenteDTO = validUtenteDTO();
+        var nazioneId = 400;
+        utenteDTO.setNazionalita(nazioneId);
+
+        assertThrows(Exception.class, () -> gestioneUtente.registerOrganizer(utenteDTO));
+        verify(utenteRepository, never()).save(any());
+    }
+
 
 }
