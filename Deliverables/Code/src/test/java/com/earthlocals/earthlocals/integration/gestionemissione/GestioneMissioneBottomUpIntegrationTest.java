@@ -6,6 +6,7 @@ import com.earthlocals.earthlocals.model.*;
 import com.earthlocals.earthlocals.service.gestionemissioni.GestioneMissione;
 import com.earthlocals.earthlocals.service.gestionemissioni.dto.MissioneDTO;
 import com.earthlocals.earthlocals.service.gestionemissioni.exceptions.MissioneNotAcceptableException;
+import com.earthlocals.earthlocals.service.gestionemissioni.exceptions.MissioneNotFoundException;
 import com.earthlocals.earthlocals.service.gestionemissioni.pictures.PicturesFilesystemStorage;
 import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolation;
@@ -195,6 +196,16 @@ public class GestioneMissioneBottomUpIntegrationTest {
         Missione fromDb = missioneRepository.findById(id).orElseThrow();
         assertEquals(internalStato, fromDb.supplyStato());
     }
+
+    //Non particolarmente sicuro
+    @Test
+    @WithMockUser(roles = "MODERATOR")
+    void acceptMissioneNotExists() {
+        Long id = 1L;
+        assertThrows(MissioneNotFoundException.class, () -> gestioneMissione.acceptMissione(id));
+    }
+
+
 
 
 
