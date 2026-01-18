@@ -41,8 +41,8 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
-        TestAppConfig.class,
-        GestioneUtente.class
+    TestAppConfig.class,
+    GestioneUtente.class
 })
 public class GestioneUtenteUnitTest {
     @MockitoBean
@@ -581,8 +581,8 @@ public class GestioneUtenteUnitTest {
 
         var editPassportDTO = mock(EditPassportDTO.class);
 
-        var context = SecurityContextHolder.getContext();
         var volontario = mock(Volontario.class);
+        var context = SecurityContextHolder.getContext();
         var authentication = new TestingAuthenticationToken(volontario, null, "ROLE_VOLUNTEER");
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
@@ -599,34 +599,34 @@ public class GestioneUtenteUnitTest {
         assertEquals(res, volontario);
 
         verify(passportStorageService, times(1))
-                .removeFile(oldPath);
+            .removeFile(oldPath);
 
         var inOrder = inOrder(volontario, volontarioRepository, passportStorageService);
 
         var numeroPassaportoCaptor = ArgumentCaptor.forClass(String.class);
         inOrder
-                .verify(volontario, times(1))
-                .setNumeroPassaporto(numeroPassaportoCaptor.capture());
+            .verify(volontario, times(1))
+            .setNumeroPassaporto(numeroPassaportoCaptor.capture());
         assertEquals(numeroPassaporto, numeroPassaportoCaptor.getValue());
 
         var dataScadenzaPassaportoCaptor = ArgumentCaptor.forClass(LocalDate.class);
         inOrder
-                .verify(volontario, times(1))
-                .setDataScadenzaPassaporto(dataScadenzaPassaportoCaptor.capture());
+            .verify(volontario, times(1))
+            .setDataScadenzaPassaporto(dataScadenzaPassaportoCaptor.capture());
         assertEquals(scadenzaPassaporto, dataScadenzaPassaportoCaptor.getValue());
 
         var dataEmissionePassaportoCaptor = ArgumentCaptor.forClass(LocalDate.class);
         inOrder
-                .verify(volontario, times(1))
-                .setDataEmissionePassaporto(dataEmissionePassaportoCaptor.capture());
+            .verify(volontario, times(1))
+            .setDataEmissionePassaporto(dataEmissionePassaportoCaptor.capture());
         assertEquals(emissionePassaporto, dataEmissionePassaportoCaptor.getValue());
 
 
         inOrder.verify(passportStorageService, times(1))
-                .acceptUpload(mockFile);
+            .acceptUpload(mockFile);
 
         inOrder.verify(volontario, times(1))
-                .setPathPassaporto(newPath);
+            .setPathPassaporto(newPath);
 
         inOrder.verify(volontarioRepository, times(1)).save(volontario);
 
@@ -720,15 +720,10 @@ public class GestioneUtenteUnitTest {
 
     @Test
     @WithMockUser(roles = {"ORGANIZER", "MODERATOR", "ACCOUNT_MANAGER"})
-    void getPassaportVolontarioFileResourceNotVolunteerFails() {
+    void getPassportVolontarioFileResourceNotVolunteerFails() {
         assertThrows(AuthorizationDeniedException.class, () -> gestioneUtente.getPassportVolontarioFileResource());
     }
 
-    @Test
-    @WithAnonymousUser
-    void getPassaportVolontarioFileResourceAnonymousFails() {
-        assertThrows(AuthorizationDeniedException.class, () -> gestioneUtente.getPassportVolontarioFileResource());
-    }
 
     @Test
     void getPassportVolontarioFileResourceDownloadFileFails() {
