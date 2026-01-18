@@ -158,4 +158,17 @@ public class GestioneMissioneBottomUpIntegrationTest {
         assertEquals(Missione.MissioneStato.ACCETTATA, updated.getStato());
     }
 
+    @Test
+    @WithMockUser(roles = {"VOLUNTEER", "ORGANIZER", "ACCOUNT_MANAGER"})
+    void acceptMissioneNotModeratorFails() throws Exception{
+        Missione missione = validMissioneEntity();
+        Long id = missione.getId();
+        assertEquals(Missione.MissioneStato.PENDING, missione.getStato());
+
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneMissione.acceptMissione(id));
+        Missione fromDb = missioneRepository.findById(id).orElseThrow();
+        assertEquals(Missione.MissioneStato.PENDING, fromDb.getStato());
+    }
+
+
 }
