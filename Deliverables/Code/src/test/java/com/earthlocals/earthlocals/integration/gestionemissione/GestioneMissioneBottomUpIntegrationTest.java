@@ -7,6 +7,8 @@ import com.earthlocals.earthlocals.service.gestionemissioni.GestioneMissione;
 import com.earthlocals.earthlocals.service.gestionemissioni.dto.MissioneDTO;
 import com.earthlocals.earthlocals.service.gestionemissioni.pictures.PicturesFilesystemStorage;
 import jakarta.transaction.Transactional;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -28,6 +30,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -114,6 +117,17 @@ public class GestioneMissioneBottomUpIntegrationTest {
 
         assertThrows(AuthorizationDeniedException.class, () -> gestioneMissione.registerMissione(missioneDTO));
         verify(missioneRepository, never()).save(any(Missione.class));
+    }
+
+    //Test incerto, potrebbero volercene uno per ogni constraint
+    @Test
+    @WithMockUser(roles = "ORGANIZER")
+    void registerMissioneValidationFails() throws Exception {
+        var missioneDTO = validMissioneDTO();
+        missioneDTO.setCitta(null);
+
+        assertThrows(ConstraintViolationException.class, () -> gestioneMissione.registerMissione(missioneDTO));
+        verify(validator).validate(missioneDTO);
     }
 
 }
