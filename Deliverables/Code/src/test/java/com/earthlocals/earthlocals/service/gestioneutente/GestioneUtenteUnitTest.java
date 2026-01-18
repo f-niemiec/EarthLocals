@@ -761,8 +761,8 @@ public class GestioneUtenteUnitTest {
         assertDoesNotThrow(() -> gestioneUtente.activateAccount(token));
 
         InOrder inOrder = inOrder(utente, utenteRepository);
-        inOrder.verify(utente).setPending(false);
-        inOrder.verify(utenteRepository).save(utente);
+        inOrder.verify(utente, times(1)).setPending(false);
+        inOrder.verify(utenteRepository, times(1)).save(utente);
         verify(utente, never()).setPending(true);
 
         verify(verificationTokenRepository).delete(verToken);
@@ -774,7 +774,7 @@ public class GestioneUtenteUnitTest {
         String token = "abc";
         when(verificationTokenRepository.findByToken(token)).thenReturn(Optional.empty());
 
-        assertThrows(Exception.class, () -> gestioneUtente.activateAccount(token));
+        assertThrows(VerificationTokenNotFoundException.class, () -> gestioneUtente.activateAccount(token));
     }
 
     @Test
