@@ -253,4 +253,12 @@ public class GestioneMissioneBottomUpIntegrationTest {
         assertEquals(internalStato, fromDb.supplyStato());
     }
 
+    //Stesso discorso di acceptMissioneNotExists
+    @Test
+    @WithMockUser(roles = "MODERATOR")
+    void rejectMissioneNotExists() {
+        Long id = 1L;
+        assertThrows(MissioneNotFoundException.class, () -> gestioneMissione.rejectMissione(id));
+    }
+
 }
