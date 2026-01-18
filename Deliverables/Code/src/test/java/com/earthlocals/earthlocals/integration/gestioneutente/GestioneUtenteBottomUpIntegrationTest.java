@@ -707,13 +707,70 @@ public class GestioneUtenteBottomUpIntegrationTest {
         resetPasswordDTO.setNewPassword("PasswordMoltoSicura12345!");
         resetPasswordDTO.setToken(token);
 
-        var hashedPasswordUtente = passwordEncoder.encode("PasswordMoltoSicura12345!");
         gestioneUtente.resetPassword(resetPasswordDTO);
         verify(passwordResetTokenRepository, times(1)).save(any());
         passwordEncoder.matches("PasswordMoltoSicura12345!", utente.getPassword());
         assertFalse(passwordResetTokenRepository.existsById(id));
 
     }
+    
+    @Test
+    void resetPasswordConstraintViolation() throws IOException, ExpiredResetTokenException, PasswordResetTokenNotFoundException {
+        var utente = validUtenteEntity();
+        utenteRepository.save(utente);
+
+        var token = UUID.randomUUID().toString();
+        var resetToken = new PasswordResetToken(utente, token);
+        passwordResetTokenRepository.save(resetToken);
+
+
+        var resetPasswordDTO = new ResetPasswordDTO();
+        resetPasswordDTO.setMatchingPassword("PasswordMoltoSicura12345!");
+        resetPasswordDTO.setNewPassword("PasswordMoltoSicura123456!");
+        resetPasswordDTO.setToken(token);
+
+        verify(passwordResetTokenRepository, times(1)).save(any());
+        assertThrows(ConstraintViolationException.class, () -> gestioneUtente.resetPassword(resetPasswordDTO));
+    }
+
+    @Test
+    void resetPasswordTokenNotFound() throws IOException {
+        var utente = validUtenteEntity();
+        utenteRepository.save(utente);
+
+        var token = UUID.randomUUID().toString();
+        var resetToken = new PasswordResetToken(utente, token);
+        passwordResetTokenRepository.save(resetToken);
+
+        var resetPasswordDTO = new ResetPasswordDTO();
+        resetPasswordDTO.setMatchingPassword("PasswordMoltoSicura12345!");
+        resetPasswordDTO.setNewPassword("PasswordMoltoSicura12345!");
+        resetPasswordDTO.setToken(token);
+
+        Long id = resetToken.getId();
+        passwordResetTokenRepository.deleteById(id);
+
+        assertThrows(PasswordResetTokenNotFoundException.class, () -> gestioneUtente.resetPassword(resetPasswordDTO));
+    }
+
+    @Test
+    void resetPasswordTokenIsExpired() throws IOException {
+        var utente = validUtenteEntity();
+        utenteRepository.save(utente);
+
+        var token = UUID.randomUUID().toString();
+        var resetToken = new PasswordResetToken(utente, token);
+        passwordResetTokenRepository.save(resetToken);
+
+        var resetPasswordDTO = new ResetPasswordDTO();
+        resetPasswordDTO.setMatchingPassword("PasswordMoltoSicura12345!");
+        resetPasswordDTO.setNewPassword("PasswordMoltoSicura12345!");
+        resetPasswordDTO.setToken(token);
+
+        resetToken.setExpiryDate(LocalDateTime.now().minusHours(24));
+        assertThrows(ExpiredResetTokenException.class, () -> gestioneUtente.resetPassword(resetPasswordDTO));
+    }
+
 
     @Getter
     static public class ResultCaptor<T> implements Answer<T> {
