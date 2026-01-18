@@ -72,14 +72,14 @@ public class LoginSystemTest {
     @Test
     public void TC3_1LoginSuccessfull() {
         var utente = Utente.utenteBuilder()
-                .nome("Mario")
-                .cognome("Rossi")
-                .email("andrea.squitieri@mail.com")
-                .password(passwordEncoder.encode("PasswordMoltoSicura1234!"))
-                .dataNascita(LocalDate.of(1999, 12, 25))
-                .sesso('M')
-                .pending(false)
-                .build();
+            .nome("Mario")
+            .cognome("Rossi")
+            .email("andrea.squitieri@mail.com")
+            .password(passwordEncoder.encode("PasswordMoltoSicura1234!"))
+            .dataNascita(LocalDate.of(1999, 12, 25))
+            .sesso('M')
+            .pending(false)
+            .build();
         utenteRepository.save(utente);
 
         driver.get(LocalTestWebServer.obtain(this.context).uri());
@@ -105,14 +105,14 @@ public class LoginSystemTest {
     @Test
     public void TC3_3PasswordErrata() {
         var utente = Utente.utenteBuilder()
-                .nome("Mario")
-                .cognome("Rossi")
-                .email("andrea.squitieri@mail.com")
-                .password(passwordEncoder.encode("PasswordMoltoSicura1234!"))
-                .dataNascita(LocalDate.of(1999, 12, 25))
-                .sesso('M')
-                .pending(false)
-                .build();
+            .nome("Mario")
+            .cognome("Rossi")
+            .email("andrea.squitieri@mail.com")
+            .password(passwordEncoder.encode("PasswordMoltoSicura1234!"))
+            .dataNascita(LocalDate.of(1999, 12, 25))
+            .sesso('M')
+            .pending(false)
+            .build();
         utenteRepository.save(utente);
 
         driver.get(LocalTestWebServer.obtain(this.context).uri());
