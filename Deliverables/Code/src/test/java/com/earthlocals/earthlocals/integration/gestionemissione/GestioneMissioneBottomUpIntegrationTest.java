@@ -390,6 +390,21 @@ public class GestioneMissioneBottomUpIntegrationTest {
         assertTrue(resIds.contains(missione2.getId()));
     }
 
+    @Test
+    @WithMockUser(roles = {"VOLUNTEER", "MODERATOR", "ACCOUNT_MANAGER"})
+    void getMissioniOrganizzatoreNotOrganizerFails() {
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneMissione.getMissioniOrganizzatore(0, 1));
+    }
+
+    @Test
+    @WithAnonymousUser
+    void getMissioniOrganizzatoreAnonymousFails() {
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneMissione.getMissioniOrganizzatore(0, 1));
+    }
+
+
+
+
 
 
 
