@@ -27,8 +27,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -87,5 +86,14 @@ public class GestioneMissioneBottomUpIntegrationTest {
         verify(missioneRepository, times(1)).save(missioneCaptor.capture());
         var savedMissione = missioneCaptor.getValue();
         assertSame(savedMissione, res);
+        assertNotNull(res);
+        assertNotNull(res.getId());
+        assertEquals(missioneDTO.getNome(), res.getNome());
+        assertEquals(missioneDTO.getCitta(), res.getCitta());
+        assertEquals(Missione.MissioneStato.PENDING, res.getStato());
+        assertNotNull(res.getCreatore());
+        assertNotNull(res.getPaese());
     }
+
+
 }
