@@ -24,7 +24,9 @@ import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.authorization.AuthorizationDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
@@ -34,10 +36,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -63,6 +62,8 @@ public class GestioneMissioneBottomUpIntegrationTest {
     private UtenteRepository utenteRepository;
     @MockitoSpyBean
     private GestioneMissione gestioneMissione;
+    @MockitoSpyBean
+    private RuoloRepository ruoloRepository;
 
     @BeforeEach
     public void setup() {
@@ -357,6 +358,39 @@ public class GestioneMissioneBottomUpIntegrationTest {
     void getMissioniPendingPageSizeZero() {
         assertThrows(IllegalArgumentException.class, () -> gestioneMissione.getMissioniPending(0, 0));
     }
+
+    @Test
+    void getMissioniOrganizzatore() throws Exception{
+        Ruolo organizerRole = new Ruolo(Ruolo.ORGANIZER);
+        ruoloRepository.save(organizerRole);
+        Utente organizer = Utente.utenteBuilder()
+                .nome("Mario")
+                .cognome("Rossi")
+                .email("organizer@test.com")
+                .password("password")
+                .dataNascita(LocalDate.of(1990, 1, 1))
+                .sesso('M')
+                .pending(false)
+                .ruoli(Set.of(organizerRole))
+                .build();
+        utenteRepository.save(organizer);
+        Missione missione1 = validMissioneEntity();
+        missione1.setCreatore(organizer);
+        missione1.forceInternalStatoForTest(Missione.InternalMissioneStato.PENDING);
+        missioneRepository.saveAndFlush(missione1);
+        Missione missione2 = validMissioneEntity();
+        missione2.setCreatore(organizer);
+        missione2.forceInternalStatoForTest(Missione.InternalMissioneStato.PENDING);
+        missioneRepository.saveAndFlush(missione2);
+        var auth = new TestingAuthenticationToken(organizer, null, "ROLE_ORGANIZER");
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        Page<Missione> res = gestioneMissione.getMissioniOrganizzatore(0, 10);
+        List<Long> resIds = res.map(Missione::getId).getContent();
+        assertTrue(resIds.contains(missione1.getId()));
+        assertTrue(resIds.contains(missione2.getId()));
+    }
+
+
 
 
 
