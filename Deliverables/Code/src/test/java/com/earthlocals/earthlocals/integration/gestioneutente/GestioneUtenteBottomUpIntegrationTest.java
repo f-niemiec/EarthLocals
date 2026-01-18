@@ -1,4 +1,4 @@
-package com.earthlocals.earthlocals.integrationtesting.service.gestioneutente;
+package com.earthlocals.earthlocals.integration.gestioneutente;
 
 import com.earthlocals.earthlocals.config.SystemTestAppConfig;
 import com.earthlocals.earthlocals.config.TestcontainerConfig;
