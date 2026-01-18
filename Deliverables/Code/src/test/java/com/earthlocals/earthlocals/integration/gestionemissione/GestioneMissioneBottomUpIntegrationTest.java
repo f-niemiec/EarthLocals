@@ -205,6 +205,18 @@ public class GestioneMissioneBottomUpIntegrationTest {
         assertThrows(MissioneNotFoundException.class, () -> gestioneMissione.acceptMissione(id));
     }
 
+    @Test
+    @WithMockUser(roles = "MODERATOR")
+    void rejectMissione() throws Exception{
+        Missione missione = validMissioneEntity();
+        Long id = missione.getId();
+
+        assertDoesNotThrow(() -> gestioneMissione.rejectMissione(id));
+        Missione fromDb = missioneRepository.findById(id).orElseThrow();
+        assertEquals(Missione.MissioneStato.RIFIUTATA, fromDb.getStato());
+    }
+
+
 
 
 
