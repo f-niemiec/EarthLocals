@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import({SystemTestAppConfig.class, TestcontainerConfig.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class ViewOrganizedMissioneSystemTest {
+public class ViewOrganizedMissionsSystemTest {
     private final ClassPathResource file = new ClassPathResource("static/resources/files/sample.pdf");
     JavascriptExecutor js;
     @Autowired
@@ -77,20 +77,21 @@ public class ViewOrganizedMissioneSystemTest {
     }
 
     @Test
-    public void TC10_1MissioniOrganizzateOne() {
+    public void TC10_1MissioniMoreThanOne() {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1280, 672));
         driver.findElement(By.linkText("Log in")).click();
         driver.findElement(By.id("inputEmailLoginForm")).click();
-        driver.findElement(By.id("inputEmailLoginForm")).sendKeys("mario.rossi@example.com");
+        driver.findElement(By.id("inputEmailLoginForm")).sendKeys("organizer3@earthlocals.com");
         driver.findElement(By.id("inputPasswordLoginForm")).click();
-        driver.findElement(By.id("inputPasswordLoginForm")).sendKeys("MiaoMeow24!");
+        driver.findElement(By.id("inputPasswordLoginForm")).sendKeys("PasswordMoltoSicura1234!");
         driver.findElement(By.cssSelector(".btn")).click();
         driver.findElement(By.linkText("Profilo")).click();
         driver.findElement(By.linkText("Gestione missioni")).click();
+        driver.findElement(By.cssSelector(".row-cols-md-2")).click();
         {
-            List<WebElement> elements = driver.findElements(By.cssSelector(".col:nth-child(3) .card-img"));
-            assert (elements.size() == 1);
+            List<WebElement> elements = driver.findElements(By.cssSelector(".col:nth-child(2) .card-text"));
+            assert (elements.size() > 0);
         }
     }
 
@@ -134,21 +135,20 @@ public class ViewOrganizedMissioneSystemTest {
     }
 
     @Test
-    public void TC10_4MissioniMoreThanOne() {
+    public void TC10_4MissioniOrganizzateOne() {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1280, 672));
         driver.findElement(By.linkText("Log in")).click();
         driver.findElement(By.id("inputEmailLoginForm")).click();
-        driver.findElement(By.id("inputEmailLoginForm")).sendKeys("organizer3@earthlocals.com");
+        driver.findElement(By.id("inputEmailLoginForm")).sendKeys("mario.rossi@example.com");
         driver.findElement(By.id("inputPasswordLoginForm")).click();
-        driver.findElement(By.id("inputPasswordLoginForm")).sendKeys("PasswordMoltoSicura1234!");
+        driver.findElement(By.id("inputPasswordLoginForm")).sendKeys("MiaoMeow24!");
         driver.findElement(By.cssSelector(".btn")).click();
         driver.findElement(By.linkText("Profilo")).click();
         driver.findElement(By.linkText("Gestione missioni")).click();
-        driver.findElement(By.cssSelector(".row-cols-md-2")).click();
         {
-            List<WebElement> elements = driver.findElements(By.cssSelector(".col:nth-child(2) .card-text"));
-            assert (elements.size() > 0);
+            List<WebElement> elements = driver.findElements(By.cssSelector(".col:nth-child(3) .card-img"));
+            assert (elements.size() == 1);
         }
     }
 

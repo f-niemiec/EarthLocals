@@ -5,10 +5,7 @@ import com.earthlocals.earthlocals.config.TestcontainerConfig;
 import com.earthlocals.earthlocals.model.*;
 import com.earthlocals.earthlocals.service.gestioneutente.GestioneUtente;
 import com.earthlocals.earthlocals.service.gestioneutente.dto.*;
-import com.earthlocals.earthlocals.service.gestioneutente.exceptions.ExpiredVerificationTokenException;
-import com.earthlocals.earthlocals.service.gestioneutente.exceptions.UserAlreadyExistsException;
-import com.earthlocals.earthlocals.service.gestioneutente.exceptions.VerificationTokenNotFoundException;
-import com.earthlocals.earthlocals.service.gestioneutente.exceptions.WrongPasswordException;
+import com.earthlocals.earthlocals.service.gestioneutente.exceptions.*;
 import com.earthlocals.earthlocals.service.gestioneutente.passport.PassportStorageService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolationException;
@@ -40,6 +37,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.Collections;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -194,18 +192,18 @@ public class GestioneUtenteBottomUpIntegrationTest {
         Ruolo ruolo = ruoloRepository.findByNome(Ruolo.VOLUNTEER);
 
         var utenteBuilder = Volontario.volontarioBuilder()
-            .nome(volontarioDTO.getNome())
-            .cognome(volontarioDTO.getCognome())
-            .email(volontarioDTO.getEmail())
-            .password(passwordEncoder.encode(volontarioDTO.getPassword()))
-            .dataNascita(volontarioDTO.getDataNascita())
-            .sesso(volontarioDTO.getSesso())
-            .nazionalita(p)
-            .pending(false)
-            .ruoli(Collections.singletonList(ruolo))
-            .numeroPassaporto(volontarioDTO.getNumeroPassaporto())
-            .dataScadenzaPassaporto(volontarioDTO.getDataScadenzaPassaporto())
-            .dataEmissionePassaporto(volontarioDTO.getDataEmissionePassaporto());
+                .nome(volontarioDTO.getNome())
+                .cognome(volontarioDTO.getCognome())
+                .email(volontarioDTO.getEmail())
+                .password(passwordEncoder.encode(volontarioDTO.getPassword()))
+                .dataNascita(volontarioDTO.getDataNascita())
+                .sesso(volontarioDTO.getSesso())
+                .nazionalita(p)
+                .pending(false)
+                .ruoli(Collections.singletonList(ruolo))
+                .numeroPassaporto(volontarioDTO.getNumeroPassaporto())
+                .dataScadenzaPassaporto(volontarioDTO.getDataScadenzaPassaporto())
+                .dataEmissionePassaporto(volontarioDTO.getDataEmissionePassaporto());
 
         volontarioRepository.save(utenteBuilder.build());
 
@@ -272,15 +270,15 @@ public class GestioneUtenteBottomUpIntegrationTest {
         Ruolo ruolo = ruoloRepository.findByNome(Ruolo.VOLUNTEER);
 
         var utenteBuilder = Utente.utenteBuilder()
-            .nome(utenteDTO.getNome())
-            .cognome(utenteDTO.getCognome())
-            .email(utenteDTO.getEmail())
-            .password(passwordEncoder.encode(utenteDTO.getPassword()))
-            .dataNascita(utenteDTO.getDataNascita())
-            .sesso(utenteDTO.getSesso())
-            .nazionalita(p)
-            .pending(false)
-            .ruoli(Collections.singletonList(ruolo));
+                .nome(utenteDTO.getNome())
+                .cognome(utenteDTO.getCognome())
+                .email(utenteDTO.getEmail())
+                .password(passwordEncoder.encode(utenteDTO.getPassword()))
+                .dataNascita(utenteDTO.getDataNascita())
+                .sesso(utenteDTO.getSesso())
+                .nazionalita(p)
+                .pending(false)
+                .ruoli(Collections.singletonList(ruolo));
 
         utenteRepository.save(utenteBuilder.build());
 
@@ -424,10 +422,10 @@ public class GestioneUtenteBottomUpIntegrationTest {
         inOrder.verify(utenteRepository, times(1)).save(utente);
 
         assertTrue(
-            passwordEncoder.matches(
-                editPasswordDTO.getNewPassword(),
-                passwordCaptor.getValue()
-            ));
+                passwordEncoder.matches(
+                        editPasswordDTO.getNewPassword(),
+                        passwordCaptor.getValue()
+                ));
 
         assertEquals(utente, res);
         verify(utenteRepository, times(1)).save(any());
@@ -693,6 +691,29 @@ public class GestioneUtenteBottomUpIntegrationTest {
         assertThrows(ExpiredVerificationTokenException.class, () -> gestioneUtente.activateAccount(verToken.getToken()));
     }
 
+    @Test
+    void resetPassword() throws IOException, ExpiredResetTokenException, PasswordResetTokenNotFoundException {
+        var utente = validUtenteEntity();
+        utenteRepository.save(utente);
+
+        var token = UUID.randomUUID().toString();
+        var resetToken = new PasswordResetToken(utente, token);
+        passwordResetTokenRepository.save(resetToken);
+        Long id = resetToken.getId();
+
+
+        var resetPasswordDTO = new ResetPasswordDTO();
+        resetPasswordDTO.setMatchingPassword("PasswordMoltoSicura12345!");
+        resetPasswordDTO.setNewPassword("PasswordMoltoSicura12345!");
+        resetPasswordDTO.setToken(token);
+
+        var hashedPasswordUtente = passwordEncoder.encode("PasswordMoltoSicura12345!");
+        gestioneUtente.resetPassword(resetPasswordDTO);
+        verify(passwordResetTokenRepository, times(1)).save(any());
+        passwordEncoder.matches("PasswordMoltoSicura12345!", utente.getPassword());
+        assertFalse(passwordResetTokenRepository.existsById(id));
+
+    }
 
     @Getter
     static public class ResultCaptor<T> implements Answer<T> {
