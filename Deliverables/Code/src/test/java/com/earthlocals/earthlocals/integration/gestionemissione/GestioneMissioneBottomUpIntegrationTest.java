@@ -170,5 +170,18 @@ public class GestioneMissioneBottomUpIntegrationTest {
         assertEquals(Missione.MissioneStato.PENDING, fromDb.getStato());
     }
 
+    @Test
+    @WithAnonymousUser
+    void acceptMissioneAnonymousFails() throws Exception{
+        Missione missione = validMissioneEntity();
+        Long id = missione.getId();
+        assertEquals(Missione.MissioneStato.PENDING, missione.getStato());
+
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneMissione.acceptMissione(id));
+        Missione fromDb = missioneRepository.findById(id).orElseThrow();
+        assertEquals(Missione.MissioneStato.PENDING, fromDb.getStato());
+    }
+
+
 
 }
