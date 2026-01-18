@@ -248,6 +248,21 @@ public class GestioneUtenteUnitTest {
     }
 
     @Test
+    void registerVolunteerPaeseNotFound() throws Exception {
+        var volontarioDTO = mock(VolontarioDTO.class);
+        var nazioneId = 1;
+
+        when(volontarioDTO.getEmail()).thenReturn("email@example.com");
+        when(volontarioDTO.getNazionalita()).thenReturn(nazioneId);
+
+        when(paeseRepository.findById(nazioneId)).thenReturn(Optional.empty());
+
+        assertThrows(Exception.class, () -> gestioneUtente.registerVolunteer(volontarioDTO));
+        verify(volontarioRepository, never()).save(any());
+
+    }
+
+    @Test
     void registerOrganizer() throws Exception {
         var utenteDTO = mock(UtenteDTO.class);
         var nazioneId = 1;
@@ -370,12 +385,11 @@ public class GestioneUtenteUnitTest {
 
     }
 
+
     @Test
     void registerOrganizerPaeseNotFound() throws Exception {
         var utenteDTO = mock(UtenteDTO.class);
         var nazioneId = 1;
-        var paese = mock(Paese.class);
-        var ruolo = mock(Ruolo.class);
 
         when(utenteDTO.getEmail()).thenReturn("email@example.com");
         when(utenteDTO.getNazionalita()).thenReturn(nazioneId);
