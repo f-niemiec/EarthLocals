@@ -2,7 +2,9 @@ package com.earthlocals.earthlocals.systemtesting.gestionemissione;// Generated 
 
 import com.earthlocals.earthlocals.config.SystemTestAppConfig;
 import com.earthlocals.earthlocals.config.TestcontainerConfig;
-import com.earthlocals.earthlocals.model.*;
+import com.earthlocals.earthlocals.model.Missione;
+import com.earthlocals.earthlocals.model.MissioneRepository;
+import com.earthlocals.earthlocals.model.UtenteRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,12 +26,9 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ActiveProfiles("test")
@@ -84,7 +83,7 @@ public class AcceptMissioniTest {
     }
 
     @Test
-    public void TC10_1AcceptMissioneSuccess() throws Exception{
+    public void TC10_1AcceptMissioneSuccess() throws Exception {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1280, 672));
         driver.findElement(By.linkText("Log in")).click();
@@ -102,11 +101,10 @@ public class AcceptMissioniTest {
 
         driver.findElement(By.cssSelector("tr:nth-child(2) > td:nth-child(1)")).click();
         assertEquals(driver.findElement(By.linkText("Programma di volontariato per la pianificazione agricola e la mappatura delle risorse in permacultura")).getText(), "Programma di volontariato per la pianificazione agricola e la mappatura delle risorse in permacultura");
-
     }
 
     @Test
-    public void TC10_2AcceptMissioneNotLoggedAnymore() throws Exception{
+    public void TC10_2AcceptMissioneNotLoggedAnymore() throws Exception {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1280, 672));
         driver.findElement(By.linkText("Log in")).click();
@@ -125,7 +123,7 @@ public class AcceptMissioniTest {
     }
 
     @Test
-    public void TC10_3AcceptMissioneNotModerator() throws Exception{
+    public void TC10_3AcceptMissioneNotModerator() throws Exception {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1280, 672));
         driver.findElement(By.linkText("Log in")).click();

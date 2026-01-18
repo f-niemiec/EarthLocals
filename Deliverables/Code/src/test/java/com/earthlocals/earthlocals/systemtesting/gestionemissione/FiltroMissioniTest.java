@@ -3,6 +3,7 @@ package com.earthlocals.earthlocals.systemtesting.gestionemissione;// Generated 
 import com.earthlocals.earthlocals.config.SystemTestAppConfig;
 import com.earthlocals.earthlocals.config.TestcontainerConfig;
 import com.earthlocals.earthlocals.model.*;
+import org.assertj.core.api.WithAssertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import({SystemTestAppConfig.class, TestcontainerConfig.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class FiltroMissioniTest {
+public class FiltroMissioniTest implements WithAssertions {
     private final ClassPathResource file = new ClassPathResource("static/resources/files/sample.pdf");
     JavascriptExecutor js;
     @Autowired
@@ -84,23 +85,48 @@ public class FiltroMissioniTest {
     }
 
     @Test
-    public void TC12_1FiltroMissioniDuePresenti() {
+    public void TC12_1FiltroMissioniDuePresenti() throws InterruptedException {
+        var afghanistan = paeseRepository.findById(5).orElseThrow();
+        var creatore = utenteRepository.findById(203L).orElseThrow();
+        var missione1 = Missione.missioneBuilder()
+                .nome("Missione1")
+                .paese(afghanistan)
+                .citta("Kabul")
+                .descrizione("Descrizione test 1")
+                .dataInizio(LocalDate.of(2026, 10, 10))
+                .dataFine(LocalDate.of(2026, 10, 15))
+                .competenzeRichieste("Competenze test 1")
+                .requisitiExtra("Requisiti extra 1")
+                .immagine("test1.jpg")
+                .creatore(creatore)
+                .build();
+        missione1.accettaMissione();
+        var missione2 = Missione.missioneBuilder()
+                .nome("Missione2")
+                .paese(afghanistan)
+                .citta("Kabul")
+                .descrizione("Descrizione test 2")
+                .dataInizio(LocalDate.of(2026, 10, 10))
+                .dataFine(LocalDate.of(2026, 10, 15))
+                .competenzeRichieste("Competenze test 2")
+                .requisitiExtra("Requisiti extra 2")
+                .immagine("test2.jpg")
+                .creatore(creatore)
+                .build();
+        missione2.accettaMissione();
+
+        missioneRepository.saveAll(List.of(missione1, missione2));
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1280, 672));
         driver.findElement(By.linkText("Opportunità")).click();
-        driver.findElement(By.name("paeseId")).click();
-        {
-            WebElement dropdown = driver.findElement(By.name("paeseId"));
-            dropdown.findElement(By.xpath("//option[. = 'Italia']")).click();
-        }
-        driver.findElement(By.cssSelector("option:nth-child(124)")).click();
+
+        WebElement dropdown = driver.findElement(By.name("paeseId"));
+        dropdown.findElement(By.xpath("//option[. = 'Afghanistan']")).click();
         driver.findElement(By.cssSelector(".btn-success")).click();
-        driver.findElement(By.cssSelector(".row-cols-md-2")).click();
-        {
-            List<WebElement> elements = driver.findElements(By.cssSelector(".col:nth-child(2) .card-img"));
-            assert(elements.size() > 0);
-        }
+        List<WebElement> elements = driver.findElements(By.cssSelector(".card"));
+        assertEquals(elements.size(), 2);
     }
+
     @Test
     public void TC12_3FiltroMissioniNessuna() {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
@@ -116,12 +142,12 @@ public class FiltroMissioniTest {
         driver.findElement(By.cssSelector(".container-fluid")).click();
         {
             List<WebElement> elements = driver.findElements(By.cssSelector("span:nth-child(3)"));
-            assert(elements.size() > 0);
+            assert (elements.size() > 0);
         }
     }
 
     @Test
-    public void TC12_5FiltroMissioniSoloUna(){
+    public void TC12_5FiltroMissioniSoloUna() {
         Paese paese = paeseRepository.findAll().getFirst();
         Utente creatore = utenteRepository.findByEmail("organizer2@earthlocals.com");
         Missione missione = Missione.missioneBuilder()
@@ -148,13 +174,13 @@ public class FiltroMissioniTest {
         driver.findElement(By.cssSelector(".btn-success")).click();
         {
             List<WebElement> elements = driver.findElements(By.cssSelector(".card-img"));
-            assert(elements.size() > 0);
+            assert (elements.size() > 0);
         }
     }
 
     //Non particolarmente sicuro
     @Test
-    public void TC12_6FiltroEmpty(){
+    public void TC12_6FiltroEmpty() {
         candidaturaRepository.deleteAll();
         missioneRepository.deleteAll();
         driver.get(LocalTestWebServer.obtain(this.context).uri());
@@ -163,7 +189,7 @@ public class FiltroMissioniTest {
         driver.findElement(By.cssSelector(".container-fluid")).click();
         {
             List<WebElement> elements = driver.findElements(By.cssSelector("span:nth-child(3)"));
-            assert(elements.size() > 0);
+            assert (elements.size() > 0);
         }
     }
 
@@ -174,7 +200,7 @@ public class FiltroMissioniTest {
         driver.findElement(By.linkText("Opportunità")).click();
         {
             List<WebElement> elements = driver.findElements(By.cssSelector(".col:nth-child(3) .card-title"));
-            assert(elements.size() > 0);
+            assert (elements.size() > 0);
         }
     }
 }
