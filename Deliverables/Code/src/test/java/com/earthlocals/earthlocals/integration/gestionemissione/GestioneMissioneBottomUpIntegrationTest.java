@@ -19,6 +19,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.authorization.AuthorizationDeniedException;
+import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -106,5 +107,13 @@ public class GestioneMissioneBottomUpIntegrationTest {
         verify(missioneRepository, never()).save(any(Missione.class));
     }
 
+    @Test
+    @WithAnonymousUser
+    void registerMissioneAnonymousFails() throws Exception{
+        var missioneDTO = validMissioneDTO();
+
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneMissione.registerMissione(missioneDTO));
+        verify(missioneRepository, never()).save(any(Missione.class));
+    }
 
 }
