@@ -316,6 +316,15 @@ public class GestioneMissioneBottomUpIntegrationTest {
         assertTrue(res.getTotalElements() >= 2);
     }
 
+    @Test
+    void getMissioniApertePageNumberNegative() {
+        assertThrows(IllegalArgumentException.class, () -> gestioneMissione.getMissioniAperte(1, -1, 1));
+    }
+
+    @Test
+    void getMissioniApertePageSizeZero() {
+        assertThrows(IllegalArgumentException.class, () -> gestioneMissione.getMissioniAperte(1, 1, 0));
+    }
 
 
 
