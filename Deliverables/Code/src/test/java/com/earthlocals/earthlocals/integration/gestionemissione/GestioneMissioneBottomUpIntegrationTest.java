@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.test.context.support.WithAnonymousUser;
@@ -259,6 +260,16 @@ public class GestioneMissioneBottomUpIntegrationTest {
     void rejectMissioneNotExists() {
         Long id = 1L;
         assertThrows(MissioneNotFoundException.class, () -> gestioneMissione.rejectMissione(id));
+    }
+
+    @Test
+    void getMissioniAperte() throws Exception {
+        Missione missione = validMissioneEntity();
+        Page<Missione> res = gestioneMissione.getMissioniAperte(paeseRepository.findAll().getLast().getId(), 0, 10);
+        assertTrue(res.getContent().stream()
+                .allMatch(m -> m.getPaese().getId().equals(paeseRepository.findAll().getLast().getId())
+                        && m.getStato() == Missione.MissioneStato.PENDING &&
+                        m.getDataFine().isAfter(LocalDate.now())));
     }
 
 }
