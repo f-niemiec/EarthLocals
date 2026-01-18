@@ -5,7 +5,9 @@ import com.earthlocals.earthlocals.config.TestcontainerConfig;
 import com.earthlocals.earthlocals.model.*;
 import com.earthlocals.earthlocals.service.gestioneutente.GestioneUtente;
 import com.earthlocals.earthlocals.service.gestioneutente.dto.*;
+import com.earthlocals.earthlocals.service.gestioneutente.exceptions.ExpiredVerificationTokenException;
 import com.earthlocals.earthlocals.service.gestioneutente.exceptions.UserAlreadyExistsException;
+import com.earthlocals.earthlocals.service.gestioneutente.exceptions.VerificationTokenNotFoundException;
 import com.earthlocals.earthlocals.service.gestioneutente.exceptions.WrongPasswordException;
 import com.earthlocals.earthlocals.service.gestioneutente.passport.PassportStorageService;
 import jakarta.transaction.Transactional;
@@ -35,6 +37,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.Collections;
 
@@ -631,6 +634,63 @@ public class GestioneUtenteBottomUpIntegrationTest {
 
         assertThrows(IllegalArgumentException.class, () -> gestioneUtente.getPassportVolontarioFileResource());
 
+    }
+
+    @Test
+    void createVerificationToken() throws Exception {
+        var utente = validUtenteEntity();
+        utenteRepository.save(utente);
+
+        var token = assertDoesNotThrow(() -> gestioneUtente.createVerificationToken(utente));
+        ArgumentCaptor<VerificationToken> captor = ArgumentCaptor.forClass(VerificationToken.class);
+        verify(verificationTokenRepository, times(1)).save(captor.capture());
+        var verToken = captor.getValue();
+        assertEquals(token, verToken.getToken());
+        var verToken2 = assertDoesNotThrow(() -> verificationTokenRepository.findByToken(token).orElseThrow());
+        assertEquals(verToken, verToken2);
+    }
+
+    @Test
+    void activateAccount() throws Exception {
+        var utente = spy(validUtenteEntity());
+        utente.setPending(false);
+        utenteRepository.save(utente);
+
+        var verToken = spy(new VerificationToken(utente, "token"));
+        verificationTokenRepository.save(verToken);
+        assertDoesNotThrow(() -> gestioneUtente.activateAccount(verToken.getToken()));
+        var inOrder = inOrder(utenteRepository, verificationTokenRepository, utente);
+
+        inOrder.verify(utente, times(1)).setPending(false);
+        inOrder.verify(utenteRepository, times(1)).save(utente);
+        inOrder.verify(verificationTokenRepository, times(1)).delete(verToken);
+        verify(utente, never()).setPending(true);
+
+        verify(verificationTokenRepository).delete(verToken);
+
+
+        assertFalse(utente.getPending());
+    }
+
+    @Test
+    void activateAccountTokenNotFound() throws Exception {
+        var utente = spy(validUtenteEntity());
+        utente.setPending(false);
+        utenteRepository.save(utente);
+
+        assertThrows(VerificationTokenNotFoundException.class, () -> gestioneUtente.activateAccount("TOKEN"));
+    }
+
+    @Test
+    void activateAccountTokenExpired() throws Exception {
+        var utente = spy(validUtenteEntity());
+        utente.setPending(false);
+        utenteRepository.save(utente);
+
+        var verToken = spy(new VerificationToken(utente, "token"));
+        verToken.setExpiryDate(LocalDateTime.of(2020, Month.APRIL, 1, 0, 0));
+        verificationTokenRepository.save(verToken);
+        assertThrows(ExpiredVerificationTokenException.class, () -> gestioneUtente.activateAccount(verToken.getToken()));
     }
 
 
