@@ -70,7 +70,7 @@ public class LoginSystemTest {
 
 
     @Test
-    public void TC3_1Loginsuccessfull() {
+    public void TC3_1LoginSuccessfull() {
         var utente = Utente.utenteBuilder()
                 .nome("Mario")
                 .cognome("Rossi")
@@ -92,7 +92,7 @@ public class LoginSystemTest {
     }
 
     @Test
-    public void TC3_2Emailnonpresente() {
+    public void TC3_2EmailNonPresente() {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1280, 672));
         driver.findElement(By.linkText("Log in")).click();

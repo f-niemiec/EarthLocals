@@ -140,10 +140,8 @@ public class CreateMissioneSystemTest {
         assertEquals(driver.findElement(By.cssSelector("h2")).getText(), "403 - Accesso negato!");
     }
 
-    //TODO: Test 8_3
-
     @Test
-    public void TC8_4SalvataggioMissioneNomeObbligatorio() throws IOException {
+    public void TC8_3SalvataggioMissioneNomeObbligatorio() throws IOException {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1534, 766));
         driver.findElement(By.linkText("Log in")).click();
@@ -177,7 +175,7 @@ public class CreateMissioneSystemTest {
     }
 
     @Test
-    public void TC8_5SalvataggioMissioneNomeTroppoCorto() throws IOException {
+    public void TC8_4SalvataggioMissioneNomeTroppoCorto() throws IOException {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1534, 766));
         driver.findElement(By.linkText("Log in")).click();
@@ -212,7 +210,7 @@ public class CreateMissioneSystemTest {
     }
 
     @Test
-    public void TC8_6SalvataggioMissioneNomeTroppoLungo() throws IOException {
+    public void TC8_5SalvataggioMissioneNomeTroppoLungo() throws IOException {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1534, 766));
         driver.findElement(By.linkText("Log in")).click();
@@ -247,7 +245,7 @@ public class CreateMissioneSystemTest {
     }
 
     @Test
-    public void TC8_7SalvataggioMissioneCittaObbligatoria() throws IOException {
+    public void TC8_6SalvataggioMissioneCittaObbligatoria() throws IOException {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1534, 766));
         driver.findElement(By.linkText("Log in")).click();
@@ -282,7 +280,7 @@ public class CreateMissioneSystemTest {
     }
 
     @Test
-    public void TC8_8SalvataggioMissioneDescrizioneObbligatoria() throws IOException {
+    public void TC8_7SalvataggioMissioneDescrizioneObbligatoria() throws IOException {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1534, 766));
         driver.findElement(By.linkText("Log in")).click();
@@ -317,7 +315,7 @@ public class CreateMissioneSystemTest {
     }
 
     @Test
-    public void TC8_9SalvataggioMissioneDescrizioneTroppoCorta() throws IOException {
+    public void TC8_8SalvataggioMissioneDescrizioneTroppoCorta() throws IOException {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1534, 766));
         driver.findElement(By.linkText("Log in")).click();
@@ -353,7 +351,7 @@ public class CreateMissioneSystemTest {
     }
 
     @Test
-    public void TC8_10SalvataggioMissioneDataInizioErrata() throws IOException {
+    public void TC8_9SalvataggioMissioneDataInizioErrata() throws IOException {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1534, 766));
         driver.findElement(By.linkText("Log in")).click();
@@ -390,7 +388,7 @@ public class CreateMissioneSystemTest {
     }
 
     @Test
-    public void TC8_11SalvataggioMissioneDataFineErrata() throws IOException {
+    public void TC8_10SalvataggioMissioneDataFineErrata() throws IOException {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1534, 766));
         driver.findElement(By.linkText("Log in")).click();
@@ -427,7 +425,7 @@ public class CreateMissioneSystemTest {
     }
 
     @Test
-    public void TC8_12SalvataggioMissioneDataFineErrata() throws IOException {
+    public void TC8_11SalvataggioMissioneDataFineErrata() throws IOException {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1534, 766));
         driver.findElement(By.linkText("Log in")).click();
@@ -464,7 +462,7 @@ public class CreateMissioneSystemTest {
     }
 
     @Test
-    public void TC8_13SalvataggioMissioneDataOverLap() throws IOException {
+    public void TC8_12SalvataggioMissioneDataOverLap() throws IOException {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1534, 766));
         driver.findElement(By.linkText("Log in")).click();
@@ -497,7 +495,7 @@ public class CreateMissioneSystemTest {
     }
 
     @Test
-    public void TC8_14SalvataggioMissioneTipoFileErrato() throws IOException {
+    public void TC8_13SalvataggioMissioneTipoFileErrato() throws IOException {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1534, 766));
         driver.findElement(By.linkText("Log in")).click();
@@ -534,7 +532,7 @@ public class CreateMissioneSystemTest {
     }
 
     @Test
-    public void TC8_15SalvataggioMissioneSuccessoConCompetenzeRichiesteVuoto() throws IOException {
+    public void TC8_14SalvataggioMissioneSuccessoConCompetenzeRichiesteVuoto() throws IOException {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1534, 766));
         driver.findElement(By.linkText("Log in")).click();
