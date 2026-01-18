@@ -5,6 +5,8 @@ import com.earthlocals.earthlocals.config.TestcontainerConfig;
 import com.earthlocals.earthlocals.model.*;
 import com.earthlocals.earthlocals.service.gestionemissioni.GestioneMissione;
 import com.earthlocals.earthlocals.service.gestionemissioni.dto.MissioneDTO;
+import com.earthlocals.earthlocals.service.gestionemissioni.exceptions.MissioneNotAcceptableException;
+import com.earthlocals.earthlocals.service.gestionemissioni.exceptions.MissioneNotFoundException;
 import com.earthlocals.earthlocals.service.gestionemissioni.pictures.PicturesFilesystemStorage;
 import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolation;
@@ -156,6 +158,107 @@ public class GestioneMissioneBottomUpIntegrationTest {
         assertDoesNotThrow(() -> gestioneMissione.acceptMissione(id));
         Missione updated = missioneRepository.findById(id).orElseThrow();
         assertEquals(Missione.MissioneStato.ACCETTATA, updated.getStato());
+    }
+
+    @Test
+    @WithMockUser(roles = {"VOLUNTEER", "ORGANIZER", "ACCOUNT_MANAGER"})
+    void acceptMissioneNotModeratorFails() throws Exception{
+        Missione missione = validMissioneEntity();
+        Long id = missione.getId();
+        assertEquals(Missione.MissioneStato.PENDING, missione.getStato());
+
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneMissione.acceptMissione(id));
+        Missione fromDb = missioneRepository.findById(id).orElseThrow();
+        assertEquals(Missione.MissioneStato.PENDING, fromDb.getStato());
+    }
+
+    @Test
+    @WithAnonymousUser
+    void acceptMissioneAnonymousFails() throws Exception{
+        Missione missione = validMissioneEntity();
+        Long id = missione.getId();
+        assertEquals(Missione.MissioneStato.PENDING, missione.getStato());
+
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneMissione.acceptMissione(id));
+        Missione fromDb = missioneRepository.findById(id).orElseThrow();
+        assertEquals(Missione.MissioneStato.PENDING, fromDb.getStato());
+    }
+
+    @Test
+    @WithMockUser(roles = "MODERATOR")
+    void acceptMissioneNotPending() throws Exception{
+        Missione.InternalMissioneStato internalStato = Missione.InternalMissioneStato.RIFIUTATA;
+        Missione missione = validMissioneEntity();
+        missione.forceInternalStatoForTest(internalStato);
+        missioneRepository.saveAndFlush(missione);
+        Long id = missione.getId();
+        assertThrows(MissioneNotAcceptableException.class, () -> gestioneMissione.acceptMissione(id));
+        Missione fromDb = missioneRepository.findById(id).orElseThrow();
+        assertEquals(internalStato, fromDb.supplyStato());
+    }
+
+    //Non particolarmente sicuro
+    @Test
+    @WithMockUser(roles = "MODERATOR")
+    void acceptMissioneNotExists() {
+        Long id = 1L;
+        assertThrows(MissioneNotFoundException.class, () -> gestioneMissione.acceptMissione(id));
+    }
+
+    @Test
+    @WithMockUser(roles = "MODERATOR")
+    void rejectMissione() throws Exception{
+        Missione missione = validMissioneEntity();
+        Long id = missione.getId();
+
+        assertDoesNotThrow(() -> gestioneMissione.rejectMissione(id));
+        Missione fromDb = missioneRepository.findById(id).orElseThrow();
+        assertEquals(Missione.MissioneStato.RIFIUTATA, fromDb.getStato());
+    }
+
+    @Test
+    @WithMockUser(roles = {"VOLUNTEER", "ORGANIZER", "ACCOUNT_MANAGER"})
+    void rejectMissioneNotModeratorFails() throws Exception{
+        Missione missione = validMissioneEntity();
+        Long id = missione.getId();
+        assertEquals(Missione.MissioneStato.PENDING, missione.getStato());
+
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneMissione.rejectMissione(id));
+        Missione fromDb = missioneRepository.findById(id).orElseThrow();
+        assertEquals(Missione.MissioneStato.PENDING, fromDb.getStato());
+    }
+
+    @Test
+    @WithAnonymousUser
+    void rejectMissioneAnonymousFails() throws Exception{
+        Missione missione = validMissioneEntity();
+        Long id = missione.getId();
+        assertEquals(Missione.MissioneStato.PENDING, missione.getStato());
+
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneMissione.rejectMissione(id));
+        Missione fromDb = missioneRepository.findById(id).orElseThrow();
+        assertEquals(Missione.MissioneStato.PENDING, fromDb.getStato());
+    }
+
+    @Test
+    @WithMockUser(roles = "MODERATOR")
+    void rejectMissioneNotPending() throws Exception{
+        Missione.InternalMissioneStato internalStato = Missione.InternalMissioneStato.ACCETTATA;
+        Missione missione = validMissioneEntity();
+        missione.forceInternalStatoForTest(internalStato);
+        missioneRepository.saveAndFlush(missione);
+        Long id = missione.getId();
+        assertThrows(MissioneNotAcceptableException.class, () -> gestioneMissione.rejectMissione(id));
+        Missione fromDb = missioneRepository.findById(id).orElseThrow();
+        assertEquals(internalStato, fromDb.supplyStato());
+    }
+
+    //Stesso discorso di acceptMissioneNotExists
+    @Test
+    @WithMockUser(roles = "MODERATOR")
+    void rejectMissioneNotExists() {
+        Long id = 1L;
+        assertThrows(MissioneNotFoundException.class, () -> gestioneMissione.rejectMissione(id));
     }
 
 }
