@@ -340,6 +340,26 @@ public class GestioneMissioneBottomUpIntegrationTest {
         assertThrows(AuthorizationDeniedException.class, () -> gestioneMissione.getMissioniPending(0, 10));
     }
 
+    @Test
+    @WithAnonymousUser
+    void getMissioniPendingAnonymousFails() {
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneMissione.getMissioniPending(0, 10));
+    }
+
+    @Test
+    @WithMockUser(roles = "MODERATOR")
+    void getMissioniPendingPageNumberNegative() {
+        assertThrows(IllegalArgumentException.class, () -> gestioneMissione.getMissioniPending(-1, 1));
+    }
+
+    @Test
+    @WithMockUser(roles = "MODERATOR")
+    void getMissioniPendingPageSizeZero() {
+        assertThrows(IllegalArgumentException.class, () -> gestioneMissione.getMissioniPending(0, 0));
+    }
+
+
+
 
 
 }
