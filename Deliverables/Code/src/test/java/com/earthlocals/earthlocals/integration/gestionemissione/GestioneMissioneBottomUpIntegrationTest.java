@@ -240,6 +240,17 @@ public class GestioneMissioneBottomUpIntegrationTest {
         assertEquals(Missione.MissioneStato.PENDING, fromDb.getStato());
     }
 
-
+    @Test
+    @WithMockUser(roles = "MODERATOR")
+    void rejectMissioneNotPending() throws Exception{
+        Missione.InternalMissioneStato internalStato = Missione.InternalMissioneStato.ACCETTATA;
+        Missione missione = validMissioneEntity();
+        missione.forceInternalStatoForTest(internalStato);
+        missioneRepository.saveAndFlush(missione);
+        Long id = missione.getId();
+        assertThrows(MissioneNotAcceptableException.class, () -> gestioneMissione.rejectMissione(id));
+        Missione fromDb = missioneRepository.findById(id).orElseThrow();
+        assertEquals(internalStato, fromDb.supplyStato());
+    }
 
 }
