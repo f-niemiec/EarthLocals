@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -73,7 +74,7 @@ public class FilteredMissionsSearchSystemTest implements WithAssertions {
     }
 
     @Test
-    public void TC11_2FiltroMissioniUnaPresente() {
+    public void TC11_1FiltroMissioniUnaPresente() {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1280, 672));
         driver.findElement(By.linkText("Opportunità")).click();
@@ -85,7 +86,7 @@ public class FilteredMissionsSearchSystemTest implements WithAssertions {
     }
 
     @Test
-    public void TC11_1FiltroMissioniDuePresenti() throws InterruptedException {
+    public void TC11_2FiltroMissioniDuePresenti() throws InterruptedException {
         var afghanistan = paeseRepository.findById(5).orElseThrow();
         var creatore = utenteRepository.findById(203L).orElseThrow();
         var missione1 = Missione.missioneBuilder()
@@ -141,66 +142,18 @@ public class FilteredMissionsSearchSystemTest implements WithAssertions {
         driver.findElement(By.cssSelector(".btn-success")).click();
         driver.findElement(By.cssSelector(".container-fluid")).click();
         {
-            List<WebElement> elements = driver.findElements(By.cssSelector("span:nth-child(3)"));
-            assert (elements.size() > 0);
+            assertEquals(driver.findElement(By.cssSelector(".w-50")).getText(), "Trovate 0 missioni");
         }
     }
 
     @Test
-    public void TC11_5FiltroMissioniSoloUna() {
-        Paese paese = paeseRepository.findAll().getFirst();
-        Utente creatore = utenteRepository.findByEmail("organizer2@earthlocals.com");
-        Missione missione = Missione.missioneBuilder()
-                .nome("Missione")
-                .paese(paese)
-                .citta("Città test")
-                .descrizione("Descrizione test")
-                .dataInizio(LocalDate.now())
-                .dataFine(LocalDate.now().plusDays(7))
-                .competenzeRichieste("Competenze test")
-                .requisitiExtra("Requisiti extra")
-                .immagine("test.jpg")
-                .creatore(creatore)
-                .build();
-        missioneRepository.save(missione);
-        driver.get(LocalTestWebServer.obtain(this.context).uri());
-        driver.manage().window().setSize(new Dimension(1280, 672));
-        driver.findElement(By.linkText("Opportunità")).click();
-        {
-            WebElement dropdown = driver.findElement(By.name("paeseId"));
-            dropdown.findElement(By.xpath("//option[. = 'Taiwan']")).click();
-        }
-        driver.findElement(By.cssSelector("option:nth-child(44)")).click();
-        driver.findElement(By.cssSelector(".btn-success")).click();
-        {
-            List<WebElement> elements = driver.findElements(By.cssSelector(".card-img"));
-            assert (elements.size() > 0);
-        }
-    }
-
-    //Non particolarmente sicuro
-    @Test
-    public void TC11_6FiltroEmpty() {
-        candidaturaRepository.deleteAll();
-        missioneRepository.deleteAll();
-        driver.get(LocalTestWebServer.obtain(this.context).uri());
-        driver.manage().window().setSize(new Dimension(1280, 672));
-        driver.findElement(By.linkText("Opportunità")).click();
-        driver.findElement(By.cssSelector(".container-fluid")).click();
-        {
-            List<WebElement> elements = driver.findElements(By.cssSelector("span:nth-child(3)"));
-            assert (elements.size() > 0);
-        }
-    }
-
-    @Test
-    public void TC11_5FiltroNotSelected() {
+    public void TC11_4FiltroNotSelected() {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1280, 672));
         driver.findElement(By.linkText("Opportunità")).click();
         {
             List<WebElement> elements = driver.findElements(By.cssSelector(".col:nth-child(3) .card-title"));
-            assert (elements.size() > 0);
+            assertFalse(elements.isEmpty());
         }
     }
 }
