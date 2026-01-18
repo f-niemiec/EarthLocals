@@ -77,7 +77,7 @@ public class ViewOrganizedMissioneSystemTest {
     }
 
     @Test
-    public void TC11_1MissioniOrganizzateOne() {
+    public void TC10_1MissioniOrganizzateOne() {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1280, 672));
         driver.findElement(By.linkText("Log in")).click();
@@ -95,7 +95,7 @@ public class ViewOrganizedMissioneSystemTest {
     }
 
     @Test
-    public void TC11_2MissioniNotLoggedAnymore() {
+    public void TC10_2MissioniNotLoggedAnymore() {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1280, 672));
         driver.findElement(By.linkText("Log in")).click();
@@ -114,7 +114,7 @@ public class ViewOrganizedMissioneSystemTest {
     }
 
     @Test
-    public void TC11_3MissioniNotAuthorized() {
+    public void TC10_3MissioniNotAuthorized() {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1280, 672));
         driver.findElement(By.linkText("Log in")).click();
@@ -134,7 +134,7 @@ public class ViewOrganizedMissioneSystemTest {
     }
 
     @Test
-    public void TC11_4MissioniMoreThanOne() {
+    public void TC10_4MissioniMoreThanOne() {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1280, 672));
         driver.findElement(By.linkText("Log in")).click();
@@ -153,7 +153,7 @@ public class ViewOrganizedMissioneSystemTest {
     }
 
     @Test
-    public void TC11_5MissioniNonPresenti() {
+    public void TC10_5MissioniNonPresenti() {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1280, 672));
         driver.findElement(By.linkText("Log in")).click();

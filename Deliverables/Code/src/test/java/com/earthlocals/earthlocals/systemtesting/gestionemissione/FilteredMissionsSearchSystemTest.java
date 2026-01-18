@@ -73,7 +73,7 @@ public class FilteredMissionsSearchSystemTest implements WithAssertions {
     }
 
     @Test
-    public void TC12_2FiltroMissioniUnaPresente() {
+    public void TC11_2FiltroMissioniUnaPresente() {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1280, 672));
         driver.findElement(By.linkText("Opportunità")).click();
@@ -85,7 +85,7 @@ public class FilteredMissionsSearchSystemTest implements WithAssertions {
     }
 
     @Test
-    public void TC12_1FiltroMissioniDuePresenti() throws InterruptedException {
+    public void TC11_1FiltroMissioniDuePresenti() throws InterruptedException {
         var afghanistan = paeseRepository.findById(5).orElseThrow();
         var creatore = utenteRepository.findById(203L).orElseThrow();
         var missione1 = Missione.missioneBuilder()
@@ -128,7 +128,7 @@ public class FilteredMissionsSearchSystemTest implements WithAssertions {
     }
 
     @Test
-    public void TC12_3FiltroMissioniNessuna() {
+    public void TC11_3FiltroMissioniNessuna() {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1280, 672));
         driver.findElement(By.linkText("Opportunità")).click();
@@ -147,7 +147,7 @@ public class FilteredMissionsSearchSystemTest implements WithAssertions {
     }
 
     @Test
-    public void TC12_5FiltroMissioniSoloUna() {
+    public void TC11_5FiltroMissioniSoloUna() {
         Paese paese = paeseRepository.findAll().getFirst();
         Utente creatore = utenteRepository.findByEmail("organizer2@earthlocals.com");
         Missione missione = Missione.missioneBuilder()
@@ -180,7 +180,7 @@ public class FilteredMissionsSearchSystemTest implements WithAssertions {
 
     //Non particolarmente sicuro
     @Test
-    public void TC12_6FiltroEmpty() {
+    public void TC11_6FiltroEmpty() {
         candidaturaRepository.deleteAll();
         missioneRepository.deleteAll();
         driver.get(LocalTestWebServer.obtain(this.context).uri());
@@ -194,7 +194,7 @@ public class FilteredMissionsSearchSystemTest implements WithAssertions {
     }
 
     @Test
-    public void TC12_5FiltroNotSelected() {
+    public void TC11_5FiltroNotSelected() {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1280, 672));
         driver.findElement(By.linkText("Opportunità")).click();

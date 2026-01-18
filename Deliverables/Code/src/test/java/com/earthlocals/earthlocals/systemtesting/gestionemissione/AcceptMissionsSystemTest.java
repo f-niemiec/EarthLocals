@@ -83,7 +83,7 @@ public class AcceptMissionsSystemTest {
     }
 
     @Test
-    public void TC10_1AcceptMissioneSuccess() throws Exception {
+    public void TC9_1AcceptMissioneSuccess() throws Exception {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1280, 672));
         driver.findElement(By.linkText("Log in")).click();
@@ -104,7 +104,7 @@ public class AcceptMissionsSystemTest {
     }
 
     @Test
-    public void TC10_2AcceptMissioneNotLoggedAnymore() throws Exception {
+    public void TC9_2AcceptMissioneNotLoggedAnymore() throws Exception {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1280, 672));
         driver.findElement(By.linkText("Log in")).click();
@@ -123,7 +123,7 @@ public class AcceptMissionsSystemTest {
     }
 
     @Test
-    public void TC10_3AcceptMissioneNotModerator() throws Exception {
+    public void TC9_3AcceptMissioneNotModerator() throws Exception {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1280, 672));
         driver.findElement(By.linkText("Log in")).click();
@@ -142,7 +142,7 @@ public class AcceptMissionsSystemTest {
     }
 
     @Test
-    public void TC10_4AcceptMissioneAlreadyAccepted() throws Exception {
+    public void TC9_4AcceptMissioneAlreadyAccepted() throws Exception {
         driver.get(LocalTestWebServer.obtain(this.context).uri());
         driver.manage().window().setSize(new Dimension(1280, 672));
         driver.findElement(By.linkText("Log in")).click();
