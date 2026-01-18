@@ -334,6 +334,12 @@ public class GestioneMissioneBottomUpIntegrationTest {
         assertTrue(res.getContent().stream().allMatch(m -> m.getStato() == Missione.MissioneStato.PENDING));
     }
 
+    @Test
+    @WithMockUser(roles = {"VOLUNTEER", "ORGANIZER", "ACCOUNT_MANAGER"})
+    void getMissioniPendingNotModeratorFails() {
+        assertThrows(AuthorizationDeniedException.class, () -> gestioneMissione.getMissioniPending(0, 10));
+    }
+
 
 
 }
