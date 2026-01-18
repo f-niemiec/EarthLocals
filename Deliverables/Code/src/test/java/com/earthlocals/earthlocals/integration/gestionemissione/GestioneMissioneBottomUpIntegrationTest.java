@@ -5,6 +5,7 @@ import com.earthlocals.earthlocals.config.TestcontainerConfig;
 import com.earthlocals.earthlocals.model.*;
 import com.earthlocals.earthlocals.service.gestionemissioni.GestioneMissione;
 import com.earthlocals.earthlocals.service.gestionemissioni.dto.MissioneDTO;
+import com.earthlocals.earthlocals.service.gestionemissioni.exceptions.MissioneNotAcceptableException;
 import com.earthlocals.earthlocals.service.gestionemissioni.pictures.PicturesFilesystemStorage;
 import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolation;
@@ -180,6 +181,19 @@ public class GestioneMissioneBottomUpIntegrationTest {
         assertThrows(AuthorizationDeniedException.class, () -> gestioneMissione.acceptMissione(id));
         Missione fromDb = missioneRepository.findById(id).orElseThrow();
         assertEquals(Missione.MissioneStato.PENDING, fromDb.getStato());
+    }
+
+    @Test
+    @WithMockUser(roles = "MODERATOR")
+    void acceptMissioneNotPending() throws Exception{
+        Missione.InternalMissioneStato internalStato = Missione.InternalMissioneStato.RIFIUTATA;
+        Missione missione = validMissioneEntity();
+        missione.forceInternalStatoForTest(internalStato);
+        missioneRepository.saveAndFlush(missione);
+        Long id = missione.getId();
+        assertThrows(MissioneNotAcceptableException.class, () -> gestioneMissione.acceptMissione(id));
+        Missione fromDb = missioneRepository.findById(id).orElseThrow();
+        assertEquals(internalStato, fromDb.supplyStato());
     }
 
 
