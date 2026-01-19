@@ -100,7 +100,9 @@ public class AcceptMissionsSystemTest {
         driver.findElement(By.cssSelector(".table")).click();
 
         driver.findElement(By.cssSelector("tr:nth-child(2) > td:nth-child(1)")).click();
-        assertEquals(driver.findElement(By.linkText("Programma di volontariato per la pianificazione agricola e la mappatura delle risorse in permacultura")).getText(), "Programma di volontariato per la pianificazione agricola e la mappatura delle risorse in permacultura");
+        assertEquals(
+                driver.findElement(By.linkText("Programma di volontariato per la pianificazione agricola e la mappatura delle risorse in permacultura")).getText(),
+                "Programma di volontariato per la pianificazione agricola e la mappatura delle risorse in permacultura");
     }
 
     @Test
