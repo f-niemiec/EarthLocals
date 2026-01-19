@@ -22,6 +22,7 @@ import org.springframework.boot.test.http.server.LocalTestWebServer;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -132,7 +133,7 @@ public class LoginTopDownIntegrationTest {
         Mockito.when(utente.isAccountNonLocked()).thenReturn(true);
         Mockito.when(utente.isCredentialsNonExpired()).thenReturn(true);
 
-        Mockito.when(utenteRepository.loadUserByUsername(utente.getEmail())).thenReturn(null);
+        Mockito.when(utenteRepository.loadUserByUsername(utente.getEmail())).thenThrow(UsernameNotFoundException.class);
 
 
         driver.get(LocalTestWebServer.obtain(this.context).uri());
