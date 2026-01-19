@@ -426,7 +426,7 @@ public class CreateMissioneTopDownIntegrationTest {
         driver.findElement(By.linkText("Nuova missione")).click();
         driver.findElement(By.id("passaportoEditPassportForm")).sendKeys(getWebpFilePath());
         driver.findElement(By.id("title")).sendKeys("Help Teaching a Pechino");
-        driver.findElement(By.id("description")).sendKeys(" ");
+        driver.findElement(By.id("description")).sendKeys(" ".repeat(20));
         {
             WebElement dropdown = driver.findElement(By.id("paese"));
             dropdown.findElement(By.xpath("//option[. = 'Cina']")).click();
@@ -436,7 +436,7 @@ public class CreateMissioneTopDownIntegrationTest {
         driver.findElement(By.id("dataFine")).sendKeys("2026-04-01");
         driver.findElement(By.id("competenze")).sendKeys("Esperienza con i bambini e nell’insegnamento dell'inglese");
         driver.findElement(By.cssSelector(".btn-primary")).click();
-        assertEquals(driver.findElement(By.cssSelector(".mb-4:nth-child(4) > .invalid-feedback:nth-child(3)")).getText(), "La descrizione è obbligatoria");
+        assertEquals(driver.findElement(By.cssSelector(".invalid-feedback")).getText(), "La descrizione è obbligatoria");
     }
 
     @Test
