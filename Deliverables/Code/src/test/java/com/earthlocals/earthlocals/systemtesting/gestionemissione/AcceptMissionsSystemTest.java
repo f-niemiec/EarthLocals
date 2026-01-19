@@ -19,6 +19,7 @@ import org.springframework.boot.test.http.server.LocalTestWebServer;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -30,6 +31,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.mockito.ArgumentMatchers.any;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -95,12 +98,16 @@ public class AcceptMissionsSystemTest {
         driver.findElement(By.linkText("Profilo")).click();
         driver.findElement(By.linkText("Gestione missioni")).click();
 
+        Long before = missioneRepository.findByInternalStato(Missione.InternalMissioneStato.PENDING, any(Pageable.class)).stream().count();
         driver.findElement(By.cssSelector("tr:nth-child(2) .fa-check")).click();
         driver.findElement(By.cssSelector("div[aria-modal=true] form > .btn")).click();
         driver.findElement(By.cssSelector(".table")).click();
 
         driver.findElement(By.cssSelector("tr:nth-child(2) > td:nth-child(1)")).click();
-        assertEquals(driver.findElement(By.linkText("Programma di volontariato per la pianificazione agricola e la mappatura delle risorse in permacultura")).getText(), "Programma di volontariato per la pianificazione agricola e la mappatura delle risorse in permacultura");
+        //assertEquals(driver.findElement(By.linkText("Programma di volontariato per la pianificazione agricola e la mappatura delle risorse in permacultura")).getText(), "Programma di volontariato per la pianificazione agricola e la mappatura delle risorse in permacultura");
+        Long after = missioneRepository.findByInternalStato(Missione.InternalMissioneStato.PENDING, any(Pageable.class)).stream().count();
+        //assertNotEquals(before, after);
+        assertEquals(before-1, after);
     }
 
     @Test
