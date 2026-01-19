@@ -205,4 +205,57 @@ public class AcceptMissioneTopDownTest {
     }
 
 
+    @Test
+    @WithMockUser(roles = "ORGANIZER")
+    void AcceptMissioneNotModerator() {
+        var paese = mock(Paese.class, RETURNS_SMART_NULLS);
+        when(paese.getId()).thenReturn(1);
+        when(paese.getNome()).thenReturn("Cina");
+        when(paeseRepository.findAll(any(Sort.class))).thenReturn(List.of(paese));
+        when(paeseRepository.findById(1)).thenReturn(Optional.of(paese));
+
+        var utente = mock(Utente.class, RETURNS_SMART_NULLS);
+        when(utente.getEmail()).thenReturn("organizer@earthlocals.com");
+        when(utente.getPassword()).thenReturn(passwordEncoder.encode("test"));
+        when(utente.isEnabled()).thenReturn(true);
+        when(utente.isAccountNonExpired()).thenReturn(true);
+        when(utente.isAccountNonLocked()).thenReturn(true);
+        when(utente.isCredentialsNonExpired()).thenReturn(true);
+        when(utente.getAuthorities()).thenReturn((Collection) Set.of(new SimpleGrantedAuthority("ROLE_ORGANIZER")));
+        when(utente.getNazionalita()).thenReturn(paese);
+        when(utente.getDataNascita()).thenReturn(LocalDate.of(2004, Month.APRIL, 1));
+        when(utente.getSesso()).thenReturn('M');
+        when(utente.getPending()).thenReturn(false);
+
+        var id = 1L;
+        var missione1 = mock(Missione.class, RETURNS_SMART_NULLS);
+        when(missione1.getId()).thenReturn(id);
+        when(missione1.getNome()).thenReturn("Titolo 1");
+        when(missione1.getStato()).thenReturn(Missione.MissioneStato.PENDING);
+        when(missione1.getPaese()).thenReturn(paese);
+        when(missione1.getDescrizione()).thenReturn("Descrizione della missione 1");
+        when(missione1.getNome()).thenReturn("Missione 1");
+        when(missione1.getDataInizio()).thenReturn(LocalDate.of(2023, Month.JANUARY, 1));
+        when(missione1.getDataFine()).thenReturn(LocalDate.of(2023, Month.FEBRUARY, 1));
+        when(missione1.accettaMissione()).thenReturn(true);
+
+        var page = new PageImpl<>(List.of(missione1), Pageable.unpaged(), 1L);
+        when(missioneRepository.findByInternalStatoAndDataFineAfter(eq(Missione.InternalMissioneStato.PENDING), any(), any(Pageable.class))).thenReturn(page);
+        when(missioneRepository.findById(1L)).thenReturn(Optional.of(missione1));
+
+
+        driver.get(LocalTestWebServer.obtain(this.context).uri());
+        driver.manage().window().setSize(new Dimension(1280, 672));
+        driver.findElement(By.linkText("Log in")).click();
+        driver.findElement(By.id("inputEmailLoginForm")).click();
+        driver.findElement(By.id("inputEmailLoginForm")).sendKeys("organizer@earthlocals.com");
+        driver.findElement(By.id("inputPasswordLoginForm")).click();
+        driver.findElement(By.id("inputPasswordLoginForm")).sendKeys("test");
+        driver.findElement(By.cssSelector(".btn")).click();
+        driver.get(LocalTestWebServer.obtain(this.context).uri("/account/moderator/missions"));
+
+        assertEquals(driver.findElement(By.cssSelector("h2")).getText(), "403 - Accesso negato!");
+    }
+
+
 }
