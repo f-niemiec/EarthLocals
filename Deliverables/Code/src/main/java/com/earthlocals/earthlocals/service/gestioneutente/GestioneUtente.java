@@ -45,18 +45,18 @@ public class GestioneUtente {
         Ruolo ruolo = ruoloRepository.findByNome(Ruolo.VOLUNTEER);
 
         var utenteBuilder = Volontario.volontarioBuilder()
-                .nome(volontarioDTO.getNome())
-                .cognome(volontarioDTO.getCognome())
-                .email(volontarioDTO.getEmail())
-                .password(passwordEncoder.encode(volontarioDTO.getPassword()))
-                .dataNascita(volontarioDTO.getDataNascita())
-                .sesso(volontarioDTO.getSesso())
-                .nazionalita(p)
-                .pending(true)
-                .ruoli(Collections.singletonList(ruolo))
-                .numeroPassaporto(volontarioDTO.getNumeroPassaporto())
-                .dataScadenzaPassaporto(volontarioDTO.getDataScadenzaPassaporto())
-                .dataEmissionePassaporto(volontarioDTO.getDataEmissionePassaporto());
+            .nome(volontarioDTO.getNome())
+            .cognome(volontarioDTO.getCognome())
+            .email(volontarioDTO.getEmail())
+            .password(passwordEncoder.encode(volontarioDTO.getPassword()))
+            .dataNascita(volontarioDTO.getDataNascita())
+            .sesso(volontarioDTO.getSesso())
+            .nazionalita(p)
+            .pending(true)
+            .ruoli(Collections.singletonList(ruolo))
+            .numeroPassaporto(volontarioDTO.getNumeroPassaporto())
+            .dataScadenzaPassaporto(volontarioDTO.getDataScadenzaPassaporto())
+            .dataEmissionePassaporto(volontarioDTO.getDataEmissionePassaporto());
 
         try {
             utenteBuilder.pathPassaporto(passportStorageService.acceptUpload(volontarioDTO.getPassaporto()));
@@ -82,15 +82,15 @@ public class GestioneUtente {
 
         // TODO: Evitare ripetizione codice
         var utenteBuilder = Utente.utenteBuilder()
-                .nome(utenteDTO.getNome())
-                .cognome(utenteDTO.getCognome())
-                .email(utenteDTO.getEmail())
-                .password(passwordEncoder.encode(utenteDTO.getPassword()))
-                .dataNascita(utenteDTO.getDataNascita())
-                .sesso(utenteDTO.getSesso())
-                .nazionalita(p)
-                .pending(true)
-                .ruoli(Collections.singletonList(ruolo));
+            .nome(utenteDTO.getNome())
+            .cognome(utenteDTO.getCognome())
+            .email(utenteDTO.getEmail())
+            .password(passwordEncoder.encode(utenteDTO.getPassword()))
+            .dataNascita(utenteDTO.getDataNascita())
+            .sesso(utenteDTO.getSesso())
+            .nazionalita(p)
+            .pending(true)
+            .ruoli(Collections.singletonList(ruolo));
 
         var utente = utenteBuilder.build();
 

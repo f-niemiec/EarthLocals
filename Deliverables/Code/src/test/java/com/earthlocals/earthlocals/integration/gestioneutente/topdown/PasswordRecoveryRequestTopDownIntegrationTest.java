@@ -39,7 +39,7 @@ import static org.mockito.Mockito.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import({SystemTestAppConfig.class, TestcontainerConfig.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class PasswordRecoveryTopDownIntegrationTest {
+public class PasswordRecoveryRequestTopDownIntegrationTest {
 
     private final ClassPathResource file = new ClassPathResource("static/resources/files/sample.pdf");
     private final ClassPathResource webpFile = new ClassPathResource("static/resources/files/sample.webp");
