@@ -13,8 +13,8 @@ import java.util.Objects;
 public class GestioneEmail {
 
     final private static String warning = "\nEmail generata automaticamente, si prega di non rispondere." +
-            "\nEarthLocals";
-    final private static String linkBase = "http://localhost:8080/";
+        "\nEarthLocals";
+    final private static String linkBase = "https://earthlocals.engineer/";
 
     final private JavaMailSender mailSender;
     final private CandidaturaRepository candidaturaRepository;
@@ -27,10 +27,10 @@ public class GestioneEmail {
         String nomeMissione = candidatura.getMissione().getNome();
         mail.setTo(candidatura.getMissione().getCreatore().getEmail());
         mail.setSubject("[Nuova candidatura] "
-                + nomeMissione);
+            + nomeMissione);
         mail.setText("Gentile " + candidatura.getMissione().getCreatore().getNome()
-                + ", la sua missione " + nomeMissione +
-                " ha ricevuto una nuova candidatura!\n " + warning);
+            + ", la sua missione " + nomeMissione +
+            " ha ricevuto una nuova candidatura!\n " + warning);
         mailSender.send(mail);
     }
 
@@ -40,10 +40,10 @@ public class GestioneEmail {
         String nomeMissione = candidatura.getMissione().getNome();
         mail.setTo(candidatura.getMissione().getCreatore().getEmail());
         mail.setSubject("[Annullamento candidatura] "
-                + nomeMissione);
+            + nomeMissione);
         mail.setText("Gentile " + candidatura.getMissione().getCreatore().getNome()
-                + ", una candidatura alla sua missione " + nomeMissione +
-                " è stata annullata!\n " + warning);
+            + ", una candidatura alla sua missione " + nomeMissione +
+            " è stata annullata!\n " + warning);
         mailSender.send(mail);
     }
 
@@ -53,10 +53,10 @@ public class GestioneEmail {
         String nomeMissione = candidatura.getMissione().getNome();
         mail.setTo(candidatura.getCandidato().getEmail());
         mail.setSubject("[Accettazione candidatura] "
-                + nomeMissione);
+            + nomeMissione);
         mail.setText("Gentile " + candidatura.getCandidato().getNome()
-                + ",\n la sua candidatura alla missione " + nomeMissione +
-                " è stata approvata!\n " + warning);
+            + ",\n la sua candidatura alla missione " + nomeMissione +
+            " è stata approvata!\n " + warning);
         mailSender.send(mail);
     }
 
@@ -66,10 +66,10 @@ public class GestioneEmail {
         String nomeMissione = candidatura.getMissione().getNome();
         mail.setTo(candidatura.getCandidato().getEmail());
         mail.setSubject("[Accettazione candidatura] "
-                + nomeMissione);
+            + nomeMissione);
         mail.setText("Gentile " + candidatura.getCandidato().getNome()
-                + ",\n ci dispiace informarla che la sua candidatura alla missione " + nomeMissione +
-                " è stata rifiutata.\n " + warning);
+            + ",\n ci dispiace informarla che la sua candidatura alla missione " + nomeMissione +
+            " è stata rifiutata.\n " + warning);
         mailSender.send(mail);
     }
 
@@ -79,10 +79,10 @@ public class GestioneEmail {
         String nomeMissione = missione.getNome();
         mail.setTo(missione.getCreatore().getEmail());
         mail.setSubject("[Approvazione missione] "
-                + nomeMissione);
+            + nomeMissione);
         mail.setText("Gentile " + missione.getCreatore().getNome()
-                + ", la sua missione " + nomeMissione +
-                " è stata approvata!\n " + warning);
+            + ", la sua missione " + nomeMissione +
+            " è stata approvata!\n " + warning);
         mailSender.send(mail);
     }
 
@@ -92,11 +92,11 @@ public class GestioneEmail {
         String nomeMissione = missione.getNome();
         mail.setTo(missione.getCreatore().getEmail());
         mail.setSubject("[Rifiuto missione] "
-                + nomeMissione);
+            + nomeMissione);
         mail.setText("Gentile " + missione.getCreatore().getNome()
-                + ", ci dispiace informarla che " +
-                "la sua missione " + nomeMissione +
-                " è stata rifiutata.\n " + warning);
+            + ", ci dispiace informarla che " +
+            "la sua missione " + nomeMissione +
+            " è stata rifiutata.\n " + warning);
         mailSender.send(mail);
     }
 
@@ -107,8 +107,8 @@ public class GestioneEmail {
         mail.setTo(utente.getEmail());
         mail.setSubject("[Conferma registrazione] Account EarthLocals");
         mail.setText("Gentile, " + utente.getNome() + ", di seguito le inviamo" +
-                " un link per confermare la propria registrazione: " + linkBase +
-                "registration/registrationConfirm?token=" + token + "\n" + warning);
+            " un link per confermare la propria registrazione: " + linkBase +
+            "registration/registrationConfirm?token=" + token + "\n" + warning);
         mailSender.send(mail);
     }
 
@@ -119,8 +119,8 @@ public class GestioneEmail {
         mail.setTo(utente.getEmail());
         mail.setSubject("[Richiesta recupero password] Account EarthLocals");
         mail.setText("Gentile, " + utente.getNome() + ", di seguito le inviamo" +
-                " un link per effettuare il cambio password: " + linkBase +
-                "resetPasswordConfirm?token=" + token + "\n" + warning);
+            " un link per effettuare il cambio password: " + linkBase +
+            "resetPasswordConfirm?token=" + token + "\n" + warning);
         mailSender.send(mail);
     }
 
