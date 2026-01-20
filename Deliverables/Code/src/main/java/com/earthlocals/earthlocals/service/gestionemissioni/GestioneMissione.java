@@ -98,11 +98,9 @@ public class GestioneMissione {
         var now = LocalDate.now();
 
 
-        // Se l'ID è nullo o 0 (valore di default per "Ovunque"), restituisci tutto
         if (paeseId == null || paeseId == 0) {
             return missioneRepository.findByInternalStatoAndDataFineAfter(statoAperto, now, pageable);
         } else {
-            // Altrimenti recupera il paese e filtra
             Paese paese = paeseRepository.findById(paeseId).orElse(null);
             if (paese == null) {
                 return missioneRepository.findByInternalStatoAndDataFineAfter(statoAperto, now, pageable);

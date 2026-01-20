@@ -14,7 +14,7 @@ public interface MissioneRepository extends JpaRepository<Missione, Long> {
 
     Page<Missione> findByCreatore(Utente creatore, Pageable pageable);
 
-    Page<Missione> findByStato(Missione.MissioneStato stato, Pageable pageable);
+    Page<Missione> findByInternalStato(Missione.InternalMissioneStato stato, Pageable pageable);
 
     Page<Missione> findByPaeseAndStato(Paese paese, Missione.MissioneStato stato, Pageable pageable);
 

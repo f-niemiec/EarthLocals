@@ -9,6 +9,7 @@ import com.earthlocals.earthlocals.service.gestioneutente.exceptions.WrongPasswo
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/account")
 @RequiredArgsConstructor
+@PreAuthorize("isAuthenticated()")
 public class AccountController {
 
     final private GestioneUtente gestioneUtente;
@@ -45,7 +47,8 @@ public class AccountController {
             return "account/edit";
         }
         gestioneUtente.editUser(editUtenteDTO);
-        return "account/edit";
+
+        return "redirect:/account/edit?success=true";
     }
 
     @GetMapping("/edit-password")

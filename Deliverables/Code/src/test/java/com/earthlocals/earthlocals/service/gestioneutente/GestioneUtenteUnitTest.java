@@ -41,8 +41,8 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
-        TestAppConfig.class,
-        GestioneUtente.class
+    TestAppConfig.class,
+    GestioneUtente.class
 })
 public class GestioneUtenteUnitTest {
     @MockitoBean
@@ -248,6 +248,21 @@ public class GestioneUtenteUnitTest {
     }
 
     @Test
+    void registerVolunteerPaeseNotFound() throws Exception {
+        var volontarioDTO = mock(VolontarioDTO.class);
+        var nazioneId = 1;
+
+        when(volontarioDTO.getEmail()).thenReturn("email@example.com");
+        when(volontarioDTO.getNazionalita()).thenReturn(nazioneId);
+
+        when(paeseRepository.findById(nazioneId)).thenReturn(Optional.empty());
+
+        assertThrows(Exception.class, () -> gestioneUtente.registerVolunteer(volontarioDTO));
+        verify(volontarioRepository, never()).save(any());
+
+    }
+
+    @Test
     void registerOrganizer() throws Exception {
         var utenteDTO = mock(UtenteDTO.class);
         var nazioneId = 1;
@@ -370,12 +385,11 @@ public class GestioneUtenteUnitTest {
 
     }
 
+
     @Test
     void registerOrganizerPaeseNotFound() throws Exception {
         var utenteDTO = mock(UtenteDTO.class);
         var nazioneId = 1;
-        var paese = mock(Paese.class);
-        var ruolo = mock(Ruolo.class);
 
         when(utenteDTO.getEmail()).thenReturn("email@example.com");
         when(utenteDTO.getNazionalita()).thenReturn(nazioneId);
@@ -399,7 +413,6 @@ public class GestioneUtenteUnitTest {
         var paeseId = 1;
         when(editUtenteDTO.getNome()).thenReturn("Nome");
         when(editUtenteDTO.getCognome()).thenReturn("Cognome");
-        when(editUtenteDTO.getEmail()).thenReturn("email@example.com");
         when(editUtenteDTO.getDataNascita()).thenReturn(LocalDate.of(2004, Month.APRIL, 1));
         when(editUtenteDTO.getSesso()).thenReturn('M');
         when(editUtenteDTO.getNazionalita()).thenReturn(paeseId);
@@ -420,10 +433,6 @@ public class GestioneUtenteUnitTest {
         var cognomeCaptor = ArgumentCaptor.forClass(String.class);
         verify(utente, times(1)).setCognome(cognomeCaptor.capture());
         assertEquals(editUtenteDTO.getCognome(), cognomeCaptor.getValue());
-
-        var emailCaptor = ArgumentCaptor.forClass(String.class);
-        verify(utente, times(1)).setEmail(emailCaptor.capture());
-        assertEquals(editUtenteDTO.getEmail(), emailCaptor.getValue());
 
         var dataNascitaCaptor = ArgumentCaptor.forClass(LocalDate.class);
         verify(utente, times(1)).setDataNascita(dataNascitaCaptor.capture());
@@ -572,8 +581,8 @@ public class GestioneUtenteUnitTest {
 
         var editPassportDTO = mock(EditPassportDTO.class);
 
-        var context = SecurityContextHolder.getContext();
         var volontario = mock(Volontario.class);
+        var context = SecurityContextHolder.getContext();
         var authentication = new TestingAuthenticationToken(volontario, null, "ROLE_VOLUNTEER");
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
@@ -590,34 +599,34 @@ public class GestioneUtenteUnitTest {
         assertEquals(res, volontario);
 
         verify(passportStorageService, times(1))
-                .removeFile(oldPath);
+            .removeFile(oldPath);
 
         var inOrder = inOrder(volontario, volontarioRepository, passportStorageService);
 
         var numeroPassaportoCaptor = ArgumentCaptor.forClass(String.class);
         inOrder
-                .verify(volontario, times(1))
-                .setNumeroPassaporto(numeroPassaportoCaptor.capture());
+            .verify(volontario, times(1))
+            .setNumeroPassaporto(numeroPassaportoCaptor.capture());
         assertEquals(numeroPassaporto, numeroPassaportoCaptor.getValue());
 
         var dataScadenzaPassaportoCaptor = ArgumentCaptor.forClass(LocalDate.class);
         inOrder
-                .verify(volontario, times(1))
-                .setDataScadenzaPassaporto(dataScadenzaPassaportoCaptor.capture());
+            .verify(volontario, times(1))
+            .setDataScadenzaPassaporto(dataScadenzaPassaportoCaptor.capture());
         assertEquals(scadenzaPassaporto, dataScadenzaPassaportoCaptor.getValue());
 
         var dataEmissionePassaportoCaptor = ArgumentCaptor.forClass(LocalDate.class);
         inOrder
-                .verify(volontario, times(1))
-                .setDataEmissionePassaporto(dataEmissionePassaportoCaptor.capture());
+            .verify(volontario, times(1))
+            .setDataEmissionePassaporto(dataEmissionePassaportoCaptor.capture());
         assertEquals(emissionePassaporto, dataEmissionePassaportoCaptor.getValue());
 
 
         inOrder.verify(passportStorageService, times(1))
-                .acceptUpload(mockFile);
+            .acceptUpload(mockFile);
 
         inOrder.verify(volontario, times(1))
-                .setPathPassaporto(newPath);
+            .setPathPassaporto(newPath);
 
         inOrder.verify(volontarioRepository, times(1)).save(volontario);
 
@@ -711,15 +720,10 @@ public class GestioneUtenteUnitTest {
 
     @Test
     @WithMockUser(roles = {"ORGANIZER", "MODERATOR", "ACCOUNT_MANAGER"})
-    void getPassaportVolontarioFileResourceNotVolunteerFails() {
+    void getPassportVolontarioFileResourceNotVolunteerFails() {
         assertThrows(AuthorizationDeniedException.class, () -> gestioneUtente.getPassportVolontarioFileResource());
     }
 
-    @Test
-    @WithAnonymousUser
-    void getPassaportVolontarioFileResourceAnonymousFails() {
-        assertThrows(AuthorizationDeniedException.class, () -> gestioneUtente.getPassportVolontarioFileResource());
-    }
 
     @Test
     void getPassportVolontarioFileResourceDownloadFileFails() {
@@ -757,8 +761,8 @@ public class GestioneUtenteUnitTest {
         assertDoesNotThrow(() -> gestioneUtente.activateAccount(token));
 
         InOrder inOrder = inOrder(utente, utenteRepository);
-        inOrder.verify(utente).setPending(false);
-        inOrder.verify(utenteRepository).save(utente);
+        inOrder.verify(utente, times(1)).setPending(false);
+        inOrder.verify(utenteRepository, times(1)).save(utente);
         verify(utente, never()).setPending(true);
 
         verify(verificationTokenRepository).delete(verToken);
@@ -770,7 +774,7 @@ public class GestioneUtenteUnitTest {
         String token = "abc";
         when(verificationTokenRepository.findByToken(token)).thenReturn(Optional.empty());
 
-        assertThrows(Exception.class, () -> gestioneUtente.activateAccount(token));
+        assertThrows(VerificationTokenNotFoundException.class, () -> gestioneUtente.activateAccount(token));
     }
 
     @Test

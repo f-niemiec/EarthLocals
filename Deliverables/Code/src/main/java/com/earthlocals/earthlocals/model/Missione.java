@@ -1,5 +1,6 @@
 package com.earthlocals.earthlocals.model;
 
+import com.google.common.annotations.VisibleForTesting;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -124,5 +125,14 @@ public class Missione implements Serializable {
         COMPLETATA,
     }
 
+    @VisibleForTesting
+    public void forceInternalStatoForTest(InternalMissioneStato stato) {
+        this.internalStato = stato;
+    }
+
+    @VisibleForTesting
+    public InternalMissioneStato supplyStato(){
+        return this.internalStato;
+    }
 
 }

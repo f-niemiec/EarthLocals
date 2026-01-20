@@ -63,7 +63,7 @@
                                             <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">
                                                 Chiudi
                                             </button>
-                                            <form method="post" th:action="@{/mission/candidatura/accept}">
+                                            <form method="post" novalidate th:action="@{/mission/candidatura/accept}">
                                                 <input name="id" th:value="${candidatura.id}" type="hidden"/>
                                                 <button class="btn btn-primary" type="submit">Accetta</button>
                                             </form>
@@ -93,7 +93,7 @@
                                             <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">
                                                 Chiudi
                                             </button>
-                                            <form method="post" th:action="@{/mission/candidatura/reject}">
+                                            <form method="post" novalidate th:action="@{/mission/candidatura/reject}">
                                                 <input name="id" th:value="${candidatura.id}" type="hidden"/>
                                                 <button class="btn btn-danger" type="submit">Rifiuta</button>
                                             </form>
@@ -113,7 +113,7 @@
 
     </div>
 
-    <th:block th:replace="fragments/pagination :: pagination(${candidature})"></th:block>
+    <th:block th:replace="~{fragments/pagination :: pagination(${candidature})}"></th:block>
 </th:block>
 </body>
 </html>

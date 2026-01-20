@@ -99,8 +99,12 @@ public class RegistrationController {
     }
 
     @GetMapping("/registrationConfirm")
-    public String confirmRegistration(Model model, @RequestParam(value = "token") String token, WebRequest request) throws VerificationTokenNotFoundException, ExpiredVerificationTokenException {
-        gestioneUtente.activateAccount(token);
+    public String confirmRegistration(Model model, @RequestParam(value = "token") String token, WebRequest request) {
+        try {
+            gestioneUtente.activateAccount(token);
+        } catch (ExpiredVerificationTokenException | VerificationTokenNotFoundException e) {
+            return "redirect:/login?verTokenError=true";
+        }
         return "redirect:/login?confirmed=true";
     }
 

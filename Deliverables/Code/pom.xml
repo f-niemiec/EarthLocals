@@ -190,6 +190,12 @@
             <version>4.0.1</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>htmlunit3-driver</artifactId>
+            <version>4.39.0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>
@@ -205,6 +211,24 @@
 
 
     <build>
+
+        <resources>
+            <resource>
+                <directory>${project.basedir}/src/main/resources</directory>
+            </resource>
+            <resource>
+                <directory>${project.basedir}/node_modules/jquery/dist</directory>
+                <targetPath>static/resources/js/jquery</targetPath>
+            </resource>
+            <resource>
+                <directory>${project.basedir}/node_modules/popper.js/dist</directory>
+                <targetPath>static/resources/js/popperjs</targetPath>
+            </resource>
+            <resource>
+                <directory>${project.basedir}/node_modules/bootstrap/dist/js</directory>
+                <targetPath>static/resources/js/bootstrap</targetPath>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>com.github.eirslett</groupId>

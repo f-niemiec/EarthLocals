@@ -298,19 +298,19 @@ VALUES ('IN_CORSO', 152, '2026-01-15', 252, 202);
 --
 
 INSERT INTO public.missione
-VALUES (2, 452, '2026-06-30', '2026-02-01', 352, 'Loksa linn',
+VALUES (2, 204, '2026-06-30', '2026-02-01', 352, 'Loksa linn',
         'Fluent English; between 18 and 80 years old; welcomes solo volunteers, couples, and partners of volunteers', '
 
 Hey there! 😊 We''re an expat couple who chose to live close to nature, grow a garden, and raise a child. It''s a beautiful adventure, but sometimes it can get a bit overwhelming! So, we''re looking for a little extra help with a bit of everything. If you enjoy a mix of tasks and good company, we''d love to hear from you! 😉🌿🌸',
         'e6378923-5bb2-4a6d-a0ee-1660647abe15-Immagine_WhatsApp_2025-03-23_ore_12.12.51_bf1a518b.jpg',
         'Experience Family Life in Estonia: Garden & House Help Needed! ✨', '', 73);
 INSERT INTO public.missione
-VALUES (2, 552, '2026-07-23', '2026-06-23', 253, 'Taipei', '善意。
+VALUES (2, 205, '2026-07-23', '2026-06-23', 253, 'Taipei', '善意。
 强大的力量。
 胆识。', '大规模攻占台北，收复我们的伟大土地，统一我们的国家。',
         'b443f62f-2216-4d7e-8e69-49f726416779-0227-0524_taipei-xlarge.jpg', '我们去夺回台北吧', '不用担心', 220);
 INSERT INTO public.missione
-VALUES (2, 502, '2026-10-22', '2026-09-28', 302, 'Bordeaux', 'Buona forza fisica, dinamismo e manualità di base.', 'Missione Bordeaux: Nel Cuore della Vendemmia
+VALUES (2, 205, '2026-10-22', '2026-09-28', 302, 'Bordeaux', 'Buona forza fisica, dinamismo e manualità di base.', 'Missione Bordeaux: Nel Cuore della Vendemmia
 Partecipa a un’esperienza autentica tra i filari dei vigneti più famosi al mondo. Cerchiamo persone volenterose per la raccolta dell''uva a Bordeaux, dove la tradizione incontra la passione.
 
 Perché unirti a noi?
@@ -965,6 +965,12 @@ INSERT INTO public.ruoli_utenti
 VALUES (1, 803);
 INSERT INTO public.ruoli_utenti
 VALUES (1, 954);
+INSERT INTO public.ruoli_utenti
+VALUES (2, 203);
+INSERT INTO public.ruoli_utenti
+VALUES (2, 204);
+INSERT INTO public.ruoli_utenti
+VALUES (2, 205);
 
 
 --
@@ -986,15 +992,30 @@ VALUES (4, 'ROLE_ACCOUNT_MANAGER');
 --
 
 INSERT INTO public.utente
-VALUES (false, 'M', '2004-04-01', '2026-01-06', '2027-04-01', 1, NULL, 'Volontario', NULL, 'test',
+VALUES (false, 'M', '2004-04-01', '1999-01-06', '2027-04-01', 1, NULL, 'Volontario', NULL, 'test',
         'volunteer@earthlocals.com', NULL, 'test', 'AAA',
-        '$argon2id$v=19$m=16384,t=2,p=1$E/NCSlGFntqHasNftBFEuA$3dDcSF67KBuuncTrUZ70jX9OavG32gIBjlCcbPlUhqk',
+        '$argon2id$v=19$m=16384,t=2,p=1$wrwzZBAu+Sq48aKcbYg8Tg$psZ340666qgE1osdMnMWy7+brcNEi46TldzE0x9XuHU',
         'a240fe66-f323-4c34-a5d8-527c8d6b732f-basic-text.pdf', NULL, 1);
 INSERT INTO public.utente
 VALUES (false, 'M', '2004-03-23', '2004-03-23', '3223-03-23', 352, NULL, 'Volontario', NULL, 'Niemiec',
-        'francesconiemiec23@gmail.com', NULL, 'Francesco', 'FN2323232',
+        'john.travolta68@email.it', NULL, 'Francesco', 'FN2323232',
         '$argon2id$v=19$m=16384,t=2,p=1$7f64SB2ngs0ox4hmE77+Eg$E4gjipQhkIOK/EGBR2oIonl6RmrbsPPa3qYeUxJ8I20',
         '52ab3eac-66f2-4ee7-815b-c68e820f0927-03.Introduzione ad UML.pdf', NULL, 1);
+INSERT INTO public.utente
+VALUES (false, 'M', NULL, '1999-01-06', NULL, 203, NULL, 'Utente', NULL, 'test3',
+        'organizer1@earthlocals.com', NULL, 'organizer3', 'AAA',
+        '$argon2id$v=19$m=16384,t=2,p=1$wrwzZBAu+Sq48aKcbYg8Tg$psZ340666qgE1osdMnMWy7+brcNEi46TldzE0x9XuHU',
+        NULL, NULL, 1);
+INSERT INTO public.utente
+VALUES (false, 'M', NULL, '1999-01-06', NULL, 204, NULL, 'Utente', NULL, 'test3',
+        'organizer2@earthlocals.com', NULL, 'organizer3', 'AAA',
+        '$argon2id$v=19$m=16384,t=2,p=1$wrwzZBAu+Sq48aKcbYg8Tg$psZ340666qgE1osdMnMWy7+brcNEi46TldzE0x9XuHU',
+        NULL, NULL, 1);
+INSERT INTO public.utente
+VALUES (false, 'M', NULL, '1999-01-06', NULL, 205, NULL, 'Utente', NULL, 'test3',
+        'organizer3@earthlocals.com', NULL, 'organizer3', 'AAA',
+        '$argon2id$v=19$m=16384,t=2,p=1$wrwzZBAu+Sq48aKcbYg8Tg$psZ340666qgE1osdMnMWy7+brcNEi46TldzE0x9XuHU',
+        NULL, NULL, 1);
 INSERT INTO public.utente
 VALUES (false, 'M', NULL, '2004-01-27', NULL, 353, NULL, 'Utente', NULL, 'Pha Lo Mbhs', 'ghastman999@gmail.com', NULL,
         'Fhan Bi Yoh', NULL,

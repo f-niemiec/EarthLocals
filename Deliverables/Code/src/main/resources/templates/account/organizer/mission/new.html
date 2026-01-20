@@ -10,8 +10,8 @@
     <div class="alert alert-success mb-4" th:if="${param.success}">
         <strong>Creazione missione effettuata con successo!</strong> <br/>
     </div>
-    <form enctype="multipart/form-data" method="post" th:action="@{/account/organizer/mission/new}"
-          th:object="${missioneDTO}">
+    <form enctype="multipart/form-data" method="post" novalidate
+          th:action="@{/account/organizer/mission/new}" th:object="${missioneDTO}">
 
         <div class="mb-4">
             <!--TODO: Aggiungere controllo client side per la dimensione del file-->
@@ -50,7 +50,7 @@
                 <select class="form-select" id="paese" required
                         th:classappend="${#fields.hasErrors('paese')} ? 'is-invalid' : ''" th:field="*{paese}">
                     <th:block th:each="paese:${paesi}">
-                        <option th:value="${paese.id}" th:text="${paese.nome}"></option>
+                        <option th:text="${paese.nome}" th:value="${paese.id}"></option>
                     </th:block>
                 </select>
                 <div class="invalid-feedback" th:each="error : ${#fields.errors('paese')}"
@@ -102,7 +102,7 @@
 
 
         <div class="d-flex justify-content-end">
-            <th:block th:replace="fragments/submit_button.html :: submitButton ('Crea')"></th:block>
+            <th:block th:replace="~{fragments/submit_button.html :: submitButton ('Crea')}"></th:block>
         </div>
     </form>
 </th:block>

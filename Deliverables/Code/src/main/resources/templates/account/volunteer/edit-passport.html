@@ -24,6 +24,7 @@
         </div>
     </a>
     <form class="" enctype="multipart/form-data" id="editPassportForm" method="post"
+          novalidate
           th:action="@{/account/volunteer/edit-passport}"
           th:object="${passportDTO}">
         <div>
@@ -70,7 +71,7 @@
         </div>
         <div class="mt-4" id="submitContainerEditPassportForm">
             <div class="d-flex justify-content-end">
-                <th:block th:replace="fragments/submit_button.html :: submitButton ('Salva modifiche')"></th:block>
+                <th:block th:replace="~{fragments/submit_button.html :: submitButton ('Salva modifiche')}"></th:block>
             </div>
         </div>
     </form>

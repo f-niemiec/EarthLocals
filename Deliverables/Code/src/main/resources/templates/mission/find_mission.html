@@ -21,7 +21,9 @@
                     <div>
                         <h5 class="fw-bold mb-4">Filtra Missioni</h5>
 
-                        <form method="get" th:action="@{/mission/find_mission}">
+                        <form method="get"
+                              novalidate
+                              th:action="@{/mission/find_mission}">
 
                             <div class="mb-3">
                                 <label class="form-label text-muted small">Luogo</label>
@@ -58,7 +60,7 @@
                         <th:block th:each="missione : ${missioniPage}">
                             <div class="col">
                                 <th:block
-                                        th:replace="fragments/card_missione :: card_missione(${missione}, ~{ :: #missionButton}, ~{:: emptyFragment})">
+                                        th:replace="~{fragments/card_missione :: card_missione(${missione}, ~{ :: #missionButton}, ~{:: emptyFragment})}">
                                     <a class="btn btn-primary w-100 rounded-pill" id="missionButton"
                                        th:href="@{/mission(id = ${missione.id})}">
                                         Visualizza Dettagli <i class="fa-solid fa-arrow-right ms-1"></i>
@@ -69,7 +71,7 @@
                             </div>
                         </th:block>
                     </div>
-                    <th:block th:replace="fragments/pagination :: pagination(${missioniPage})"/>
+                    <th:block th:replace="~{fragments/pagination :: pagination(${missioniPage})}"/>
 
                 </div>
             </div>
